@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformer Calculator – PinasTools EE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #111318;
+  --bg2: #1a1d26;
+  --bg3: #22263a;
+  --gold: #f59e0b;
+  --gold2: #fbbf24;
+  --gold-dim: #92610a;
+  --text: #f0f0f0;
+  --muted: #8a8fa8;
+  --radius: 16px;
+  --green: #22c55e;
+  --red: #ef4444;
+  --blue: #3b82f6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── MODAL ── */
+#lang-modal {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+#lang-modal.hidden { display: none; }
+.modal-box {
+  background: var(--bg2);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  max-width: 360px; width: 100%;
+  text-align: center;
+}
+.modal-box h2 { font-size: 1.4rem; color: var(--gold); margin-bottom: 8px; }
+.modal-box p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+.lang-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.lang-btn {
+  background: var(--bg3); border: 1.5px solid var(--bg3);
+  color: var(--text); border-radius: 12px;
+  padding: 14px 8px; font-size: .95rem; font-family: 'Outfit', sans-serif;
+  cursor: pointer; transition: all .2s;
+}
+.lang-btn:hover, .lang-btn.active {
+  border-color: var(--gold); color: var(--gold); background: rgba(245,158,11,.08);
+}
+.lang-btn .flag { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+.modal-confirm {
+  margin-top: 20px; width: 100%;
+  background: var(--gold); color: #111;
+  border: none; border-radius: 12px;
+  padding: 14px; font-size: 1rem; font-weight: 700;
+  font-family: 'Outfit', sans-serif; cursor: pointer;
+  transition: background .2s;
+}
+.modal-confirm:hover { background: var(--gold2); }
+
+/* ── HEADER ── */
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid rgba(245,158,11,.2);
+  padding: 16px;
+  text-align: center;
+  position: sticky; top: 0; z-index: 10;
+}
+header h1 {
+  font-size: 1.25rem; font-weight: 700; color: var(--gold);
+  letter-spacing: .5px;
+}
+header p { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid rgba(245,158,11,.15);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.tab-btn {
+  flex: 1; min-width: 90px;
+  padding: 13px 8px;
+  background: none; border: none;
+  color: var(--muted); font-family: 'Outfit', sans-serif;
+  font-size: .85rem; font-weight: 500; cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all .2s; white-space: nowrap;
+}
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── CONTENT ── */
+.tab-content { display: none; padding: 16px; max-width: 640px; margin: 0 auto; }
+.tab-content.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(245,158,11,.1);
+}
+.card-title {
+  font-size: .8rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--gold); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── INPUTS ── */
+.field-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 10px;
+}
+.field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+label {
+  display: block; font-size: .75rem; color: var(--muted);
+  margin-bottom: 5px; font-weight: 500;
+}
+input[type=number], select {
+  width: 100%; background: var(--bg3);
+  border: 1.5px solid rgba(245,158,11,.2);
+  border-radius: 10px; color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size: .95rem;
+  padding: 10px 12px; outline: none; transition: border .2s;
+}
+input[type=number]:focus, select:focus { border-color: var(--gold); }
+input[type=number]::placeholder { color: var(--muted); font-size: .85rem; }
+select option { background: var(--bg2); }
+
+/* ── BUTTONS ── */
+.btn-calc {
+  width: 100%; background: var(--gold);
+  color: #111; border: none; border-radius: 12px;
+  padding: 14px; font-size: 1rem; font-weight: 700;
+  font-family: 'Outfit', sans-serif; cursor: pointer;
+  transition: background .2s; margin-top: 4px;
+}
+.btn-calc:hover { background: var(--gold2); }
+.btn-clear {
+  width: 100%; background: transparent;
+  color: var(--muted); border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 11px; font-size: .9rem;
+  font-family: 'Outfit', sans-serif; cursor: pointer;
+  transition: all .2s; margin-top: 8px;
+}
+.btn-clear:hover { border-color: var(--muted); color: var(--text); }
+
+/* ── RESULTS ── */
+.result-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-top: 14px;
+}
+.result-item {
+  background: var(--bg3); border-radius: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--gold);
+}
+.result-label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.result-value { font-size: 1.15rem; font-weight: 700; color: var(--gold); margin-top: 3px; }
+.result-unit { font-size: .75rem; color: var(--muted); font-weight: 400; }
+
+.indicator {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg3); border-radius: 10px;
+  padding: 10px 16px; font-size: .9rem; font-weight: 600;
+  margin-top: 12px; width: 100%; justify-content: center;
+}
+.indicator.step-up { color: var(--green); border: 1.5px solid var(--green); }
+.indicator.step-down { color: var(--blue); border: 1.5px solid var(--blue); }
+.indicator.unity { color: var(--gold); border: 1.5px solid var(--gold); }
+
+.formula-box {
+  background: rgba(245,158,11,.06);
+  border: 1px dashed rgba(245,158,11,.3);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: .82rem; color: var(--muted);
+  font-family: 'Courier New', monospace;
+  line-height: 1.7; margin-bottom: 14px;
+}
+.formula-box span { color: var(--gold2); }
+
+/* ── TABLE TAB ── */
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: .82rem;
+}
+th {
+  background: rgba(245,158,11,.12);
+  color: var(--gold); font-weight: 600;
+  padding: 10px 8px; text-align: left;
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .5px;
+}
+td {
+  padding: 9px 8px; color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(245,158,11,.04); }
+
+.badge {
+  display: inline-block; border-radius: 6px;
+  padding: 2px 8px; font-size: .72rem; font-weight: 600;
+}
+.badge-delta { background: rgba(59,130,246,.2); color: var(--blue); }
+.badge-wye { background: rgba(34,197,94,.2); color: var(--green); }
+
+/* ── TIPS TAB ── */
+.tip-card {
+  background: var(--bg2); border-radius: var(--radius);
+  padding: 18px; margin-bottom: 14px;
+  border-left: 4px solid var(--gold);
+}
+.tip-card.green { border-left-color: var(--green); }
+.tip-card.blue { border-left-color: var(--blue); }
+.tip-card.red { border-left-color: var(--red); }
+
+.tip-card h3 {
+  font-size: .85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 10px;
+}
+.tip-card.green h3 { color: var(--green); }
+.tip-card.blue h3 { color: var(--blue); }
+.tip-card.red h3 { color: var(--red); }
+.tip-card h3 { color: var(--gold); }
+
+.mnemonic {
+  background: rgba(245,158,11,.1);
+  border-radius: 10px; padding: 12px;
+  font-size: .9rem; font-weight: 700;
+  color: var(--gold2); text-align: center;
+  letter-spacing: .5px; margin-bottom: 10px;
+}
+.tip-body { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+.tip-body strong { color: var(--text); }
+
+.sample-prob {
+  background: var(--bg3); border-radius: 12px;
+  padding: 14px; margin-top: 12px;
+}
+.sample-prob .prob-num {
+  font-size: .7rem; font-weight: 700; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+}
+.sample-prob .prob-q {
+  font-size: .88rem; color: var(--text);
+  font-weight: 600; margin-bottom: 10px; line-height: 1.5;
+}
+.sample-prob .prob-sol {
+  font-size: .82rem; color: var(--muted);
+  line-height: 1.7; border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 10px;
+}
+.sample-prob .prob-sol .step {
+  display: flex; gap: 8px; margin-bottom: 6px;
+}
+.sample-prob .prob-sol .step-num {
+  background: var(--gold); color: #111;
+  border-radius: 50%; width: 20px; height: 20px;
+  font-size: .7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.ans {
+  background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.3);
+  border-radius: 8px; padding: 8px 12px;
+  font-size: .85rem; font-weight: 700; color: var(--green);
+  margin-top: 10px;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 1px solid rgba(245,158,11,.2);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: 10px 16px;
+  z-index: 10;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  text-decoration: none; color: var(--muted);
+  font-size: .7rem; font-weight: 500; gap: 3px;
+  transition: color .2s;
+}
+.nav-item.active, .nav-item:hover { color: var(--gold); }
+.nav-icon { font-size: 1.25rem; }
+
+/* ── UTIL ── */
+.text-gold { color: var(--gold); }
+.text-muted { color: var(--muted); }
+.mt-8 { margin-top: 8px; }
+.mb-0 { margin-bottom: 0; }
+
+.err-msg {
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: 10px; padding: 10px 14px;
+  color: var(--red); font-size: .83rem; margin-top: 10px;
+  display: none;
+}
+.err-msg.show { display: block; }
+
+.divider {
+  border: none; border-top: 1px solid rgba(255,255,255,.07);
+  margin: 14px 0;
+}
+
+.row-full { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE MODAL -->
+<div id="lang-modal">
+  <div class="modal-box">
+    <h2>🇵🇭 PinasTools</h2>
+    <p id="modal-desc">Piliin ang iyong wika / Choose your language</p>
+    <div class="lang-grid">
+      <button class="lang-btn active" data-lang="tl" onclick="selectLang(this)">
+        <span class="flag">🇵🇭</span>Tagalog
+      </button>
+      <button class="lang-btn" data-lang="en" onclick="selectLang(this)">
+        <span class="flag">🇺🇸</span>English
+      </button>
+      <button class="lang-btn" data-lang="ceb" onclick="selectLang(this)">
+        <span class="flag">🌊</span>Cebuano
+      </button>
+      <button class="lang-btn" data-lang="ilo" onclick="selectLang(this)">
+        <span class="flag">🏔️</span>Ilocano
+      </button>
+    </div>
+    <button class="modal-confirm" onclick="confirmLang()" id="modal-confirm-btn">Simulan na! →</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <h1>⚡ Transformer Calculator</h1>
+  <p id="header-sub">Para sa PRC EE Board Exam • PinasTools</p>
+</header>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('calc', this)" id="tab-calc-btn">🧮 Calculator</button>
+  <button class="tab-btn" onclick="switchTab('table', this)" id="tab-table-btn">📋 Table</button>
+  <button class="tab-btn" onclick="switchTab('tips', this)" id="tab-tips-btn">💡 Board Tips</button>
+  <button class="tab-btn" onclick="switchTab('caltech', this)" id="tab-caltech-btn">🎯 CalTech</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 1: CALCULATOR
+════════════════════════════════════════ -->
+<div id="tab-calc" class="tab-content active">
+
+  <!-- TURNS RATIO -->
+  <div class="card">
+    <div class="card-title">⚡ Turns Ratio &amp; Voltage/Current</div>
+    <div class="formula-box">
+      <span>N₁/N₂ = V₁/V₂ = I₂/I₁</span><br>
+      Paalala: Current ratio ay <span>BALIGTAD</span> ng turns ratio!
+    </div>
+    <div class="field-row three">
+      <div>
+        <label id="lbl-n1">N₁ (Primary Turns)</label>
+        <input type="number" id="n1" placeholder="hal. 1000">
+      </div>
+      <div>
+        <label id="lbl-n2">N₂ (Secondary Turns)</label>
+        <input type="number" id="n2" placeholder="hal. 500">
+      </div>
+      <div>
+        <label>Turns Ratio (a = N₁/N₂)</label>
+        <input type="number" id="a_ratio" placeholder="hal. 2">
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-v1">V₁ – Primary Voltage (V)</label>
+        <input type="number" id="v1" placeholder="hal. 13200">
+      </div>
+      <div>
+        <label id="lbl-v2">V₂ – Secondary Voltage (V)</label>
+        <input type="number" id="v2" placeholder="hal. 230">
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-i1">I₁ – Primary Current (A)</label>
+        <input type="number" id="i1" placeholder="hal. 5">
+      </div>
+      <div>
+        <label id="lbl-i2">I₂ – Secondary Current (A)</label>
+        <input type="number" id="i2" placeholder="hal. 10">
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-kva">kVA Rating</label>
+        <input type="number" id="kva" placeholder="hal. 25">
+      </div>
+      <div>
+        <label id="lbl-pf">Power Factor (0–1)</label>
+        <input type="number" id="pf" placeholder="hal. 0.85" step="0.01" min="0" max="1">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcTurns()" id="btn-calc-turns">Kalkulahin ang Ratio →</button>
+    <button class="btn-clear" onclick="clearTurns()" id="btn-clear-turns">I-clear</button>
+    <div class="err-msg" id="err-turns">Mag-enter ng kahit 2 known values para masolve!</div>
+    <div id="res-turns" style="display:none">
+      <div class="result-grid" id="rg-turns"></div>
+      <div id="step-indicator"></div>
+    </div>
+  </div>
+
+  <!-- EFFICIENCY -->
+  <div class="card">
+    <div class="card-title">🔋 Efficiency Calculator</div>
+    <div class="formula-box">
+      <span>η = P_out / P_in × 100%</span><br>
+      <span>P_in = P_out + P_losses</span><br>
+      <span>P_losses = P_cu + P_fe</span>
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-pout">P_out – Output Power (W)</label>
+        <input type="number" id="eff_pout" placeholder="hal. 9500">
+      </div>
+      <div>
+        <label id="lbl-pin">P_in – Input Power (W)</label>
+        <input type="number" id="eff_pin" placeholder="hal. 10000">
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-pcu">P_cu – Copper Loss (W)</label>
+        <input type="number" id="eff_pcu" placeholder="hal. 300">
+      </div>
+      <div>
+        <label id="lbl-pfe">P_fe – Iron/Core Loss (W)</label>
+        <input type="number" id="eff_pfe" placeholder="hal. 200">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcEff()" id="btn-calc-eff">Kalkulahin ang Efficiency →</button>
+    <button class="btn-clear" onclick="clearEff()" id="btn-clear-eff">I-clear</button>
+    <div class="err-msg" id="err-eff">Mag-enter ng sapat na values (P_out at P_in, o losses)!</div>
+    <div id="res-eff" style="display:none">
+      <div class="result-grid" id="rg-eff"></div>
+    </div>
+  </div>
+
+  <!-- COPPER LOSS -->
+  <div class="card">
+    <div class="card-title">🔴 Copper Loss Calculator</div>
+    <div class="formula-box">
+      <span>P_cu = I² × R</span><br>
+      I = current (A), R = winding resistance (Ω)
+    </div>
+    <div class="field-row three">
+      <div>
+        <label id="lbl-cu-i">Current I (A)</label>
+        <input type="number" id="cu_i" placeholder="hal. 10">
+      </div>
+      <div>
+        <label id="lbl-cu-r">Resistance R (Ω)</label>
+        <input type="number" id="cu_r" placeholder="hal. 2.5">
+      </div>
+      <div>
+        <label id="lbl-cu-p">P_cu (W)</label>
+        <input type="number" id="cu_p" placeholder="auto">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcCopper()" id="btn-calc-cu">Kalkulahin ang P_cu →</button>
+    <button class="btn-clear" onclick="clearCopper()" id="btn-clear-cu">I-clear</button>
+    <div id="res-cu" style="display:none">
+      <div class="result-grid" id="rg-cu"></div>
+    </div>
+  </div>
+
+  <!-- VOLTAGE REGULATION -->
+  <div class="card">
+    <div class="card-title">📈 Voltage Regulation</div>
+    <div class="formula-box">
+      <span>VR = (V_NL − V_FL) / V_FL × 100%</span><br>
+      V_NL = No-Load voltage, V_FL = Full-Load voltage
+    </div>
+    <div class="field-row">
+      <div>
+        <label id="lbl-vnl">V_NL – No Load Voltage (V)</label>
+        <input type="number" id="vr_vnl" placeholder="hal. 240">
+      </div>
+      <div>
+        <label id="lbl-vfl">V_FL – Full Load Voltage (V)</label>
+        <input type="number" id="vr_vfl" placeholder="hal. 230">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcVR()" id="btn-calc-vr">Kalkulahin ang VR →</button>
+    <button class="btn-clear" onclick="clearVR()" id="btn-clear-vr">I-clear</button>
+    <div class="err-msg" id="err-vr">Mag-enter ng V_NL at V_FL!</div>
+    <div id="res-vr" style="display:none">
+      <div class="result-grid" id="rg-vr"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 2: TABLE
+════════════════════════════════════════ -->
+<div id="tab-table" class="tab-content">
+
+  <div class="card mb-0">
+    <div class="card-title">🇵🇭 Philippine Standard Distribution Transformer Ratings</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>kVA Rating</th>
+            <th>Primary (kV)</th>
+            <th>Secondary (V)</th>
+            <th>Serbisyo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>5 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Bahay</td></tr>
+          <tr><td>10 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Bahay/Maliit na Negosyo</td></tr>
+          <tr><td>15 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Maliit na Negosyo</td></tr>
+          <tr><td>25 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Komersyal</td></tr>
+          <tr><td>37.5 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Komersyal</td></tr>
+          <tr><td>50 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Medium Komersyal</td></tr>
+          <tr><td>75 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Industrial</td></tr>
+          <tr><td>100 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Industrial</td></tr>
+          <tr><td>167 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Malaking Industrial</td></tr>
+          <tr><td>250 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Malaking Industrial</td></tr>
+          <tr><td>333 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Malaking Industrial</td></tr>
+          <tr><td>500 kVA</td><td>13.2 kV</td><td>230/460 V</td><td>Substation</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px; font-size:.75rem; color:var(--muted)">
+      ⚡ Meralco primary distribution: <strong style="color:var(--gold)">13.2 kV</strong> (sa Metro Manila at karatig na lungsod)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔁 Transformer Connection Types</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Connection</th>
+            <th>Primary</th>
+            <th>Secondary</th>
+            <th>Phase Shift</th>
+            <th>Gamit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Delta-Wye (Δ-Y)</strong></td>
+            <td><span class="badge badge-delta">Δ</span></td>
+            <td><span class="badge badge-wye">Y</span></td>
+            <td>30°</td>
+            <td>Step-up, Generation</td>
+          </tr>
+          <tr>
+            <td><strong>Wye-Delta (Y-Δ)</strong></td>
+            <td><span class="badge badge-wye">Y</span></td>
+            <td><span class="badge badge-delta">Δ</span></td>
+            <td>−30°</td>
+            <td>Step-down, Distribution</td>
+          </tr>
+          <tr>
+            <td><strong>Delta-Delta (Δ-Δ)</strong></td>
+            <td><span class="badge badge-delta">Δ</span></td>
+            <td><span class="badge badge-delta">Δ</span></td>
+            <td>0°</td>
+            <td>Industrial, High Current</td>
+          </tr>
+          <tr>
+            <td><strong>Wye-Wye (Y-Y)</strong></td>
+            <td><span class="badge badge-wye">Y</span></td>
+            <td><span class="badge badge-wye">Y</span></td>
+            <td>0°</td>
+            <td>High Voltage Transmission</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📐 3-Phase Transformer Formulas</div>
+    <div class="formula-box">
+      <span>S_total = √3 × V_L × I_L</span>  (3-phase kVA)<br>
+      <span>V_L = √3 × V_phase</span>  (Wye connection)<br>
+      <span>I_L = √3 × I_phase</span>  (Delta connection)<br>
+      <span>V_phase = V_L</span>  (Delta – boltahe sama-sama)<br>
+      <span>I_phase = I_L</span>  (Wye – kasalukuyan sa bawat phase)
+    </div>
+    <div style="font-size:.8rem; color:var(--muted); line-height:1.6;">
+      <strong style="color:var(--text)">Alaala:</strong> Sa Wye, V_phase &lt; V_line. Sa Delta, I_phase &lt; I_line.
+      Laging gamitin ang <strong style="color:var(--gold)">line values</strong> sa 3-phase power formula.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Meralco Distribution Voltage Levels</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>Level</th><th>Voltage</th><th>Paliwanag</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Transmission</td><td>69 kV / 115 kV / 230 kV</td><td>NGCP grid</td></tr>
+          <tr><td>Sub-transmission</td><td>34.5 kV</td><td>Meralco subtransmission</td></tr>
+          <tr><td>Primary Distribution</td><td><strong style="color:var(--gold)">13.2 kV</strong></td><td>Meralco feeder lines</td></tr>
+          <tr><td>Secondary (Residential)</td><td>230 V (1-phase)</td><td>Bahay, single-phase</td></tr>
+          <tr><td>Secondary (Commercial)</td><td>230/460 V (3-phase)</td><td>Komersyal, industrial</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 3: BOARD TIPS
+════════════════════════════════════════ -->
+<div id="tab-tips" class="tab-content">
+
+  <!-- MNEMONICS -->
+  <div class="tip-card">
+    <h3>🧠 Mnemonics para sa Board Exam</h3>
+
+    <div class="mnemonic">N-I-V-I</div>
+    <div class="tip-body">
+      <strong>N</strong>₁/<strong>N</strong>₂ = <strong>V</strong>₁/<strong>V</strong>₂ = <strong>I</strong>₂/<strong>I</strong>₁<br>
+      Tandaan: Current ay <strong style="color:var(--red)">BALIGTAD</strong> — I₂ nasa itaas, I₁ nasa ibaba!<br>
+      "NIVI" — N una, V gitna, I baligtad sa dulo.
+    </div>
+  </div>
+
+  <div class="tip-card green">
+    <h3>🔺 Step-Up vs Step-Down Trick</h3>
+    <div class="mnemonic" style="background:rgba(34,197,94,.1);color:var(--green)">
+      "Step UP ang Voltage = Step DOWN ang Current"
+    </div>
+    <div class="tip-body">
+      Kung <strong>N₂ &gt; N₁</strong> → Step-UP transformer → V₂ mas mataas, I₂ mas mababa.<br>
+      Kung <strong>N₂ &lt; N₁</strong> → Step-DOWN transformer → V₂ mas mababa, I₂ mas mataas.<br>
+      <br>
+      <strong>Bakit?</strong> Conservation of energy! P₁ ≈ P₂ (ideal transformer), kaya kung V tumaas, I dapat bumaba para manatiling equal ang power.
+    </div>
+  </div>
+
+  <div class="tip-card blue">
+    <h3>🔋 Efficiency Trick</h3>
+    <div class="mnemonic" style="background:rgba(59,130,246,.1);color:var(--blue)">
+      "η = Output ÷ Input, losses nasa denominator via OUTPUT"
+    </div>
+    <div class="tip-body">
+      <strong>η = P_out / P_in = P_out / (P_out + P_losses)</strong><br><br>
+      Board exam trick: Kung binibigay ang losses at output power:<br>
+      P_in = P_out + P_cu + P_fe<br>
+      η = P_out / (P_out + P_cu + P_fe) × 100%<br><br>
+      <strong>Max efficiency condition:</strong> P_cu = P_fe (copper loss = iron loss)<br>
+      Sa board exam, itanong nila ang load fraction para max efficiency: x = √(P_fe / P_cu_FL)
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <h3>📈 Voltage Regulation Mnemonic</h3>
+    <div class="mnemonic">"No Load MINUS Full Load, OVER Full Load"</div>
+    <div class="tip-body">
+      <strong>VR = (V_NL − V_FL) / V_FL × 100%</strong><br><br>
+      Tandaan: "<strong>NL minus FL, over FL</strong>"<br>
+      Palaging positive para sa lagging power factor (normal load).<br>
+      Negative VR = leading PF (capacitive load) — rare sa board pero posible.
+    </div>
+  </div>
+
+  <!-- COMMON MISTAKE -->
+  <div class="tip-card red">
+    <h3>⚠️ Common Mistake – HUWAG GAWIN!</h3>
+    <div class="tip-body">
+      <strong>Mali:</strong> Gamitin ang <code style="color:var(--red)">N₁/N₂ = I₁/I₂</code> (MALI ito!)<br>
+      <strong>Tama:</strong> <code style="color:var(--green)">N₁/N₂ = I₂/I₁</code> (BALIGTAD ang current!)<br><br>
+      Maraming examinees ang nalilito dito! Ang turns ratio at voltage ratio ay <strong>direct proportion</strong>, pero ang current ratio ay <strong>inverse proportion</strong>.<br><br>
+      <strong>PH Context:</strong> Sa Meralco 13.2kV transformer, ang primary current ay maliit (mataas ang voltage), secondary current ay malaki (mababa ang voltage). Ito ang proof na baligtad talaga!
+    </div>
+  </div>
+
+  <!-- SAMPLE PROBLEMS -->
+  <div class="card">
+    <div class="card-title">📝 Sample PRC EE Board Problems</div>
+
+    <div class="sample-prob">
+      <div class="prob-num">Problem 1 – Turns Ratio &amp; Current</div>
+      <div class="prob-q">
+        Isang transformer ang may 2,000 primary turns at 500 secondary turns. Kung ang primary voltage ay 13,200 V at ang primary current ay 10 A, hanapin ang secondary voltage at secondary current.
+      </div>
+      <div class="prob-sol">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>Turns ratio: a = N₁/N₂ = 2000/500 = <strong>4</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>Secondary voltage: V₂ = V₁/a = 13,200/4 = <strong>3,300 V</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>Secondary current (BALIGTAD!): I₂ = I₁ × a = 10 × 4 = <strong>40 A</strong></div>
+        </div>
+        <div class="ans">✅ V₂ = 3,300 V | I₂ = 40 A (Step-DOWN transformer)</div>
+      </div>
+    </div>
+
+    <div class="sample-prob" style="margin-top:12px">
+      <div class="prob-num">Problem 2 – Efficiency with Losses</div>
+      <div class="prob-q">
+        Ang isang 25 kVA, 13,200/230 V transformer ay may copper loss na 320 W at iron loss na 180 W sa full load. Ang power factor ng load ay 0.85 lagging. Kalkulahin ang efficiency sa full load.
+      </div>
+      <div class="prob-sol">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>Output power: P_out = kVA × PF = 25,000 × 0.85 = <strong>21,250 W</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>Total losses: P_loss = P_cu + P_fe = 320 + 180 = <strong>500 W</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>Input power: P_in = 21,250 + 500 = <strong>21,750 W</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>Efficiency: η = 21,250/21,750 × 100% = <strong>97.70%</strong></div>
+        </div>
+        <div class="ans">✅ η = 97.70% — Magandang transformer performance!</div>
+      </div>
+    </div>
+
+    <div class="sample-prob" style="margin-top:12px">
+      <div class="prob-num">Problem 3 – Voltage Regulation</div>
+      <div class="prob-q">
+        Ang secondary no-load voltage ng isang transformer ay 240 V. Sa full load, bumaba ito sa 228 V. Kalkulahin ang voltage regulation.
+      </div>
+      <div class="prob-sol">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>Gamiting ang mnemonic: "NL minus FL, over FL"</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>VR = (V_NL − V_FL) / V_FL × 100%</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>VR = (240 − 228) / 228 × 100% = 12/228 × 100% = <strong>5.26%</strong></div>
+        </div>
+        <div class="ans">✅ VR = 5.26% — Acceptable para sa distribution transformer</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="tip-card blue">
+    <h3>⚡ Quick Reference – Exam Day</h3>
+    <div class="tip-body" style="line-height:2">
+      <strong>Turns/Voltage:</strong> N₁/N₂ = V₁/V₂ (Direct)<br>
+      <strong>Current:</strong> N₁/N₂ = I₂/I₁ (Inverse!)<br>
+      <strong>Efficiency:</strong> η = P_out/(P_out + P_losses) × 100%<br>
+      <strong>Copper Loss:</strong> P_cu = I²R<br>
+      <strong>Iron Loss:</strong> P_fe = constant (hindi nagbabago kahit mag-iba ang load)<br>
+      <strong>VR:</strong> (V_NL − V_FL)/V_FL × 100%<br>
+      <strong>Meralco Primary:</strong> 13.2 kV (tandaan lagi!)<br>
+      <strong>Ideal Transformer:</strong> P_in = P_out (no losses)
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 4: MNEMONICS & CALTECH
+════════════════════════════════════════ -->
+<div id="tab-caltech" class="tab-content">
+
+  <!-- NIVI EXPANDED -->
+  <div class="tip-card">
+    <h3>🧠 NIVI – The Master Mnemonic</h3>
+    <div class="mnemonic" style="font-size:1.3rem;letter-spacing:3px;">N · I · V · I</div>
+    <div class="tip-body" style="margin-top:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center">
+          <div style="color:var(--gold);font-weight:700;font-size:1rem">N</div>
+          <div style="font-size:.75rem;color:var(--muted)">N₁ / N₂</div>
+          <div style="font-size:.8rem;margin-top:4px">Turns ratio</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center">
+          <div style="color:var(--gold);font-weight:700;font-size:1rem">I</div>
+          <div style="font-size:.75rem;color:var(--muted)">(equals sign)</div>
+          <div style="font-size:.8rem;margin-top:4px">= patas</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center">
+          <div style="color:var(--gold);font-weight:700;font-size:1rem">V</div>
+          <div style="font-size:.75rem;color:var(--muted)">V₁ / V₂</div>
+          <div style="font-size:.8rem;margin-top:4px">Voltage ratio</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center">
+          <div style="color:var(--red);font-weight:700;font-size:1rem">I</div>
+          <div style="font-size:.75rem;color:var(--muted)">I₂ / I₁ ⚠️</div>
+          <div style="font-size:.8rem;margin-top:4px">BALIGTAD current!</div>
+        </div>
+      </div>
+      <strong>Full equation:</strong> N₁/N₂ = V₁/V₂ = I₂/I₁<br><br>
+      <strong>Worked Example A:</strong> N₁=500, N₂=250, V₁=220V → V₂ = ?<br>
+      <span style="color:var(--gold2)">a = 500/250 = 2 &nbsp;→&nbsp; V₂ = V₁/a = 220/2 = <strong>110V</strong></span><br><br>
+      <strong>Worked Example B:</strong> N₁=500, N₂=250, I₁=4A → I₂ = ?<br>
+      <span style="color:var(--gold2)">Current BALIGTAD: I₂ = I₁ × a = 4 × 2 = <strong>8A</strong></span><br>
+      <span style="color:var(--muted);font-size:.8rem">(Mas mataas ang I₂ dahil Step-DOWN, voltage bumaba kaya current umaangat para mapanatili ang power)</span>
+    </div>
+  </div>
+
+  <!-- MORE MNEMONICS -->
+  <div class="tip-card green">
+    <h3>💚 Power Mnemonics</h3>
+    <div class="mnemonic" style="background:rgba(34,197,94,.1);color:var(--green);font-size:.95rem">"Output OVER Input = η"</div>
+    <div class="tip-body" style="margin-top:10px">
+      <strong>Efficiency:</strong> η = P_out / P_in × 100%<br>
+      <strong>Trick:</strong> "Ang output ay laging mas maliit sa input — may losses palagi!"<br><br>
+      <div class="mnemonic" style="background:rgba(34,197,94,.1);color:var(--green);font-size:.95rem">"NL − FL / FL = VR"</div>
+      <strong>VR:</strong> No Load MINUS Full Load, DIVIDED by Full Load<br>
+      <strong>Trick:</strong> "NL nasa taas, FL nasa lahat" — NL ang numerator at denominator, FL pang denominator lang.<br><br>
+      <div class="mnemonic" style="background:rgba(34,197,94,.1);color:var(--green);font-size:.95rem">"Max η: Copper = Iron"</div>
+      <strong>Max Efficiency:</strong> Nangyayari kapag P_cu = P_fe<br>
+      Load fraction para max η: <strong>x = √(P_fe / P_cu_FL)</strong>
+    </div>
+  </div>
+
+  <!-- CASIO CALTECH -->
+  <div class="card">
+    <div class="card-title">🧮 Casio fx-991ES/EX PLUS CalTech</div>
+
+    <div class="tip-card blue" style="margin-bottom:14px">
+      <h3>📟 SOLVE Mode – Turns Ratio Unknown</h3>
+      <div class="tip-body">
+        <strong>Scenario:</strong> N₁=2000, V₁=13200, V₂=230 → N₂ = ?<br><br>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--gold2);line-height:1.8">
+          1. Press <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">MODE</kbd> → <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">5</kbd> (EQN)<br>
+          &nbsp;&nbsp;&nbsp;or use ALPHA CALC for SOLVE<br>
+          2. Type: 2000 ÷ X = 13200 ÷ 230<br>
+          3. Press <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">CALC</kbd> then <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">SOLVE</kbd><br>
+          4. Initial guess: X = 100, press <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">=</kbd><br>
+          ✅ Answer: X = N₂ ≈ <strong>35.15 turns</strong>
+        </div>
+        <div style="margin-top:8px;font-size:.78rem;color:var(--muted)">
+          Shortcut sa fx-991EX: MENU → 8 (Solver) → enter equation → press SOLVE
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-card blue" style="margin-bottom:14px">
+      <h3>📟 Efficiency – Mabilis na Paraan</h3>
+      <div class="tip-body">
+        <strong>Scenario:</strong> P_out=21250W, P_cu=320W, P_fe=180W → η = ?<br><br>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--gold2);line-height:1.8">
+          1. Kalkulahin ang P_losses: 320 + 180 = 500<br>
+          2. P_in: 21250 + 500 = 21750<br>
+          3. Sa Casio: 21250 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">÷</kbd> 21750 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">×</kbd> 100 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">=</kbd><br>
+          ✅ Answer: <strong>97.7011%</strong>
+        </div>
+        <div style="margin-top:8px;font-size:.78rem;color:var(--muted)">
+          Pro tip: I-store ang P_in sa variable A (ALPHA → A → CALC) para hindi na i-retype!
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-card blue" style="margin-bottom:14px">
+      <h3>📟 EQN Mode – Sabay na Solve ng V₂ at I₂</h3>
+      <div class="tip-body">
+        <strong>Scenario:</strong> Ibigay: a=4, V₁=13200V, I₁=10A → V₂, I₂ = ?<br><br>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--gold2);line-height:1.8">
+          Gamitin ang direct formula (mas mabilis):<br>
+          V₂ = V₁ ÷ a:<br>
+          &nbsp;&nbsp;13200 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">÷</kbd> 4 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">=</kbd> <strong>3300 V</strong><br>
+          I₂ = I₁ × a (BALIGTAD!):<br>
+          &nbsp;&nbsp;10 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">×</kbd> 4 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">=</kbd> <strong>40 A</strong><br>
+          kVA = V₁ × I₁ ÷ 1000:<br>
+          &nbsp;&nbsp;13200 × 10 ÷ 1000 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">=</kbd> <strong>132 kVA</strong>
+        </div>
+        <div style="margin-top:8px;font-size:.78rem;color:var(--muted)">
+          Sa fx-991EX: Gamitin ang ANS key (Ans ÷ 4) para chain ang computations!
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-card blue">
+      <h3>📟 Percentage / Ratio Tricks</h3>
+      <div class="tip-body">
+        <strong>VR sa isang step:</strong> (V_NL - V_FL) ÷ V_FL × 100<br>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--gold2);line-height:1.8;margin:8px 0">
+          ( 240 - 228 ) ÷ 228 × 100 = <strong>5.263%</strong><br>
+          Sa fx-991ES: <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">(</kbd> 240 - 228 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">)</kbd> ÷ 228 × 100 =
+        </div>
+        <strong>% button trick (EX model):</strong><br>
+        Some Casio models: 12 ÷ 228 <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">SHIFT</kbd><kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">%</kbd> → agad na ipinakita bilang percent<br><br>
+        <strong>Turns ratio as fraction:</strong><br>
+        Press <kbd style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--text)">S⟺D</kbd> para i-toggle ang decimal/fraction view — useful para makita ang exact ratio (e.g. 57/11)
+      </div>
+    </div>
+  </div>
+
+  <!-- REAL ECE BOARD MNEMONICS -->
+  <div class="tip-card" style="margin-bottom:14px">
+    <h3 style="color:var(--gold)">📚 Real ECE Board Mnemonics</h3>
+
+    <div class="mnemonic" style="font-size:.95rem;margin-bottom:10px">"HEMEC" — Transformer Loss Types</div>
+    <div class="tip-body" style="margin-bottom:12px">
+      <strong style="color:var(--gold)">H</strong>ysteresis Loss — core loss, proportional sa frequency at flux density (Steinmetz equation)<br>
+      <strong style="color:var(--gold)">E</strong>ddy Current Loss — core loss, proportional sa f² at B²<br>
+      <strong style="color:var(--gold)">M</strong>echanical Loss — (para sa motors/generators; sa transformer ay negligible)<br>
+      <strong style="color:var(--gold)">E</strong>lectrical/Copper Loss — I²R sa winding resistance, nagbabago ayon sa load<br>
+      <strong style="color:var(--gold)">C</strong>ore/Stray Loss — iba pang miscellaneous losses<br>
+      <div class="mnemonic" style="font-size:.82rem;margin-top:8px;background:rgba(245,158,11,.06)">"HEMEC sounds like 'may sakit' — para di malimutan na may losses ang transformer!"</div>
+      <div style="margin-top:8px;font-size:.82rem;color:var(--muted)">
+        Board tip: <strong style="color:var(--text)">Iron/Core losses (H+E)</strong> = constant kahit mag-iba ang load.<br>
+        <strong style="color:var(--text)">Copper losses</strong> = variable, depende sa I² (load current squared).
+      </div>
+    </div>
+
+    <div class="mnemonic" style="font-size:.95rem;margin-bottom:10px">"NIVI" Expanded — Turns Ratio Master Formula</div>
+    <div class="tip-body" style="margin-bottom:12px">
+      <strong>N</strong>₁/N₂ = <strong>V</strong>₁/V₂ = <strong>I</strong>₂/I₁ ← (BALIGTAD ang I!)<br>
+      <em style="color:var(--muted)">Mnemonic: "NIVI — N at V ay direct, I ay inverse!"</em><br>
+      <div style="margin-top:8px;font-size:.82rem;color:var(--muted)">
+        Quick check: Step-UP transformer (N₂ &gt; N₁) → V₂ ↑ subalit I₂ ↓ — conservation of power!
+      </div>
+    </div>
+
+    <div class="mnemonic" style="font-size:.95rem;margin-bottom:10px">Max Efficiency Condition — "Copper = Iron"</div>
+    <div class="tip-body">
+      Max efficiency ay nangyayari kapag: <strong>P_cu = P_fe</strong><br>
+      Load fraction para sa max η: <strong>x = √(P_fe / P_cu_FL)</strong><br>
+      <div style="margin-top:8px;font-size:.82rem;color:var(--muted)">
+        Mnemonic: <em style="color:var(--text)">"Mag-match ang Copper at Iron para maximum ang efficiency — tulad ng perfect na kasal!"</em><br>
+        Board formula: η_max occurs when variable loss = fixed loss (Copper = Iron/Core loss)
+      </div>
+    </div>
+  </div>
+
+  <!-- CALTECH WORKED EXAMPLES -->
+  <div class="card">
+    <div class="card-title">🧪 CalTech Worked Examples</div>
+
+    <div class="sample-prob">
+      <div class="prob-num">CalTech Example 1 – Find N₂</div>
+      <div class="prob-q">
+        Given: V₁ = 13,200 V, V₂ = 230 V, N₁ = 1,000 turns. Find N₂.
+      </div>
+      <div class="prob-sol">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>NIVI: N₁/N₂ = V₁/V₂ → N₂ = N₁ × V₂/V₁</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>Sa Casio: 1000 × 230 ÷ 13200 =</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>Press S⟺D para makita ang fraction: 575/33</div>
+        </div>
+        <div class="ans">✅ N₂ = 17.42 turns ≈ 17 turns (palaging i-round sa board exam kung wala binanggit)</div>
+      </div>
+    </div>
+
+    <div class="sample-prob" style="margin-top:12px">
+      <div class="prob-num">CalTech Example 2 – Max Efficiency Load</div>
+      <div class="prob-q">
+        A 50 kVA transformer: P_fe = 200 W, P_cu_FL = 500 W. At what load fraction does max efficiency occur?
+      </div>
+      <div class="prob-sol">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>Formula: x = √(P_fe / P_cu_FL)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>Sa Casio: SHIFT √ ( 200 ÷ 500 ) =</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>x = √(0.4) = 0.6325</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>Load at max η = 0.6325 × 50 kVA = 31.62 kVA</div>
+        </div>
+        <div class="ans">✅ Max efficiency at 63.25% of full load = 31.62 kVA</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="/" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span id="nav-home">Home</span>
+  </a>
+  <a href="#" class="nav-item active" onclick="return false">
+    <span class="nav-icon">⚡</span>
+    <span id="nav-transformer">Transformer</span>
+  </a>
+  <a href="/ee/" class="nav-item">
+    <span class="nav-icon">📚</span>
+    <span id="nav-ee">EE Tools</span>
+  </a>
+  <a href="/about/" class="nav-item">
+    <span class="nav-icon">ℹ️</span>
+    <span id="nav-about">About</span>
+  </a>
+</nav>
+
+<!-- Vercel Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
+
+<script>
+// ════════════════════════════════════════
+// TRANSLATIONS
+// ════════════════════════════════════════
+const T = {
+  tl: {
+    modal_confirm: "Simulan na! →",
+    header_sub: "Para sa PRC EE Board Exam • PinasTools",
+    lbl_n1: "N₁ (Primary Turns)",
+    lbl_n2: "N₂ (Secondary Turns)",
+    lbl_v1: "V₁ – Primary Voltage (V)",
+    lbl_v2: "V₂ – Secondary Voltage (V)",
+    lbl_i1: "I₁ – Primary Current (A)",
+    lbl_i2: "I₂ – Secondary Current (A)",
+    lbl_kva: "kVA Rating",
+    lbl_pf: "Power Factor (0–1)",
+    lbl_pout: "P_out – Output Power (W)",
+    lbl_pin: "P_in – Input Power (W)",
+    lbl_pcu: "P_cu – Copper Loss (W)",
+    lbl_pfe: "P_fe – Iron/Core Loss (W)",
+    lbl_vnl: "V_NL – No Load Voltage (V)",
+    lbl_vfl: "V_FL – Full Load Voltage (V)",
+    lbl_cu_i: "Current I (A)",
+    lbl_cu_r: "Resistance R (Ω)",
+    lbl_cu_p: "P_cu (W)",
+    btn_calc_turns: "Kalkulahin ang Ratio →",
+    btn_clear_turns: "I-clear",
+    btn_calc_eff: "Kalkulahin ang Efficiency →",
+    btn_clear_eff: "I-clear",
+    btn_calc_vr: "Kalkulahin ang VR →",
+    btn_clear_vr: "I-clear",
+    btn_calc_cu: "Kalkulahin ang P_cu →",
+    btn_clear_cu: "I-clear",
+    err_turns: "Mag-enter ng kahit 2 known values para masolve!",
+    err_eff: "Mag-enter ng sapat na values (P_out at P_in, o losses)!",
+    err_vr: "Mag-enter ng V_NL at V_FL!",
+    step_up: "✅ Step-UP Transformer (Nagdadagdag ng Voltage)",
+    step_down: "🔽 Step-DOWN Transformer (Nagbabawas ng Voltage)",
+    unity: "⚡ Unity Ratio (1:1 Isolation Transformer)",
+    nav_home: "Home",
+    nav_transformer: "Transformer",
+    nav_ee: "EE Tools",
+    nav_about: "About"
+  },
+  en: {
+    modal_confirm: "Let's Start! →",
+    header_sub: "For PRC EE Board Exam • PinasTools",
+    lbl_n1: "N₁ (Primary Turns)",
+    lbl_n2: "N₂ (Secondary Turns)",
+    lbl_v1: "V₁ – Primary Voltage (V)",
+    lbl_v2: "V₂ – Secondary Voltage (V)",
+    lbl_i1: "I₁ – Primary Current (A)",
+    lbl_i2: "I₂ – Secondary Current (A)",
+    lbl_kva: "kVA Rating",
+    lbl_pf: "Power Factor (0–1)",
+    lbl_pout: "P_out – Output Power (W)",
+    lbl_pin: "P_in – Input Power (W)",
+    lbl_pcu: "P_cu – Copper Loss (W)",
+    lbl_pfe: "P_fe – Iron/Core Loss (W)",
+    lbl_vnl: "V_NL – No Load Voltage (V)",
+    lbl_vfl: "V_FL – Full Load Voltage (V)",
+    lbl_cu_i: "Current I (A)",
+    lbl_cu_r: "Resistance R (Ω)",
+    lbl_cu_p: "P_cu (W)",
+    btn_calc_turns: "Calculate Ratio →",
+    btn_clear_turns: "Clear",
+    btn_calc_eff: "Calculate Efficiency →",
+    btn_clear_eff: "Clear",
+    btn_calc_vr: "Calculate VR →",
+    btn_clear_vr: "Clear",
+    btn_calc_cu: "Calculate P_cu →",
+    btn_clear_cu: "Clear",
+    err_turns: "Enter at least 2 known values to solve!",
+    err_eff: "Enter sufficient values (P_out & P_in, or losses)!",
+    err_vr: "Enter both V_NL and V_FL!",
+    step_up: "✅ Step-UP Transformer (Increases Voltage)",
+    step_down: "🔽 Step-DOWN Transformer (Decreases Voltage)",
+    unity: "⚡ Unity Ratio (1:1 Isolation Transformer)",
+    nav_home: "Home",
+    nav_transformer: "Transformer",
+    nav_ee: "EE Tools",
+    nav_about: "About"
+  },
+  ceb: {
+    modal_confirm: "Sugdan na! →",
+    header_sub: "Para sa PRC EE Board Exam • PinasTools",
+    lbl_n1: "N₁ (Pangunaheng Turns)",
+    lbl_n2: "N₂ (Ikaduhang Turns)",
+    lbl_v1: "V₁ – Primary Voltage (V)",
+    lbl_v2: "V₂ – Secondary Voltage (V)",
+    lbl_i1: "I₁ – Primary Current (A)",
+    lbl_i2: "I₂ – Secondary Current (A)",
+    lbl_kva: "kVA Rating",
+    lbl_pf: "Power Factor (0–1)",
+    lbl_pout: "P_out – Output Power (W)",
+    lbl_pin: "P_in – Input Power (W)",
+    lbl_pcu: "P_cu – Copper Loss (W)",
+    lbl_pfe: "P_fe – Iron/Core Loss (W)",
+    lbl_vnl: "V_NL – No Load Voltage (V)",
+    lbl_vfl: "V_FL – Full Load Voltage (V)",
+    lbl_cu_i: "Current I (A)",
+    lbl_cu_r: "Resistance R (Ω)",
+    lbl_cu_p: "P_cu (W)",
+    btn_calc_turns: "Kuwentaha ang Ratio →",
+    btn_clear_turns: "Limpyohan",
+    btn_calc_eff: "Kuwentaha ang Efficiency →",
+    btn_clear_eff: "Limpyohan",
+    btn_calc_vr: "Kuwentaha ang VR →",
+    btn_clear_vr: "Limpyohan",
+    btn_calc_cu: "Kuwentaha ang P_cu →",
+    btn_clear_cu: "Limpyohan",
+    err_turns: "Isulod og labing menos 2 ka values para masulbad!",
+    err_eff: "Isulod og igo nga values (P_out ug P_in, o mga losses)!",
+    err_vr: "Isulod ang V_NL ug V_FL!",
+    step_up: "✅ Step-UP Transformer (Nagpataas sa Voltage)",
+    step_down: "🔽 Step-DOWN Transformer (Nagpaubos sa Voltage)",
+    unity: "⚡ Unity Ratio (1:1 Isolation Transformer)",
+    nav_home: "Balay",
+    nav_transformer: "Transformer",
+    nav_ee: "EE Tools",
+    nav_about: "Mahitungod"
+  },
+  ilo: {
+    modal_confirm: "Rumuaren! →",
+    header_sub: "Para iti PRC EE Board Exam • PinasTools",
+    lbl_n1: "N₁ (Umuna nga Turns)",
+    lbl_n2: "N₂ (Maikadua nga Turns)",
+    lbl_v1: "V₁ – Primary Voltage (V)",
+    lbl_v2: "V₂ – Secondary Voltage (V)",
+    lbl_i1: "I₁ – Primary Current (A)",
+    lbl_i2: "I₂ – Secondary Current (A)",
+    lbl_kva: "kVA Rating",
+    lbl_pf: "Power Factor (0–1)",
+    lbl_pout: "P_out – Output Power (W)",
+    lbl_pin: "P_in – Input Power (W)",
+    lbl_pcu: "P_cu – Copper Loss (W)",
+    lbl_pfe: "P_fe – Iron/Core Loss (W)",
+    lbl_vnl: "V_NL – No Load Voltage (V)",
+    lbl_vfl: "V_FL – Full Load Voltage (V)",
+    lbl_cu_i: "Current I (A)",
+    lbl_cu_r: "Resistance R (Ω)",
+    lbl_cu_p: "P_cu (W)",
+    btn_calc_turns: "Kalkularen ti Ratio →",
+    btn_clear_turns: "Limpian",
+    btn_calc_eff: "Kalkularen ti Efficiency →",
+    btn_clear_eff: "Limpian",
+    btn_calc_vr: "Kalkularen ti VR →",
+    btn_clear_vr: "Limpian",
+    btn_calc_cu: "Kalkularen ti P_cu →",
+    btn_clear_cu: "Limpian",
+    err_turns: "Mangisurat iti 2 nga known values tapno masalbar!",
+    err_eff: "Mangisurat iti sapsapul nga values (P_out ken P_in, wenno losses)!",
+    err_vr: "Mangisurat ti V_NL ken V_FL!",
+    step_up: "✅ Step-UP Transformer (Nagpataas iti Voltage)",
+    step_down: "🔽 Step-DOWN Transformer (Nagpababa iti Voltage)",
+    unity: "⚡ Unity Ratio (1:1 Isolation Transformer)",
+    nav_home: "Balay",
+    nav_transformer: "Transformer",
+    nav_ee: "EE Tools",
+    nav_about: "Maipanggep"
+  }
+};
+
+// ════════════════════════════════════════
+// LANGUAGE MANAGEMENT
+// ════════════════════════════════════════
+let currentLang = 'tl';
+let selectedLang = 'tl';
+
+function selectLang(btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedLang = btn.dataset.lang;
+  const confirmBtnText = { tl: 'Simulan na! →', en: "Let's Start! →", ceb: 'Sugdan na! →', ilo: 'Rumuaren! →' };
+  document.getElementById('modal-confirm-btn').textContent = confirmBtnText[selectedLang];
+}
+
+function confirmLang() {
+  currentLang = selectedLang;
+  localStorage.setItem('pinastools_lang', currentLang);
+  document.getElementById('lang-modal').classList.add('hidden');
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = T[currentLang] || T.tl;
+  const ids = [
+    'header_sub','lbl_n1','lbl_n2','lbl_v1','lbl_v2','lbl_i1','lbl_i2',
+    'lbl_kva','lbl_pf','lbl_pout','lbl_pin','lbl_pcu','lbl_pfe',
+    'lbl_vnl','lbl_vfl','lbl_cu_i','lbl_cu_r','lbl_cu_p',
+    'btn_calc_turns','btn_clear_turns','btn_calc_eff','btn_clear_eff',
+    'btn_calc_vr','btn_clear_vr','btn_calc_cu','btn_clear_cu',
+    'nav_home','nav_transformer','nav_ee','nav_about'
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && t[id]) el.textContent = t[id];
+  });
+  const errIds = ['err_turns','err_eff','err_vr'];
+  errIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && t[id]) el.textContent = t[id];
+  });
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('pinastools_lang');
+  if (saved && T[saved]) {
+    currentLang = saved;
+    document.getElementById('lang-modal').classList.add('hidden');
+    applyTranslations();
+  } else {
+    // Show modal
+    document.getElementById('lang-modal').classList.remove('hidden');
+  }
+});
+
+// ════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function v(id) {
+  const val = parseFloat(document.getElementById(id).value);
+  return isNaN(val) ? null : val;
+}
+function setV(id, val) {
+  if (val !== null && !isNaN(val)) document.getElementById(id).value = +val.toFixed(6);
+}
+function fmt(n, d = 4) {
+  if (n === null || isNaN(n)) return '—';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(3) + ' M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(3) + ' k';
+  return (+n.toFixed(d)).toString();
+}
+function showErr(id) { document.getElementById(id).classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+
+function makeResultGrid(containerId, items) {
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = '';
+  items.forEach(({label, value, unit}) => {
+    grid.innerHTML += `
+      <div class="result-item">
+        <div class="result-label">${label}</div>
+        <div class="result-value">${value} <span class="result-unit">${unit || ''}</span></div>
+      </div>`;
+  });
+}
+
+// ════════════════════════════════════════
+// CALCULATOR 1: TURNS RATIO
+// ════════════════════════════════════════
+function calcTurns() {
+  hideErr('err-turns');
+  let n1 = v('n1'), n2 = v('n2'), a = v('a_ratio');
+  let vv1 = v('v1'), vv2 = v('v2');
+  let i1 = v('i1'), i2 = v('i2');
+  let kva = v('kva'), pf = v('pf');
+
+  // Solve turns ratio 'a' from available known pairs
+  if (n1 !== null && n2 !== null) { a = n1 / n2; }
+  else if (vv1 !== null && vv2 !== null) { a = vv1 / vv2; }
+  else if (i1 !== null && i2 !== null) { a = i2 / i1; }  // Note: I2/I1 = a
+
+  if (a === null) { showErr('err-turns'); return; }
+
+  // Fill unknowns
+  if (n1 !== null && n2 === null) { n2 = n1 / a; }
+  else if (n2 !== null && n1 === null) { n1 = n2 * a; }
+  else if (n1 === null && n2 === null) { n1 = a; n2 = 1; } // normalized
+
+  if (vv1 !== null && vv2 === null) { vv2 = vv1 / a; }
+  else if (vv2 !== null && vv1 === null) { vv1 = vv2 * a; }
+
+  if (i1 !== null && i2 === null) { i2 = i1 * a; }  // I2 = I1 * a (inverse!)
+  else if (i2 !== null && i1 === null) { i1 = i2 / a; }
+
+  // kVA from V and I
+  let kvaCalc = null;
+  if (vv1 !== null && i1 !== null) kvaCalc = (vv1 * i1) / 1000;
+  else if (vv2 !== null && i2 !== null) kvaCalc = (vv2 * i2) / 1000;
+  else if (kva !== null) kvaCalc = kva;
+
+  // Power from kVA and PF
+  let pw = null;
+  if (kvaCalc !== null && pf !== null) pw = kvaCalc * pf;
+
+  // Build results
+  const items = [];
+  items.push({ label: 'Turns Ratio (a)', value: fmt(a, 4), unit: ':1' });
+  if (n1 !== null) items.push({ label: 'N₁ (Primary)', value: fmt(n1, 0), unit: 'turns' });
+  if (n2 !== null) items.push({ label: 'N₂ (Secondary)', value: fmt(n2, 0), unit: 'turns' });
+  if (vv1 !== null) items.push({ label: 'V₁ (Primary)', value: fmt(vv1, 2), unit: 'V' });
+  if (vv2 !== null) items.push({ label: 'V₂ (Secondary)', value: fmt(vv2, 2), unit: 'V' });
+  if (i1 !== null) items.push({ label: 'I₁ (Primary)', value: fmt(i1, 4), unit: 'A' });
+  if (i2 !== null) items.push({ label: 'I₂ (Secondary)', value: fmt(i2, 4), unit: 'A' });
+  if (kvaCalc !== null) items.push({ label: 'kVA Rating', value: fmt(kvaCalc, 3), unit: 'kVA' });
+  if (pw !== null) items.push({ label: 'Real Power', value: fmt(pw, 2), unit: 'W' });
+
+  makeResultGrid('rg-turns', items);
+
+  // Fill computed fields back
+  setV('a_ratio', a);
+  if (v('n1') === null && n1 !== null) setV('n1', n1);
+  if (v('n2') === null && n2 !== null) setV('n2', n2);
+  if (v('v1') === null && vv1 !== null) setV('v1', vv1);
+  if (v('v2') === null && vv2 !== null) setV('v2', vv2);
+  if (v('i1') === null && i1 !== null) setV('i1', i1);
+  if (v('i2') === null && i2 !== null) setV('i2', i2);
+
+  // Indicator
+  const t = T[currentLang] || T.tl;
+  const indEl = document.getElementById('step-indicator');
+  if (a > 1.001) {
+    indEl.innerHTML = `<div class="indicator step-down">${t.step_down}</div>`;
+  } else if (a < 0.999) {
+    indEl.innerHTML = `<div class="indicator step-up">${t.step_up}</div>`;
+  } else {
+    indEl.innerHTML = `<div class="indicator unity">${t.unity}</div>`;
+  }
+
+  document.getElementById('res-turns').style.display = 'block';
+}
+
+function clearTurns() {
+  ['n1','n2','a_ratio','v1','v2','i1','i2','kva','pf'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-turns').style.display = 'none';
+  hideErr('err-turns');
+}
+
+// ════════════════════════════════════════
+// CALCULATOR 2: EFFICIENCY
+// ════════════════════════════════════════
+function calcEff() {
+  hideErr('err-eff');
+  let pout = v('eff_pout'), pin = v('eff_pin');
+  let pcu = v('eff_pcu'), pfe = v('eff_pfe');
+
+  let losses = null;
+  if (pcu !== null && pfe !== null) losses = pcu + pfe;
+  else if (pcu !== null) losses = pcu;
+  else if (pfe !== null) losses = pfe;
+
+  // Solve for pin / pout
+  if (pout !== null && pin === null && losses !== null) pin = pout + losses;
+  if (pin !== null && pout === null && losses !== null) pout = pin - losses;
+  if (pout !== null && pin === null && losses === null) { showErr('err-eff'); return; }
+  if (pin !== null && pout === null && losses === null) { showErr('err-eff'); return; }
+  if (pout === null || pin === null) { showErr('err-eff'); return; }
+
+  const eta = (pout / pin) * 100;
+  if (losses === null) losses = pin - pout;
+
+  const items = [
+    { label: 'P_out (Output)', value: fmt(pout, 2), unit: 'W' },
+    { label: 'P_in (Input)', value: fmt(pin, 2), unit: 'W' },
+    { label: 'Total Losses', value: fmt(losses, 2), unit: 'W' },
+    { label: 'Efficiency η', value: eta.toFixed(2), unit: '%' },
+  ];
+  if (pcu !== null) items.push({ label: 'Copper Loss', value: fmt(pcu, 2), unit: 'W' });
+  if (pfe !== null) items.push({ label: 'Iron Loss', value: fmt(pfe, 2), unit: 'W' });
+
+  makeResultGrid('rg-eff', items);
+  setV('eff_pout', pout); setV('eff_pin', pin);
+  document.getElementById('res-eff').style.display = 'block';
+}
+
+function clearEff() {
+  ['eff_pout','eff_pin','eff_pcu','eff_pfe'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-eff').style.display = 'none';
+  hideErr('err-eff');
+}
+
+// ════════════════════════════════════════
+// CALCULATOR 3: COPPER LOSS
+// ════════════════════════════════════════
+function calcCopper() {
+  let ci = v('cu_i'), cr = v('cu_r'), cp = v('cu_p');
+  let result = null, label = '';
+
+  if (ci !== null && cr !== null) {
+    result = ci * ci * cr;
+    setV('cu_p', result);
+    label = 'P_cu = I² × R';
+  } else if (cp !== null && cr !== null) {
+    result = Math.sqrt(cp / cr);
+    setV('cu_i', result);
+    label = 'I = √(P_cu / R)';
+  } else if (cp !== null && ci !== null) {
+    result = cp / (ci * ci);
+    setV('cu_r', result);
+    label = 'R = P_cu / I²';
+  } else return;
+
+  const items = [];
+  if (v('cu_i') !== null) items.push({ label: 'Current I', value: fmt(v('cu_i'), 4), unit: 'A' });
+  if (v('cu_r') !== null) items.push({ label: 'Resistance R', value: fmt(v('cu_r'), 4), unit: 'Ω' });
+  if (v('cu_p') !== null) items.push({ label: 'Copper Loss P_cu', value: fmt(v('cu_p'), 4), unit: 'W' });
+  items.push({ label: 'Formula used', value: label, unit: '' });
+
+  makeResultGrid('rg-cu', items);
+  document.getElementById('res-cu').style.display = 'block';
+}
+
+function clearCopper() {
+  ['cu_i','cu_r','cu_p'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-cu').style.display = 'none';
+}
+
+// ════════════════════════════════════════
+// CALCULATOR 4: VOLTAGE REGULATION
+// ════════════════════════════════════════
+function calcVR() {
+  hideErr('err-vr');
+  let vnl = v('vr_vnl'), vfl = v('vr_vfl');
+  if (vnl === null || vfl === null) { showErr('err-vr'); return; }
+
+  const vr = ((vnl - vfl) / vfl) * 100;
+  const items = [
+    { label: 'V_NL (No Load)', value: fmt(vnl, 2), unit: 'V' },
+    { label: 'V_FL (Full Load)', value: fmt(vfl, 2), unit: 'V' },
+    { label: 'Voltage Drop', value: fmt(vnl - vfl, 2), unit: 'V' },
+    { label: 'VR', value: vr.toFixed(4), unit: '%' },
+  ];
+
+  const quality = vr < 3 ? '🟢 Excellent' : vr < 6 ? '🟡 Acceptable' : '🔴 Poor';
+  items.push({ label: 'VR Quality', value: quality, unit: '' });
+
+  makeResultGrid('rg-vr', items);
+  document.getElementById('res-vr').style.display = 'block';
+}
+
+function clearVR() {
+  ['vr_vnl','vr_vfl'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('res-vr').style.display = 'none';
+  hideErr('err-vr');
+}
+
+// Keyboard shortcuts: 1-4 switch tabs, Enter triggers calc
+document.addEventListener('keydown', e => {
+  // Tab switching via number keys (not when typing in input)
+  const tag = document.activeElement.tagName;
+  const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+  if (!inInput) {
+    const tabMap = {
+      '1': ['calc',    document.getElementById('tab-calc-btn')],
+      '2': ['table',   document.getElementById('tab-table-btn')],
+      '3': ['tips',    document.getElementById('tab-tips-btn')],
+      '4': ['caltech', document.getElementById('tab-caltech-btn')],
+    };
+    if (tabMap[e.key]) {
+      const [name, btn] = tabMap[e.key];
+      switchTab(name, btn);
+      return;
+    }
+  }
+
+  if (e.key === 'Enter') {
+    const active = document.querySelector('.tab-content.active');
+    if (!active) return;
+    const id = active.id;
+    if (id === 'tab-calc') {
+      const focused = document.activeElement;
+      if (!focused) return;
+      const id2 = focused.id;
+      if (['n1','n2','a_ratio','v1','v2','i1','i2','kva','pf'].includes(id2)) calcTurns();
+      else if (['eff_pout','eff_pin','eff_pcu','eff_pfe'].includes(id2)) calcEff();
+      else if (['cu_i','cu_r','cu_p'].includes(id2)) calcCopper();
+      else if (['vr_vnl','vr_vfl'].includes(id2)) calcVR();
+    }
+  }
+});
+</script>
+</body>
+</html>

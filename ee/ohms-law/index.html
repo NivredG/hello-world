@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohm's Law & Power Calculator — PinasTools</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #111318;
+  --bg2: #1a1d26;
+  --bg3: #22263a;
+  --gold: #f59e0b;
+  --gold2: #fbbf24;
+  --gold-dim: rgba(245,158,11,0.15);
+  --gold-border: rgba(245,158,11,0.3);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --green: #22c55e;
+  --red: #ef4444;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── MODAL ── */
+#installer-modal {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#installer-modal.hidden { display: none; }
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  max-width: 360px; width: 100%;
+  text-align: center;
+}
+.modal-icon { font-size: 48px; margin-bottom: 12px; }
+.modal-title {
+  font-size: 22px; font-weight: 700;
+  color: var(--gold); margin-bottom: 6px;
+}
+.modal-sub {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 24px; line-height: 1.5;
+}
+.modal-label {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: .05em; margin-bottom: 12px;
+}
+.lang-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 24px;
+}
+.lang-btn {
+  background: var(--bg3); border: 2px solid transparent;
+  border-radius: var(--radius-sm); padding: 14px 8px;
+  color: var(--text); font-family: inherit; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all .2s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.lang-btn:hover, .lang-btn.selected {
+  border-color: var(--gold); color: var(--gold);
+  background: var(--gold-dim);
+}
+.lang-btn .flag { font-size: 24px; }
+.install-btn {
+  width: 100%; padding: 14px;
+  background: var(--gold); color: #111;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.install-btn:hover { opacity: .9; }
+
+/* ── HEADER ── */
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--gold-border);
+  padding: 16px 16px 0;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-top {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.header-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--gold); display: flex; align-items: center;
+  justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.header-title { font-size: 17px; font-weight: 700; line-height: 1.2; }
+.header-sub { font-size: 11px; color: var(--text-muted); }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 2px;
+  overflow-x: auto; padding-bottom: 0;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1; min-width: 90px;
+  padding: 10px 4px 12px;
+  background: none; border: none;
+  color: var(--text-muted); font-family: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all .2s; white-space: nowrap;
+}
+.tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* ── MAIN CONTENT ── */
+.tab-content { display: none; padding: 20px 16px; }
+.tab-content.active { display: block; }
+
+/* ── SECTION CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius);
+  padding: 20px; margin-bottom: 16px;
+}
+.card-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--gold); margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-desc {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 16px; line-height: 1.5;
+}
+
+/* ── FORMULA PILLS ── */
+.formula-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 16px;
+}
+.formula-pill {
+  background: var(--bg3);
+  border: 1px solid var(--gold-border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 13px; font-weight: 600;
+  color: var(--gold2); font-family: 'Courier New', monospace;
+}
+
+/* ── INPUTS ── */
+.input-group {
+  margin-bottom: 14px;
+}
+.input-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted); margin-bottom: 6px;
+}
+.input-label .symbol {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  border-radius: 6px; padding: 2px 8px;
+  color: var(--gold); font-size: 14px; font-weight: 700;
+}
+.input-row {
+  display: flex; gap: 8px;
+}
+.input-field {
+  flex: 1; background: var(--bg3);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text); font-family: inherit;
+  font-size: 16px; padding: 12px 14px;
+  transition: border-color .2s; outline: none;
+  -webkit-appearance: none;
+}
+.input-field:focus { border-color: var(--gold); }
+.input-field::placeholder { color: var(--text-muted); }
+.unit-badge {
+  background: var(--bg3); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  font-size: 13px; font-weight: 600; color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── BUTTONS ── */
+.calc-btn {
+  width: 100%; padding: 14px;
+  background: var(--gold); color: #111;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .2s; margin-top: 4px;
+}
+.calc-btn:hover { background: var(--gold2); }
+.clear-btn {
+  width: 100%; padding: 10px;
+  background: transparent; color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .2s; margin-top: 8px;
+}
+.clear-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── RESULT BOX ── */
+.result-box {
+  display: none; margin-top: 16px;
+  background: rgba(34,197,94,0.08);
+  border: 1.5px solid rgba(34,197,94,0.3);
+  border-radius: var(--radius-sm); padding: 16px;
+}
+.result-box.show { display: block; }
+.result-box.error {
+  background: rgba(239,68,68,0.08);
+  border-color: rgba(239,68,68,0.3);
+}
+.result-title {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--green); margin-bottom: 10px;
+}
+.result-box.error .result-title { color: var(--red); }
+.result-item {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.result-item:last-child { border-bottom: none; }
+.result-label { font-size: 13px; color: var(--text-muted); }
+.result-value {
+  font-size: 16px; font-weight: 700; color: var(--text);
+  font-family: 'Courier New', monospace;
+  cursor: pointer; transition: color .15s;
+}
+.result-value:hover { color: var(--gold); }
+.copy-hint {
+  font-size: 11px; color: var(--text-muted);
+  text-align: right; margin-top: 6px;
+}
+.copied-toast {
+  position: fixed; bottom: 90px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--green); color: #fff;
+  padding: 8px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; transition: opacity .3s;
+  pointer-events: none; z-index: 1000;
+}
+.copied-toast.show { opacity: 1; }
+
+/* ── CIRCUIT SECTION ── */
+.resistor-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.resistor-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  flex-shrink: 0;
+}
+.add-resistor-btn, .remove-resistor-btn {
+  background: var(--bg3); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 8px 14px;
+  color: var(--text-muted); font-family: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.add-resistor-btn:hover { border-color: var(--gold); color: var(--gold); }
+.remove-resistor-btn:hover { border-color: var(--red); color: var(--red); }
+.resistor-controls {
+  display: flex; gap: 8px; margin-bottom: 14px;
+}
+
+/* ── TABLE TAB ── */
+.e-series-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.e-series-table th {
+  background: var(--bg3); color: var(--gold);
+  padding: 10px 8px; text-align: center;
+  font-weight: 700; font-size: 12px;
+  border-bottom: 1px solid var(--gold-border);
+}
+.e-series-table td {
+  padding: 8px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--text); font-family: 'Courier New', monospace;
+}
+.e-series-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.e12-cell { color: var(--gold2); font-weight: 600; }
+
+.ref-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-top: 8px;
+}
+.ref-item {
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 12px; text-align: center;
+}
+.ref-item .ref-val {
+  font-size: 18px; font-weight: 700;
+  color: var(--gold); font-family: 'Courier New', monospace;
+}
+.ref-item .ref-label {
+  font-size: 11px; color: var(--text-muted); margin-top: 2px;
+}
+
+/* ── TRIANGLE SVG ── */
+.triangle-wrap {
+  display: flex; justify-content: center;
+  padding: 12px 0 4px;
+}
+
+/* ── BOARD TIPS ── */
+.tip-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius); padding: 20px;
+  margin-bottom: 16px;
+}
+.tip-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 12px;
+}
+.tip-question {
+  font-size: 15px; font-weight: 600;
+  line-height: 1.5; margin-bottom: 12px; color: var(--text);
+}
+.tip-solution {
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.tip-step {
+  font-size: 13px; line-height: 1.7; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.tip-step strong { color: var(--text); }
+.tip-step .eq {
+  font-family: 'Courier New', monospace;
+  color: var(--blue);
+}
+.tip-answer {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px; font-weight: 700; color: var(--green);
+}
+
+.law-grid {
+  display: grid; gap: 10px;
+}
+.law-item {
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.law-name {
+  font-size: 13px; font-weight: 700; color: var(--gold);
+  margin-bottom: 6px;
+}
+.law-formula {
+  font-family: 'Courier New', monospace;
+  font-size: 13px; color: var(--blue); margin-bottom: 4px;
+}
+.law-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--gold-border);
+  padding: 10px 16px 12px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+}
+.home-link {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--text-muted); text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  padding: 8px 20px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all .2s;
+}
+.home-link:hover { color: var(--gold); border-color: var(--gold-border); }
+
+/* ── DIVIDER ── */
+.section-divider {
+  height: 1px; background: rgba(255,255,255,0.06);
+  margin: 20px 0;
+}
+
+/* ── HIGHLIGHT ── */
+.highlight { color: var(--gold); font-weight: 700; }
+.highlight-blue { color: var(--blue); }
+.highlight-green { color: var(--green); }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 480px) {
+  .ref-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 640px) {
+  body { max-width: 640px; margin: 0 auto; }
+  header { border-radius: 0 0 var(--radius) var(--radius); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LANGUAGE INSTALLER MODAL ══════════════ -->
+<div id="installer-modal">
+  <div class="modal-box">
+    <div class="modal-icon">⚡</div>
+    <div class="modal-title">PinasTools Installer</div>
+    <div class="modal-sub">Piliin ang iyong language preference para sa best na experience. Mababago mo ito anytime.</div>
+    <div class="modal-label">Piliin ang wika / Choose language</div>
+    <div class="lang-grid">
+      <button class="lang-btn" data-lang="tl" onclick="selectLang(this)">
+        <span class="flag">🇵🇭</span>Tagalog
+      </button>
+      <button class="lang-btn" data-lang="en" onclick="selectLang(this)">
+        <span class="flag">🇺🇸</span>English
+      </button>
+      <button class="lang-btn" data-lang="ceb" onclick="selectLang(this)">
+        <span class="flag">🇵🇭</span>Cebuano
+      </button>
+      <button class="lang-btn" data-lang="ilo" onclick="selectLang(this)">
+        <span class="flag">🇵🇭</span>Ilocano
+      </button>
+    </div>
+    <button class="install-btn" onclick="installApp()">I-install ang PinasTools ✓</button>
+  </div>
+</div>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="header-top">
+    <div class="header-icon">⚡</div>
+    <div>
+      <div class="header-title">Ohm's Law & Power</div>
+      <div class="header-sub">ECE/EE Board Exam Calculator • PinasTools</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('calculator', this)">🔢 Calculator</button>
+    <button class="tab-btn" onclick="switchTab('table', this)">📊 Table</button>
+    <button class="tab-btn" onclick="switchTab('tips', this)">📝 Board Tips</button>
+    <button class="tab-btn" onclick="switchTab('mnemonics', this)">🧠 Mnemonics</button>
+  </div>
+</header>
+
+<!-- ══════════════ COPIED TOAST ══════════════ -->
+<div class="copied-toast" id="toast">Copied! ✓</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1: CALCULATOR
+══════════════════════════════════════════════ -->
+<div id="tab-calculator" class="tab-content active">
+
+  <!-- Ohm's Law Basic -->
+  <div class="card">
+    <div class="card-title">⚡ Ohm's Law Calculator</div>
+    <div class="card-desc">Ilagay ang dalawang (2) values — ang third ay awtomatikong maso-solve. Gamitin mo ang Bataan Peninsula State University formula sheets!</div>
+    <div class="formula-row">
+      <div class="formula-pill">V = I × R</div>
+      <div class="formula-pill">I = V / R</div>
+      <div class="formula-pill">R = V / I</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">V</span> Voltage
+      </div>
+      <div class="input-row">
+        <input type="number" id="ohm-v" class="input-field" placeholder="e.g. 12" step="any" oninput="autoCalcOhm()">
+        <div class="unit-badge">Volts (V)</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">I</span> Current
+      </div>
+      <div class="input-row">
+        <input type="number" id="ohm-i" class="input-field" placeholder="e.g. 2" step="any" oninput="autoCalcOhm()">
+        <div class="unit-badge">Amperes (A)</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">R</span> Resistance
+      </div>
+      <div class="input-row">
+        <input type="number" id="ohm-r" class="input-field" placeholder="e.g. 6" step="any" oninput="autoCalcOhm()">
+        <div class="unit-badge">Ohms (Ω)</div>
+      </div>
+    </div>
+
+    <button class="clear-btn" onclick="clearOhm()">🗑 Clear lahat</button>
+
+    <div class="result-box" id="ohm-result">
+      <div class="result-title">📊 Mga Sagot:</div>
+      <div id="ohm-result-content"></div>
+      <div class="copy-hint">I-tap ang value para i-copy ✨</div>
+    </div>
+  </div>
+
+  <!-- Power Calculator -->
+  <div class="card">
+    <div class="card-title">💡 Power Calculator</div>
+    <div class="card-desc">Lahat ng power formulas — auto-solve gamit ang iyong mga inputs sa Ohm's Law sa itaas, o mag-input ng bago dito.</div>
+    <div class="formula-row">
+      <div class="formula-pill">P = V × I</div>
+      <div class="formula-pill">P = I² × R</div>
+      <div class="formula-pill">P = V² / R</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">V</span> Voltage
+      </div>
+      <div class="input-row">
+        <input type="number" id="pw-v" class="input-field" placeholder="Volts" step="any" oninput="calcPower()">
+        <div class="unit-badge">V</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">I</span> Current
+      </div>
+      <div class="input-row">
+        <input type="number" id="pw-i" class="input-field" placeholder="Amperes" step="any" oninput="calcPower()">
+        <div class="unit-badge">A</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="symbol">R</span> Resistance
+      </div>
+      <div class="input-row">
+        <input type="number" id="pw-r" class="input-field" placeholder="Ohms" step="any" oninput="calcPower()">
+        <div class="unit-badge">Ω</div>
+      </div>
+    </div>
+
+    <button class="clear-btn" onclick="clearPower()">🗑 Clear</button>
+
+    <div class="result-box" id="power-result">
+      <div class="result-title">⚡ Power Results:</div>
+      <div id="power-result-content"></div>
+      <div class="copy-hint">I-tap ang value para i-copy ✨</div>
+    </div>
+  </div>
+
+  <!-- Series Circuit -->
+  <div class="card">
+    <div class="card-title">🔗 Series Circuit</div>
+    <div class="card-desc">Mag-input ng source voltage at resistor values. Makukuha mo ang total R, total I, at voltage drop sa bawat resistor.</div>
+    <div class="formula-row">
+      <div class="formula-pill">R_total = R1+R2+…</div>
+      <div class="formula-pill">I = V/R_total</div>
+      <div class="formula-pill">V_n = I×R_n</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><span class="symbol">Vs</span> Source Voltage</div>
+      <div class="input-row">
+        <input type="number" id="ser-v" class="input-field" placeholder="e.g. 24" step="any">
+        <div class="unit-badge">Volts</div>
+      </div>
+    </div>
+
+    <div id="series-resistors">
+      <div class="resistor-row">
+        <div class="resistor-num">R1</div>
+        <div class="input-row" style="flex:1">
+          <input type="number" class="input-field ser-r" placeholder="Ohms (Ω)" step="any">
+          <div class="unit-badge">Ω</div>
+        </div>
+      </div>
+      <div class="resistor-row">
+        <div class="resistor-num">R2</div>
+        <div class="input-row" style="flex:1">
+          <input type="number" class="input-field ser-r" placeholder="Ohms (Ω)" step="any">
+          <div class="unit-badge">Ω</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="resistor-controls">
+      <button class="add-resistor-btn" onclick="addSeriesR()" id="add-ser-btn">+ Dagdag Resistor</button>
+      <button class="remove-resistor-btn" onclick="removeSeriesR()">− Bawas</button>
+    </div>
+
+    <button class="calc-btn" onclick="calcSeries()">⚡ I-calculate ang Series</button>
+    <button class="clear-btn" onclick="clearSeries()">🗑 Clear</button>
+
+    <div class="result-box" id="series-result">
+      <div class="result-title">🔗 Series Circuit Results:</div>
+      <div id="series-result-content"></div>
+      <div class="copy-hint">I-tap ang value para i-copy ✨</div>
+    </div>
+  </div>
+
+  <!-- Parallel Circuit -->
+  <div class="card">
+    <div class="card-title">⚡ Parallel Circuit</div>
+    <div class="card-desc">Para sa parallel circuits — reciprocal formula ang gamit para sa total resistance, at ang voltage ay pantay sa lahat ng branches.</div>
+    <div class="formula-row">
+      <div class="formula-pill">1/R_t = 1/R1+1/R2+…</div>
+      <div class="formula-pill">I_n = V/R_n</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label"><span class="symbol">Vs</span> Source Voltage</div>
+      <div class="input-row">
+        <input type="number" id="par-v" class="input-field" placeholder="e.g. 12" step="any">
+        <div class="unit-badge">Volts</div>
+      </div>
+    </div>
+
+    <div id="parallel-resistors">
+      <div class="resistor-row">
+        <div class="resistor-num">R1</div>
+        <div class="input-row" style="flex:1">
+          <input type="number" class="input-field par-r" placeholder="Ohms (Ω)" step="any">
+          <div class="unit-badge">Ω</div>
+        </div>
+      </div>
+      <div class="resistor-row">
+        <div class="resistor-num">R2</div>
+        <div class="input-row" style="flex:1">
+          <input type="number" class="input-field par-r" placeholder="Ohms (Ω)" step="any">
+          <div class="unit-badge">Ω</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="resistor-controls">
+      <button class="add-resistor-btn" onclick="addParallelR()" id="add-par-btn">+ Dagdag Resistor</button>
+      <button class="remove-resistor-btn" onclick="removeParallelR()">− Bawas</button>
+    </div>
+
+    <button class="calc-btn" onclick="calcParallel()">⚡ I-calculate ang Parallel</button>
+    <button class="clear-btn" onclick="clearParallel()">🗑 Clear</button>
+
+    <div class="result-box" id="parallel-result">
+      <div class="result-title">⚡ Parallel Circuit Results:</div>
+      <div id="parallel-result-content"></div>
+      <div class="copy-hint">I-tap ang value para i-copy ✨</div>
+    </div>
+  </div>
+
+</div><!-- /tab-calculator -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 2: TABLE
+══════════════════════════════════════════════ -->
+<div id="tab-table" class="tab-content">
+
+  <!-- Ohm's Law Triangle -->
+  <div class="card">
+    <div class="card-title">🔺 Ohm's Law Triangle</div>
+    <div class="card-desc">Ang classic na memory tool — takpan ang hinahanap mo para makita ang formula.</div>
+    <div class="triangle-wrap">
+      <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" width="280" height="193">
+        <!-- Triangle outline -->
+        <polygon points="160,16 304,204 16,204" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Horizontal divider -->
+        <line x1="88" y1="132" x2="232" y2="132" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <!-- Vertical divider bottom -->
+        <line x1="160" y1="132" x2="160" y2="204" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+        <!-- V top -->
+        <circle cx="160" cy="78" r="30" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="160" y="72" text-anchor="middle" font-family="Outfit,sans-serif" font-size="22" font-weight="800" fill="#f59e0b">V</text>
+        <text x="160" y="92" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="#94a3b8">Voltage</text>
+
+        <!-- I bottom-left -->
+        <circle cx="104" cy="172" r="28" fill="rgba(96,165,250,0.15)" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="104" y="167" text-anchor="middle" font-family="Outfit,sans-serif" font-size="22" font-weight="800" fill="#60a5fa">I</text>
+        <text x="104" y="185" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="#94a3b8">Current</text>
+
+        <!-- R bottom-right -->
+        <circle cx="216" cy="172" r="28" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="216" y="167" text-anchor="middle" font-family="Outfit,sans-serif" font-size="22" font-weight="800" fill="#a78bfa">R</text>
+        <text x="216" y="185" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="#94a3b8">Resistance</text>
+
+        <!-- Labels outside -->
+        <text x="54" y="118" text-anchor="middle" font-family="'Courier New',monospace" font-size="12" fill="#f1f5f9">V = I × R</text>
+        <text x="270" y="118" text-anchor="middle" font-family="'Courier New',monospace" font-size="12" fill="#f1f5f9">I = V / R</text>
+        <text x="160" y="216" text-anchor="middle" font-family="'Courier New',monospace" font-size="12" fill="#f1f5f9">R = V / I</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- E12 / E24 Series -->
+  <div class="card">
+    <div class="card-title">🎨 Standard Resistor Values</div>
+    <div class="card-desc">E12 at E24 series — ginagamit sa PRC board exams. <span class="highlight">Gold</span> = E12 (mas madalas sa exams).</div>
+    <div style="overflow-x:auto">
+      <table class="e-series-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>E12 Value (Ω)</th>
+            <th>E24 Value (Ω)</th>
+          </tr>
+        </thead>
+        <tbody id="e-series-tbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+      💡 Tip: Multiply by powers of 10 (×10, ×100, ×1k, ×10k, etc.) para makuha ang full range ng standard values.
+    </div>
+  </div>
+
+  <!-- Quick Reference -->
+  <div class="card">
+    <div class="card-title">⚡ Common Voltage & Current Reference</div>
+    <div class="card-desc">Mga madalas na makikita sa board exam problems — memorize mo na habang nagre-review sa Bataan!</div>
+    <div class="ref-grid">
+      <div class="ref-item">
+        <div class="ref-val">1.5V</div>
+        <div class="ref-label">AA/AAA Battery</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">9V</div>
+        <div class="ref-label">9V Block Battery</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">12V</div>
+        <div class="ref-label">Automotive/Lead Acid</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">220V</div>
+        <div class="ref-label">PH Household (AC)</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">110V</div>
+        <div class="ref-label">US Standard AC</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">5V</div>
+        <div class="ref-label">USB Standard</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">3.3V</div>
+        <div class="ref-label">Logic Level (MCU)</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">0.6V</div>
+        <div class="ref-label">Si Diode Forward</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">1mA</div>
+        <div class="ref-label">Min. LED Current</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">20mA</div>
+        <div class="ref-label">Typical LED Current</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">1A</div>
+        <div class="ref-label">USB-A Max (old)</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-val">3A</div>
+        <div class="ref-label">USB-C Fast Charge</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Power Formula Reference -->
+  <div class="card">
+    <div class="card-title">💡 Power Formula Quick Reference</div>
+    <div class="card-desc">All 12 combinations — gamitin kung alin ang available na values.</div>
+    <div style="overflow-x:auto">
+      <table class="e-series-table">
+        <thead>
+          <tr><th>Given</th><th>Find</th><th>Formula</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>V, I</td><td>P</td><td style="color:var(--blue);font-family:'Courier New',monospace">P = V × I</td></tr>
+          <tr><td>V, R</td><td>P</td><td style="color:var(--blue);font-family:'Courier New',monospace">P = V² / R</td></tr>
+          <tr><td>I, R</td><td>P</td><td style="color:var(--blue);font-family:'Courier New',monospace">P = I² × R</td></tr>
+          <tr><td>P, I</td><td>V</td><td style="color:var(--gold);font-family:'Courier New',monospace">V = P / I</td></tr>
+          <tr><td>P, R</td><td>V</td><td style="color:var(--gold);font-family:'Courier New',monospace">V = √(P × R)</td></tr>
+          <tr><td>P, V</td><td>I</td><td style="color:var(--green);font-family:'Courier New',monospace">I = P / V</td></tr>
+          <tr><td>P, R</td><td>I</td><td style="color:var(--green);font-family:'Courier New',monospace">I = √(P / R)</td></tr>
+          <tr><td>P, V</td><td>R</td><td style="color:var(--purple);font-family:'Courier New',monospace">R = V² / P</td></tr>
+          <tr><td>P, I</td><td>R</td><td style="color:var(--purple);font-family:'Courier New',monospace">R = P / I²</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /tab-table -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 3: BOARD TIPS
+══════════════════════════════════════════════ -->
+<div id="tab-tips" class="tab-content">
+
+  <div class="card" style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.03));border-color:var(--gold-border)">
+    <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
+      🎓 <strong style="color:var(--text)">Para sa lahat ng ECE/EE board examinees!</strong><br>
+      Ang mga tips na ito ay based sa PRC ECE board exam format. Marami sa mga example dito ay may Bataan Peninsula context — para sa ating mga kababayan sa BPSU at iba pang Bataan schools! Kaya mo yan! 💪
+    </div>
+  </div>
+
+  <!-- Sample Problem 1 -->
+  <div class="tip-card">
+    <div class="tip-badge">📝 Sample Problem 1 — Basic Ohm's Law</div>
+    <div class="tip-question">
+      Ang isang circuit sa Bataan Science Park ay may 220V power source at 44Ω resistive load. Hanapin ang current na dumadaan sa circuit.
+    </div>
+    <div class="tip-solution">
+      <div class="tip-step"><strong>Given:</strong> V = 220V, R = 44Ω</div>
+      <div class="tip-step"><strong>Find:</strong> I = ?</div>
+      <div class="tip-step"><strong>Formula:</strong> <span class="eq">I = V / R</span></div>
+      <div class="tip-step"><strong>Solution:</strong></div>
+      <div class="tip-step"><span class="eq">I = 220V / 44Ω</span></div>
+      <div class="tip-step"><span class="eq">I = 5 Amperes</span></div>
+      <div class="tip-answer">✅ Answer: I = 5 A</div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+      💡 <em>Board Exam Tip:</em> Sa PRC exams, laging i-check kung tama ang units. 220V ang standard household voltage ng Pilipinas — common sa board exam problems!
+    </div>
+  </div>
+
+  <!-- Sample Problem 2 -->
+  <div class="tip-card">
+    <div class="tip-badge">📝 Sample Problem 2 — Power & Resistance</div>
+    <div class="tip-question">
+      Sa isang industrial plant sa Mariveles, Bataan, may motor na umuubos ng 3kW ng power sa 220V supply. Ano ang resistance ng motor at ang current na dumadaan dito?
+    </div>
+    <div class="tip-solution">
+      <div class="tip-step"><strong>Given:</strong> P = 3,000W, V = 220V</div>
+      <div class="tip-step"><strong>Find:</strong> R = ?, I = ?</div>
+      <div class="tip-step"><strong>Step 1 — Find Current:</strong></div>
+      <div class="tip-step"><span class="eq">I = P / V = 3000 / 220</span></div>
+      <div class="tip-step"><span class="eq">I ≈ 13.64 A</span></div>
+      <div class="tip-step"><strong>Step 2 — Find Resistance:</strong></div>
+      <div class="tip-step"><span class="eq">R = V / I = 220 / 13.64</span></div>
+      <div class="tip-step"><span class="eq">R ≈ 16.13 Ω</span></div>
+      <div class="tip-step">O kaya gamit ang: <span class="eq">R = V²/P = 220²/3000 = 48400/3000</span></div>
+      <div class="tip-answer">✅ Answer: I ≈ 13.64 A, R ≈ 16.13 Ω</div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+      💡 <em>Board Exam Tip:</em> Pwede mong directly gamitin ang <strong>R = V²/P</strong> para mas mabilis — isa lang na step! I-memorize mo ang lahat ng 9 power formula combinations.
+    </div>
+  </div>
+
+  <!-- Sample Problem 3 -->
+  <div class="tip-card">
+    <div class="tip-badge">📝 Sample Problem 3 — Series Circuit</div>
+    <div class="tip-question">
+      Sa isang eksperimento sa BPSU Electrical Lab, may series circuit na binubuo ng tatlong resistors: R1 = 10Ω, R2 = 20Ω, R3 = 30Ω, na konektado sa 120V DC source. Hanapin ang: (a) Total resistance, (b) Circuit current, (c) Voltage drop sa bawat resistor.
+    </div>
+    <div class="tip-solution">
+      <div class="tip-step"><strong>Given:</strong> R1 = 10Ω, R2 = 20Ω, R3 = 30Ω, Vs = 120V</div>
+      <div class="tip-step"><strong>(a) Total Resistance:</strong></div>
+      <div class="tip-step"><span class="eq">R_T = R1 + R2 + R3</span></div>
+      <div class="tip-step"><span class="eq">R_T = 10 + 20 + 30 = 60Ω</span></div>
+      <div class="tip-step"><strong>(b) Circuit Current:</strong></div>
+      <div class="tip-step"><span class="eq">I = Vs / R_T = 120 / 60 = 2A</span></div>
+      <div class="tip-step"><strong>(c) Voltage Drops (V = I × R):</strong></div>
+      <div class="tip-step"><span class="eq">V1 = 2 × 10 = 20V</span></div>
+      <div class="tip-step"><span class="eq">V2 = 2 × 20 = 40V</span></div>
+      <div class="tip-step"><span class="eq">V3 = 2 × 30 = 60V</span></div>
+      <div class="tip-step" style="color:var(--green)"><span class="eq">Check: 20 + 40 + 60 = 120V ✓ (KVL!)</span></div>
+      <div class="tip-answer">✅ R_T = 60Ω, I = 2A, V1 = 20V, V2 = 40V, V3 = 60V</div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+      💡 <em>Board Exam Tip:</em> Always verify gamit ang KVL — kung ang sum ng voltage drops ay hindi equal sa source voltage, may mali ka. Ito ang pinaka-common na checking method sa board exams!
+    </div>
+  </div>
+
+  <!-- Kirchhoff's Laws -->
+  <div class="card">
+    <div class="card-title">⚡ Kirchhoff's Laws Quick Reference</div>
+    <div class="card-desc">Dalawang batas na <span class="highlight">PALAGING</span> lumalabas sa ECE board exams. Memorize mo na ito!</div>
+
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name">KVL — Kirchhoff's Voltage Law</div>
+        <div class="law-formula">ΣV = 0 (sa isang closed loop)</div>
+        <div class="law-desc">
+          <strong style="color:var(--text)">Taglish:</strong> Ang algebraic sum ng lahat ng voltages sa isang closed loop ay zero. Ibig sabihin, ang total na voltage drop ay equal sa source voltage.<br><br>
+          <strong style="color:var(--text)">Sign Convention:</strong> + kung voltage rise (source), − kung voltage drop (resistor).
+        </div>
+      </div>
+
+      <div class="law-item">
+        <div class="law-name">KCL — Kirchhoff's Current Law</div>
+        <div class="law-formula">ΣI_in = ΣI_out (sa isang node)</div>
+        <div class="law-desc">
+          <strong style="color:var(--text)">Taglish:</strong> Ang sum ng lahat ng currents na pumapasok sa isang node ay equal sa sum ng lahat ng lumalabas. Conservation of charge ito!<br><br>
+          <strong style="color:var(--text)">Trick:</strong> Sa parallel circuits, I_total = I1 + I2 + I3 + …
+        </div>
+      </div>
+
+      <div class="law-item">
+        <div class="law-name">Series Circuit Rules</div>
+        <div class="law-formula">I = constant, V = distributed</div>
+        <div class="law-desc">
+          • Iisang current lang sa buong circuit<br>
+          • R_total = R1 + R2 + … + Rn<br>
+          • V_total = V1 + V2 + … + Vn<br>
+          • Pinaka-malaking R = pinaka-malaking voltage drop
+        </div>
+      </div>
+
+      <div class="law-item">
+        <div class="law-name">Parallel Circuit Rules</div>
+        <div class="law-formula">V = constant, I = distributed</div>
+        <div class="law-desc">
+          • Iisang voltage lang sa lahat ng branches<br>
+          • 1/R_T = 1/R1 + 1/R2 + … + 1/Rn<br>
+          • I_total = I1 + I2 + … + In<br>
+          • Pinaka-maliit na R = pinakamalaking branch current
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bataan Context Tips -->
+  <div class="card">
+    <div class="card-title">🌏 Bataan Context — Board Exam Strategy</div>
+    <div class="card-desc">Para sa mga taga-Bataan na nag-aaral para sa ECE/EE board! Mga practical tips mula sa local context.</div>
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name">🏭 FFTF / Industrial Context</div>
+        <div class="law-desc">
+          Ang Bataan ay may maraming industrial areas (Mariveles, Limay). Sa exams, madalas may industrial motor problems — typical voltages: 220V single-phase, 380V three-phase. Memorize mo na ang mga ito!
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">💡 Philippine Grid Specs</div>
+        <div class="law-desc">
+          PH Standard: 220V, 60Hz. Ang board exams often nagtanong ng resistance ng household appliances. Example: 60W bulb sa 220V → R = V²/P = 220²/60 ≈ 807Ω
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">📐 Calculator Tips (Board Exam)</div>
+        <div class="law-desc">
+          PRC allows scientific calculators. Practice ka ng: V²/R, √(P×R), 1/(1/R1 + 1/R2) — mga expressions na madalas gamitin. I-practice mo rin ang significant figures (3 sig figs usually).
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">⏱ Time Management</div>
+        <div class="law-desc">
+          Sa PRC board, may mga ~4 hours ka para sa ~100 items. Sa Ohm's Law problems, dapat max 2-3 minutes lang ang bawat isa. Identify agad: Series o Parallel? Anong formula ang kailangan?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formula Cheat Sheet -->
+  <div class="card">
+    <div class="card-title">📋 Complete Formula Cheat Sheet</div>
+    <div class="card-desc">I-screenshot mo ito para sa quick reference habang nag-aaral!</div>
+    <div style="overflow-x:auto">
+      <table class="e-series-table">
+        <thead>
+          <tr><th>Category</th><th>Formula</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="color:var(--gold)">Ohm's Law</td><td style="font-family:'Courier New',monospace;color:var(--blue)">V = I × R</td><td style="color:var(--text-muted)">Voltage</td></tr>
+          <tr><td style="color:var(--gold)">Ohm's Law</td><td style="font-family:'Courier New',monospace;color:var(--blue)">I = V / R</td><td style="color:var(--text-muted)">Current</td></tr>
+          <tr><td style="color:var(--gold)">Ohm's Law</td><td style="font-family:'Courier New',monospace;color:var(--blue)">R = V / I</td><td style="color:var(--text-muted)">Resistance</td></tr>
+          <tr><td style="color:var(--purple)">Power</td><td style="font-family:'Courier New',monospace;color:var(--blue)">P = V × I</td><td style="color:var(--text-muted)">Basic Power</td></tr>
+          <tr><td style="color:var(--purple)">Power</td><td style="font-family:'Courier New',monospace;color:var(--blue)">P = I² × R</td><td style="color:var(--text-muted)">I²R losses</td></tr>
+          <tr><td style="color:var(--purple)">Power</td><td style="font-family:'Courier New',monospace;color:var(--blue)">P = V² / R</td><td style="color:var(--text-muted)">Voltage/R</td></tr>
+          <tr><td style="color:var(--green)">Series</td><td style="font-family:'Courier New',monospace;color:var(--blue)">R_T = ΣR_n</td><td style="color:var(--text-muted)">Total R (series)</td></tr>
+          <tr><td style="color:var(--green)">Series</td><td style="font-family:'Courier New',monospace;color:var(--blue)">V_n = I × R_n</td><td style="color:var(--text-muted)">Voltage drop</td></tr>
+          <tr><td style="color:var(--red)">Parallel</td><td style="font-family:'Courier New',monospace;color:var(--blue)">1/R_T = Σ(1/R_n)</td><td style="color:var(--text-muted)">Total R (parallel)</td></tr>
+          <tr><td style="color:var(--red)">Parallel</td><td style="font-family:'Courier New',monospace;color:var(--blue)">I_n = V / R_n</td><td style="color:var(--text-muted)">Branch current</td></tr>
+          <tr><td style="color:var(--gold2)">2-R Parallel</td><td style="font-family:'Courier New',monospace;color:var(--blue)">R_T = (R1×R2)/(R1+R2)</td><td style="color:var(--text-muted)">Product over sum</td></tr>
+          <tr><td style="color:var(--gold2)">Equal R Para.</td><td style="font-family:'Courier New',monospace;color:var(--blue)">R_T = R / n</td><td style="color:var(--text-muted)">n equal resistors</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /tab-tips -->
+
+<!-- ══════════════════════════════════════════════
+     TAB 4: MNEMONICS & CALTECH
+══════════════════════════════════════════════ -->
+<div id="tab-mnemonics" class="tab-content">
+
+  <div class="card" style="background:linear-gradient(135deg,rgba(167,139,250,0.12),rgba(245,158,11,0.05));border-color:rgba(167,139,250,0.3)">
+    <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
+      🧠 <strong style="color:var(--text)">Mnemonics + Caltech = Board Exam Superpower!</strong><br>
+      I-combine mo ang memory tricks at Casio fx-991ES/EX PLUS techniques para ma-solve ang problems nang mas mabilis at mas tumpak. PRC-approved ang calculator na ito! 🎯
+    </div>
+  </div>
+
+  <!-- MNEMONICS SECTION -->
+  <div class="card">
+    <div class="card-title">🧠 Ohm's Law Mnemonics (Taglish)</div>
+    <div class="card-desc">Fun, story-based memory tricks — para hindi ka na makalimot kahit kinabukasan ng board exam!</div>
+
+    <div class="law-grid">
+      <div class="law-item" style="border:1px solid rgba(245,158,11,0.2)">
+        <div class="law-name">🍕 "VIR Triangle" Story</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Kwento:</strong> Si <strong style="color:var(--text)">V</strong>ictor (<em>Voltage</em>) ay nag-order ng pizza at binayaran si <strong style="color:var(--text)">I</strong>nto (<em>Current</em>) para bumili sa <strong style="color:var(--text)">R</strong>estaurant (<em>Resistance</em>).<br><br>
+          <strong style="color:var(--gold)">Formula recall:</strong> Cover ang hinahanap mo sa triangle — ang dalawang natitirang letters ang formula!<br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          • Cover V → I × R<br>
+          • Cover I → V ÷ R<br>
+          • Cover R → V ÷ I
+          </span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(96,165,250,0.2)">
+        <div class="law-name">⚡ "VIBRATE" Power Formula</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Sentence:</strong> "<strong style="color:var(--blue)">V</strong>ery <strong style="color:var(--blue)">I</strong>mportant <strong style="color:var(--blue)">B</strong>oard <strong style="color:var(--blue)">R</strong>esult, <strong style="color:var(--blue)">A</strong>raw-<strong style="color:var(--blue)">T</strong>aon <strong style="color:var(--blue)">E</strong>xam!"<br><br>
+          Ang meaning: <strong style="color:var(--text)">P = V×I, P = I²R, P = V²/R</strong><br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--green)">
+          VI → P = VI (dalawa lang, madali!)<br>
+          I²R → isipin mo: "I squared, R"<br>
+          V²/R → "V squared over R"
+          </span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(34,197,94,0.2)">
+        <div class="law-name">🔗 "SERIAL KILLER" (Series Rule)</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Trick:</strong> Sa Series circuit, ang <strong style="color:var(--text)">CURRENT ay serial</strong> — iisa lang, dumadaan sa lahat!<br><br>
+          "<strong style="color:var(--red)">I</strong> am the <strong style="color:var(--red)">serial</strong> one — <strong style="color:var(--red)">same</strong> ako kahit saan!"<br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          I₁ = I₂ = I₃ = I_total<br>
+          V₁ + V₂ + V₃ = V_source<br>
+          R_T = R₁ + R₂ + R₃
+          </span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(239,68,68,0.2)">
+        <div class="law-name">⚡ "PARALLEL PARTY" (Parallel Rule)</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Trick:</strong> Sa Parallel, ang <strong style="color:var(--text)">VOLTAGE ay nagpa-party</strong> — pantay-pantay sa lahat ng branches!<br><br>
+          "<strong style="color:var(--blue)">V</strong>oltage, <strong style="color:var(--blue)">V</strong>oltage, <strong style="color:var(--blue)">V</strong>oltage — same kami sa lahat ng branches!"<br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          V₁ = V₂ = V₃ = V_source<br>
+          I₁ + I₂ + I₃ = I_total<br>
+          1/R_T = 1/R₁ + 1/R₂ + 1/R₃
+          </span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(245,158,11,0.2)">
+        <div class="law-name">🏠 "BAHAY" Kirchhoff Mnemonic</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">KVL:</strong> "Kung ikaw ay umuwi sa <strong style="color:var(--text)">BAHAY</strong>, ang lahat ng lakad mo ay babalik sa simula — ZERO ang net na layo mo!"<br><br>
+          = Sum ng lahat ng voltages sa loop = 0<br><br>
+          <strong style="color:var(--gold)">KCL:</strong> "Sa GATE ng bahay — pag-in mo ang tao, kailangan equal sa pag-out. Walang maiiwan sa gate!"<br><br>
+          = ΣI_in = ΣI_out sa bawat node
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(167,139,250,0.2)">
+        <div class="law-name">📱 "PRODUCT OVER SUM" Shortcut</div>
+        <div class="law-desc">
+          Para sa 2 parallel resistors — hindi na kailangan ng reciprocal method!<br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--gold)">R_T = (R₁ × R₂) / (R₁ + R₂)</span><br><br>
+          <strong style="color:var(--text)">Mnemonic:</strong> "<strong style="color:var(--purple)">P</strong>roduct <strong style="color:var(--purple)">O</strong>ver <strong style="color:var(--purple)">S</strong>um = <strong style="color:var(--purple)">POS</strong>itive result agad!"<br><br>
+          Extra tip: kung equal ang dalawang R, ang R_T = R/2 palagi!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALTECH SECTION -->
+  <div class="card">
+    <div class="card-title">🔢 Casio fx-991ES/EX PLUS — CalTech Guide</div>
+    <div class="card-desc">Exact button sequences para sa board exam. Ang fx-991ES PLUS ay PRC-approved — gamitin mo ito nang tama!</div>
+
+    <div class="law-grid">
+      <div class="law-item" style="border:1px solid rgba(96,165,250,0.25)">
+        <div class="law-name">📱 SOLVE Function (SHIFT → CALC)</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Gamit:</strong> Para sa any unknown sa isang equation.<br><br>
+          <strong style="color:var(--text)">Example: Hanapin ang R kung V=220, I=5</strong><br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue);line-height:2">
+          1. Type: <strong>220 = 5 × X</strong><br>
+          2. Press: <strong>SHIFT → CALC</strong><br>
+          3. Enter guess (default 1): press <strong>=</strong><br>
+          4. Result: X = <strong>44</strong> (ang R!)
+          </span><br><br>
+          <span style="color:var(--green);font-size:12px">✅ Works for any VIR combination — faster kaysa manual!</span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(34,197,94,0.25)">
+        <div class="law-name">⚡ EQN Mode — Simultaneous Equations</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Gamit:</strong> Para sa mesh analysis / node voltage problems.<br><br>
+          <strong style="color:var(--text)">Button sequence:</strong><br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue);line-height:2">
+          1. Press: <strong>MODE → 5 (EQN)</strong><br>
+          2. Choose: <strong>1 (anX+bY=c, 2 unknowns)</strong><br>
+             or <strong>2 (3 unknowns)</strong><br>
+          3. Enter coefficients a, b, c for each equation<br>
+          4. Press <strong>=</strong> after each value<br>
+          5. Results show X and Y (unknowns)
+          </span><br><br>
+          <span style="color:var(--green);font-size:12px">✅ Perfect for 2-loop or 3-loop KVL problems!</span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(245,158,11,0.25)">
+        <div class="law-name">🔁 Reciprocal Key (x⁻¹) — Parallel R</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Gamit:</strong> Para sa parallel resistance — walang manual na 1/R+1/R!<br><br>
+          <strong style="color:var(--text)">Example: R1=10Ω, R2=20Ω, R3=30Ω in parallel</strong><br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue);line-height:2">
+          1. Press: <strong>( 10 x⁻¹ + 20 x⁻¹ + 30 x⁻¹ ) x⁻¹</strong><br>
+          2. Press: <strong>=</strong><br>
+          3. Result: <strong>5.4545...</strong> Ω
+          </span><br><br>
+          <span style="color:var(--text-muted);font-size:12px">Note: x⁻¹ button is usually labeled <strong style="color:var(--gold)">x⁻¹</strong> or press <strong style="color:var(--gold)">SHIFT → )</strong> depending on model.</span>
+        </div>
+      </div>
+
+      <div class="law-item" style="border:1px solid rgba(167,139,250,0.25)">
+        <div class="law-name">📊 TABLE Mode — Multiple Values</div>
+        <div class="law-desc">
+          <strong style="color:var(--gold)">Gamit:</strong> Generate maraming V, I, or R values nang sabay-sabay.<br><br>
+          <strong style="color:var(--text)">Example: V values para sa I = 1A to 5A, R = 10Ω</strong><br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue);line-height:2">
+          1. Press: <strong>MODE → 7 (TABLE)</strong><br>
+          2. Enter function: <strong>f(X) = X × 10</strong><br>
+          3. Start: <strong>1</strong>, End: <strong>5</strong>, Step: <strong>1</strong><br>
+          4. Shows table of V values!
+          </span><br><br>
+          <span style="color:var(--green);font-size:12px">✅ Useful para ma-verify multiple operating points!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALTECH WORKED EXAMPLES -->
+  <div class="card">
+    <div class="card-title">⚡ CalTech vs Manual — Worked Examples</div>
+    <div class="card-desc">Tingnan mo kung gaano ka-bilis ang caltech kumpara sa manual solving!</div>
+
+    <!-- Example 1 -->
+    <div class="tip-card" style="margin-bottom:12px">
+      <div class="tip-badge">🔢 CalTech Example 1 — Parallel Circuit</div>
+      <div class="tip-question">
+        Find the total resistance of R1=47Ω, R2=100Ω, R3=220Ω connected in parallel.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <div class="tip-solution">
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">❌ Manual (mabagal)</div>
+          <div class="tip-step"><span class="eq">1/R = 1/47 + 1/100 + 1/220</span></div>
+          <div class="tip-step"><span class="eq">= 0.02128 + 0.01 + 0.00455</span></div>
+          <div class="tip-step"><span class="eq">= 0.03582</span></div>
+          <div class="tip-step"><span class="eq">R = 1/0.03582</span></div>
+          <div class="tip-answer" style="font-size:12px">≈ 27.92 Ω (~45 secs)</div>
+        </div>
+        <div class="tip-solution">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ CalTech (mabilis)</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">( 47 x⁻¹</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">+ 100 x⁻¹</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">+ 220 x⁻¹</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">) x⁻¹ =</div>
+          <div class="tip-answer" style="font-size:12px">≈ 27.92 Ω (~8 secs)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 2 -->
+    <div class="tip-card">
+      <div class="tip-badge">🔢 CalTech Example 2 — SOLVE for Unknown R</div>
+      <div class="tip-question">
+        A circuit draws 3.5A from a 120V source. What is the circuit resistance?
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <div class="tip-solution">
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">❌ Manual</div>
+          <div class="tip-step"><span class="eq">R = V / I</span></div>
+          <div class="tip-step"><span class="eq">R = 120 / 3.5</span></div>
+          <div class="tip-answer" style="font-size:12px">= 34.286 Ω</div>
+        </div>
+        <div class="tip-solution">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ SOLVE Method</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">120 = 3.5 × X</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">SHIFT → CALC</div>
+          <div class="tip-step" style="font-family:'Courier New',monospace;color:var(--blue)">guess=1 → =</div>
+          <div class="tip-answer" style="font-size:12px">X = 34.286 Ω ✓</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-muted)">
+        💡 <em>Tip:</em> Ang SOLVE method ay mas kapaki-pakinabang sa complex equations na may maraming unknowns o non-linear expressions!
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED TIPS -->
+  <div class="card">
+    <div class="card-title">🚀 Speed Solving Tips — Multiple Choice Board Exam</div>
+    <div class="card-desc">Para ma-maximize ang iyong score sa ECE/EE board exams — tested strategies!</div>
+    <div class="law-grid">
+      <div class="law-item">
+        <div class="law-name">1️⃣ Unit Prefix Trick</div>
+        <div class="law-desc">
+          Convert agad ng units bago mag-solve:<br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          mA = ×10⁻³ A<br>
+          kΩ = ×10³ Ω<br>
+          mW = ×10⁻³ W<br>
+          kW = ×10³ W
+          </span><br>
+          Tip: Sa Casio, gamitin ang <strong style="color:var(--gold)">ENG key</strong> para quick prefix conversion!
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">2️⃣ Eliminate Wrong Choices</div>
+        <div class="law-desc">
+          Sa multiple choice, kung makita mo na ang answer ay dapat malaki (high resistance) pero may choices na maliit — bali-in mo na agad. <strong style="color:var(--text)">Rough estimate muna bago mag-exact calc!</strong><br><br>
+          Rule of thumb: Series R > pinaka-malaking R; Parallel R &lt; pinaka-maliit na R.
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">3️⃣ ANS Key Chaining</div>
+        <div class="law-desc">
+          Gamitin ang <strong style="color:var(--gold)">ANS</strong> button para mag-chain ng calculations — hindi na kailangan mag-retype!<br><br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          220 ÷ 44 = (gets I=5)<br>
+          ANS × 44 = (verifies V=220)<br>
+          ANS² × 44 = (gets P)
+          </span>
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">4️⃣ 3 Significant Figures Rule</div>
+        <div class="law-desc">
+          Sa PRC board exams, ang answers ay usually sa <strong style="color:var(--text)">3 significant figures</strong>. Kung ang iyong exact answer ay <em>27.9166...</em>, ang choices ay likely <em>27.9 Ω</em> or <em>28.0 Ω</em>.<br><br>
+          Casio tip: Press <strong style="color:var(--gold)">SHIFT → MODE → 6 → 3</strong> para sa 3 decimal places display.
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">5️⃣ Power Sanity Check</div>
+        <div class="law-desc">
+          Bago isumit ang sagot, quick check: <strong style="color:var(--text)">P = VI dapat positive at makatuwiran.</strong><br><br>
+          Kung ang P ay negatibo o napaka-laki (GW range para sa simpleng circuit) — may mali ka. Back-check agad ang iyong V at I values!
+        </div>
+      </div>
+      <div class="law-item">
+        <div class="law-name">6️⃣ EQN Mode Para sa KVL/KCL</div>
+        <div class="law-desc">
+          Sa 2-loop mesh problems, gamitin ang EQN mode (2 unknowns). Setup ang 2 KVL equations as:<br>
+          <span style="font-family:'Courier New',monospace;color:var(--blue)">
+          aI₁ + bI₂ = V₁<br>
+          cI₁ + dI₂ = V₂
+          </span><br>
+          Ang Casio ay mag-sosolve ng I₁ at I₂ nang automatic — walang elimination method na kailangan!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="law-grid" style="margin-top:16px">
+    <h4 style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);padding-bottom:7px;border-bottom:1px solid var(--border);margin-bottom:12px;grid-column:1/-1">📚 Real ECE Board Mnemonics</h4>
+
+    <div class="law-item">
+      <div class="law-name">VladImiR Putin — Ohm's Law Triangle</div>
+      <div class="law-desc">
+        <strong style="color:var(--gold)">V = I × R</strong> — isipin si "Vladimir Putin"<br>
+        <strong>V</strong>lad<strong>I</strong>mi<strong>R</strong> → V, I, R<br>
+        <div class="formula-box" style="margin-top:6px">V = IR &nbsp; I = V/R &nbsp; R = V/I</div>
+        Paalala: Ang <strong>V</strong> ay nasa itaas ng triangle, <strong>I</strong> at <strong>R</strong> nasa ibaba — cover ang hinahanap mo para makita ang formula!
+      </div>
+    </div>
+
+    <div class="law-item">
+      <div class="law-name">Virgins Are Rare — VAR ng Power</div>
+      <div class="law-desc">
+        <strong style="color:var(--gold)">V, A, R</strong> — para sa AC power triangle<br>
+        <strong>V</strong>irgins (Volt-Amperes = Apparent Power S in VA)<br>
+        <strong>A</strong>re (Active/Real Power P in Watts)<br>
+        <strong>R</strong>are (Reactive Power Q in VAR)<br>
+        <div class="formula-box" style="margin-top:6px">S² = P² + Q² &nbsp; PF = P/S = cos θ</div>
+      </div>
+    </div>
+
+    <div class="law-item">
+      <div class="law-name">Twinkle Twinkle Little Star — Power Formula</div>
+      <div class="law-desc">
+        <em style="color:var(--gold)">"Twinkle Twinkle Little Star, Power equals I-squared R!"</em><br>
+        <div class="formula-box" style="margin-top:6px">P = I²R &nbsp; P = V²/R &nbsp; P = VI</div>
+        Pangalawang linya: <em>"V-squared over R, that's what power formulas are!"</em><br>
+        <span style="font-size:.78rem;color:var(--muted)">Effective para sa board exam — kantahin mo sa isip mo habang nagtatrabaho!</span>
+      </div>
+    </div>
+
+    <div class="law-item">
+      <div class="law-name">ELI the ICE man — AC Phase Relationships</div>
+      <div class="law-desc">
+        <strong style="color:var(--gold)">ELI</strong> — sa Inductor (L): Voltage (E) leads Current (I)<br>
+        <strong style="color:var(--gold)">ICE</strong> — sa Capacitor (C): Current (I) leads Voltage (E)<br>
+        <div class="formula-box" style="margin-top:6px">ELI: V leads I (inductive) &nbsp; ICE: I leads V (capacitive)</div>
+        Trick: "ELI the ICE man" — isipin ang isang lalaking nagbebenta ng yelo, si ELI!<br>
+        <span style="font-size:.78rem;color:var(--muted)">Laging lumabas sa ECE board — phase angle problems!</span>
+      </div>
+    </div>
+
+    <div class="law-item">
+      <div class="law-name">CIVIL — Capacitor Current/Voltage Phase</div>
+      <div class="law-desc">
+        <strong style="color:var(--gold)">C-I-V-I-L</strong><br>
+        Sa <strong>C</strong>apacitor: <strong>I</strong> leads <strong>V</strong><br>
+        Sa <strong>I</strong>nductor: <strong>V</strong> leads <strong>I</strong> (kaya <strong>L</strong> ang panghuling letter)<br>
+        <div class="formula-box" style="margin-top:6px">Capacitor: I leads V by 90° &nbsp; Inductor: V leads I by 90°</div>
+        <span style="font-size:.78rem;color:var(--muted)">CIVIL = mas madaling tandaan kaysa ELI ICE para sa ibang tao. Piliin ang mas okay sa'yo!</span>
+      </div>
+    </div>
+
+    <div class="law-item">
+      <div class="law-name">DISCO — Thevenin/Norton Conversion</div>
+      <div class="law-desc">
+        <strong style="color:var(--gold)">D-I-S-C-O</strong> — para sa source transformation<br>
+        <strong>D</strong>ivide Voltage Source → Current Source: I = V/R<br>
+        <strong>I</strong>nvert direction for Current → Voltage: V = IR<br>
+        <strong>S</strong>ame resistance in both Thevenin and Norton<br>
+        <strong>C</strong>onnect R in parallel (Norton) vs series (Thevenin)<br>
+        <strong>O</strong>pen circuit → Thevenin, Short circuit → Norton<br>
+        <div class="formula-box" style="margin-top:6px">V_th = I_n × R_th &nbsp; I_n = V_th / R_th</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-mnemonics -->
+
+<!-- ══════════════ BOTTOM NAV ══════════════ -->
+<nav class="bottom-nav">
+  <a href="/" class="home-link">🏠 PinasTools Home</a>
+</nav>
+
+<script>
+// ══════════════ LANGUAGE MODAL ══════════════
+let selectedLang = null;
+
+function selectLang(btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedLang = btn.dataset.lang;
+}
+
+function installApp() {
+  if (!selectedLang) {
+    // Default to Tagalog if none selected
+    selectedLang = 'tl';
+    document.querySelector('[data-lang="tl"]').classList.add('selected');
+  }
+  localStorage.setItem('pinastools_lang', selectedLang);
+  document.getElementById('installer-modal').classList.add('hidden');
+}
+
+// Check on load
+(function() {
+  const saved = localStorage.getItem('pinastools_lang');
+  if (saved) {
+    document.getElementById('installer-modal').classList.add('hidden');
+  }
+})();
+
+// ══════════════ TABS ══════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Keyboard shortcuts: 1-4 to switch tabs
+document.addEventListener('keydown', function(e) {
+  // Skip if focus is inside an input/textarea
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  const tabMap = {'1':'calculator','2':'table','3':'tips','4':'mnemonics'};
+  if (tabMap[e.key]) {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const idx = Object.keys(tabMap).indexOf(e.key);
+    if (tabs[idx]) switchTab(tabMap[e.key], tabs[idx]);
+  }
+});
+
+// ══════════════ COPY UTILITY ══════════════
+function copyValue(val) {
+  navigator.clipboard.writeText(String(val)).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = String(val);
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1800);
+}
+
+function makeResultItem(label, value, unit) {
+  const display = formatNum(value) + ' ' + unit;
+  return `<div class="result-item">
+    <span class="result-label">${label}</span>
+    <span class="result-value" onclick="copyValue('${formatNum(value)} ${unit}')">${display}</span>
+  </div>`;
+}
+
+function formatNum(n) {
+  if (Math.abs(n) < 0.001 && n !== 0) return n.toExponential(4);
+  if (Math.abs(n) >= 1e6) return n.toExponential(4);
+  // Up to 4 significant figures
+  let s = parseFloat(n.toPrecision(5));
+  return String(s);
+}
+
+function showResult(boxId, html, isError = false) {
+  const box = document.getElementById(boxId);
+  const content = document.getElementById(boxId + '-content') ||
+    box.querySelector('[id$="-content"]');
+  box.classList.add('show');
+  box.classList.toggle('error', isError);
+  if (content) content.innerHTML = html;
+}
+
+function hideResult(boxId) {
+  document.getElementById(boxId).classList.remove('show');
+}
+
+// ══════════════ OHM'S LAW CALC ══════════════
+function autoCalcOhm() {
+  const vEl = document.getElementById('ohm-v');
+  const iEl = document.getElementById('ohm-i');
+  const rEl = document.getElementById('ohm-r');
+
+  const v = parseFloat(vEl.value);
+  const i = parseFloat(iEl.value);
+  const r = parseFloat(rEl.value);
+
+  const hV = !isNaN(v);
+  const hI = !isNaN(i);
+  const hR = !isNaN(r);
+
+  const count = [hV, hI, hR].filter(Boolean).length;
+  if (count < 2) { hideResult('ohm-result'); return; }
+
+  let resV = v, resI = i, resR = r;
+  let solved = '';
+
+  if (hV && hI && !hR) {
+    resR = v / i; solved = 'R';
+    rEl.placeholder = formatNum(resR) + ' Ω (solved)';
+  } else if (hV && hR && !hI) {
+    resI = v / r; solved = 'I';
+    iEl.placeholder = formatNum(resI) + ' A (solved)';
+  } else if (hI && hR && !hV) {
+    resV = i * r; solved = 'V';
+    vEl.placeholder = formatNum(resV) + ' V (solved)';
+  } else if (count === 3) {
+    // All 3 given — check consistency
+    const calc_r = v / i;
+    if (Math.abs(calc_r - r) / r > 0.001) {
+      showResult('ohm-result', '<div style="color:var(--red)">⚠️ Inconsistent values! Check your inputs — V ≠ I × R</div>', true);
+      return;
+    }
+    solved = 'consistent';
+  }
+
+  if (!hV) resV = resI * resR;
+  if (!hI) resI = resV / resR;
+  if (!hR) resR = resV / resI;
+
+  if (!isFinite(resV) || !isFinite(resI) || !isFinite(resR)) {
+    showResult('ohm-result', '<div style="color:var(--red)">⚠️ Invalid computation — check for zero values.</div>', true);
+    return;
+  }
+
+  const html = makeResultItem('⚡ Voltage (V)', resV, 'V') +
+    makeResultItem('🔌 Current (I)', resI, 'A') +
+    makeResultItem('🔧 Resistance (R)', resR, 'Ω') +
+    makeResultItem('💡 Power (P = VI)', resV * resI, 'W');
+
+  showResult('ohm-result', html);
+}
+
+function clearOhm() {
+  ['ohm-v','ohm-i','ohm-r'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.placeholder = el.id === 'ohm-v' ? 'e.g. 12' : el.id === 'ohm-i' ? 'e.g. 2' : 'e.g. 6';
+  });
+  hideResult('ohm-result');
+}
+
+// ══════════════ POWER CALC ══════════════
+function calcPower() {
+  const v = parseFloat(document.getElementById('pw-v').value);
+  const i = parseFloat(document.getElementById('pw-i').value);
+  const r = parseFloat(document.getElementById('pw-r').value);
+
+  const hV = !isNaN(v) && v > 0;
+  const hI = !isNaN(i) && i >= 0;
+  const hR = !isNaN(r) && r > 0;
+
+  const results = [];
+
+  if (hV && hI) results.push({ label: '💡 P = V × I', val: v * i, unit: 'W' });
+  if (hI && hR) results.push({ label: '💡 P = I² × R', val: i * i * r, unit: 'W' });
+  if (hV && hR) results.push({ label: '💡 P = V² / R', val: v * v / r, unit: 'W' });
+
+  if (results.length === 0) { hideResult('power-result'); return; }
+
+  let html = results.map(x => makeResultItem(x.label, x.val, x.unit)).join('');
+
+  // Also show derived quantities
+  if (hV && hI && !hR) html += makeResultItem('🔧 R = V / I', v / i, 'Ω');
+  if (hV && hR && !hI) html += makeResultItem('🔌 I = V / R', v / r, 'A');
+  if (hI && hR && !hV) html += makeResultItem('⚡ V = I × R', i * r, 'V');
+
+  showResult('power-result', html);
+}
+
+function clearPower() {
+  ['pw-v','pw-i','pw-r'].forEach(id => document.getElementById(id).value = '');
+  hideResult('power-result');
+}
+
+// ══════════════ SERIES CIRCUIT ══════════════
+let seriesCount = 2;
+
+function addSeriesR() {
+  if (seriesCount >= 5) return;
+  seriesCount++;
+  const div = document.createElement('div');
+  div.className = 'resistor-row';
+  div.innerHTML = `<div class="resistor-num">R${seriesCount}</div>
+    <div class="input-row" style="flex:1">
+      <input type="number" class="input-field ser-r" placeholder="Ohms (Ω)" step="any">
+      <div class="unit-badge">Ω</div>
+    </div>`;
+  document.getElementById('series-resistors').appendChild(div);
+  if (seriesCount >= 5) document.getElementById('add-ser-btn').disabled = true;
+}
+
+function removeSeriesR() {
+  if (seriesCount <= 1) return;
+  const container = document.getElementById('series-resistors');
+  container.removeChild(container.lastElementChild);
+  seriesCount--;
+  document.getElementById('add-ser-btn').disabled = false;
+}
+
+function calcSeries() {
+  const vs = parseFloat(document.getElementById('ser-v').value);
+  const rInputs = Array.from(document.querySelectorAll('.ser-r'))
+    .map(el => parseFloat(el.value))
+    .filter(v => !isNaN(v) && v > 0);
+
+  if (isNaN(vs) || vs <= 0) {
+    showResult('series-result', '<div style="color:var(--red)">⚠️ I-enter ang source voltage!</div>', true);
+    return;
+  }
+  if (rInputs.length === 0) {
+    showResult('series-result', '<div style="color:var(--red)">⚠️ Mag-enter ng kahit isang resistor value!</div>', true);
+    return;
+  }
+
+  const rTotal = rInputs.reduce((a, b) => a + b, 0);
+  const iTot = vs / rTotal;
+  const pTot = vs * iTot;
+
+  let html = makeResultItem('🔧 Total Resistance (R_T)', rTotal, 'Ω') +
+    makeResultItem('🔌 Circuit Current (I)', iTot, 'A') +
+    makeResultItem('💡 Total Power (P)', pTot, 'W');
+
+  html += '<div style="height:8px"></div>';
+  rInputs.forEach((r, idx) => {
+    const vDrop = iTot * r;
+    const pDiss = iTot * iTot * r;
+    html += makeResultItem(`⚡ V${idx+1} (drop across R${idx+1}=${formatNum(r)}Ω)`, vDrop, 'V');
+  });
+
+  // KVL Check
+  const vSum = rInputs.reduce((acc, r) => acc + iTot * r, 0);
+  html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:var(--green)">✅ KVL Check: ΣV_drops = ${formatNum(vSum)}V ≈ Vs = ${formatNum(vs)}V</div>`;
+
+  showResult('series-result', html);
+}
+
+function clearSeries() {
+  document.getElementById('ser-v').value = '';
+  document.querySelectorAll('.ser-r').forEach(el => el.value = '');
+  hideResult('series-result');
+}
+
+// ══════════════ PARALLEL CIRCUIT ══════════════
+let parallelCount = 2;
+
+function addParallelR() {
+  if (parallelCount >= 5) return;
+  parallelCount++;
+  const div = document.createElement('div');
+  div.className = 'resistor-row';
+  div.innerHTML = `<div class="resistor-num">R${parallelCount}</div>
+    <div class="input-row" style="flex:1">
+      <input type="number" class="input-field par-r" placeholder="Ohms (Ω)" step="any">
+      <div class="unit-badge">Ω</div>
+    </div>`;
+  document.getElementById('parallel-resistors').appendChild(div);
+  if (parallelCount >= 5) document.getElementById('add-par-btn').disabled = true;
+}
+
+function removeParallelR() {
+  if (parallelCount <= 1) return;
+  const container = document.getElementById('parallel-resistors');
+  container.removeChild(container.lastElementChild);
+  parallelCount--;
+  document.getElementById('add-par-btn').disabled = false;
+}
+
+function calcParallel() {
+  const vs = parseFloat(document.getElementById('par-v').value);
+  const rInputs = Array.from(document.querySelectorAll('.par-r'))
+    .map(el => parseFloat(el.value))
+    .filter(v => !isNaN(v) && v > 0);
+
+  if (isNaN(vs) || vs <= 0) {
+    showResult('parallel-result', '<div style="color:var(--red)">⚠️ I-enter ang source voltage!</div>', true);
+    return;
+  }
+  if (rInputs.length === 0) {
+    showResult('parallel-result', '<div style="color:var(--red)">⚠️ Mag-enter ng kahit isang resistor value!</div>', true);
+    return;
+  }
+
+  const recipSum = rInputs.reduce((acc, r) => acc + 1/r, 0);
+  const rTotal = 1 / recipSum;
+  const iTot = vs / rTotal;
+  const pTot = vs * iTot;
+
+  let html = makeResultItem('🔧 Total Resistance (R_T)', rTotal, 'Ω') +
+    makeResultItem('🔌 Total Current (I_total)', iTot, 'A') +
+    makeResultItem('💡 Total Power (P)', pTot, 'W');
+
+  html += '<div style="height:8px"></div>';
+  rInputs.forEach((r, idx) => {
+    const iBranch = vs / r;
+    const pBranch = vs * iBranch;
+    html += makeResultItem(`🔌 I${idx+1} (branch R${idx+1}=${formatNum(r)}Ω)`, iBranch, 'A');
+  });
+
+  // KCL Check
+  const iSum = rInputs.reduce((acc, r) => acc + vs/r, 0);
+  html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:var(--green)">✅ KCL Check: ΣI_branches = ${formatNum(iSum)}A = I_total = ${formatNum(iTot)}A</div>`;
+
+  showResult('parallel-result', html);
+}
+
+function clearParallel() {
+  document.getElementById('par-v').value = '';
+  document.querySelectorAll('.par-r').forEach(el => el.value = '');
+  hideResult('parallel-result');
+}
+
+// ══════════════ E-SERIES TABLE ══════════════
+const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+const E24 = [1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4, 2.7, 3.0,
+             3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1];
+
+(function buildETable() {
+  const tbody = document.getElementById('e-series-tbody');
+  if (!tbody) return;
+  for (let i = 0; i < E24.length; i++) {
+    const e12Val = E12[i] !== undefined ? E12[i] : '';
+    const isE12 = E12.indexOf(E24[i]) !== -1;
+    tbody.innerHTML += `<tr>
+      <td>${i + 1}</td>
+      <td class="${isE12 ? 'e12-cell' : ''}">${isE12 ? E24[i].toFixed(1) : '—'}</td>
+      <td>${E24[i].toFixed(1)}</td>
+    </tr>`;
+  }
+})();
+</script>
+</body>
+</html>

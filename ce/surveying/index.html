@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CE Surveying & Traverse | PinasTools</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111318;--bg2:#1a1d26;--bg3:#22263a;
+  --gold:#f59e0b;--gold2:#fbbf24;--goldf:#78490a;
+  --text:#e8eaf0;--muted:#8892a4;--border:#2a2f45;
+  --red:#ef4444;--green:#22c55e;--blue:#3b82f6;
+  --r:16px;--r2:10px;--r3:6px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.5}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ─── MODAL ─── */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+#modal{background:var(--bg2);border:1.5px solid var(--gold);border-radius:var(--r);max-width:380px;width:100%;padding:28px 24px;text-align:center}
+#modal h2{color:var(--gold);font-size:1.25rem;font-weight:700;margin-bottom:4px}
+#modal p{color:var(--muted);font-size:.875rem;margin-bottom:20px}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.lang-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 8px;cursor:pointer;color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;transition:all .2s}
+.lang-btn:hover,.lang-btn.selected{border-color:var(--gold);color:var(--gold);background:rgba(245,158,11,.08)}
+.btn-primary{background:var(--gold);color:#111318;border:none;border-radius:var(--r2);padding:12px 28px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;transition:background .2s}
+.btn-primary:hover{background:var(--gold2)}
+
+/* ─── HEADER ─── */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.logo{width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#111318;font-size:1rem;flex-shrink:0}
+.header-info h1{font-size:1rem;font-weight:700;color:var(--text);line-height:1.2}
+.header-info span{font-size:.75rem;color:var(--muted)}
+.header-badge{margin-left:auto;background:rgba(245,158,11,.12);border:1px solid var(--gold);border-radius:20px;padding:3px 10px;font-size:.7rem;color:var(--gold);font-weight:600;white-space:nowrap}
+
+/* ─── TABS ─── */
+.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;padding:0 8px;position:sticky;top:61px;z-index:99}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:0 0 auto;padding:12px 16px;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-kbd{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:var(--bg3);border-radius:3px;font-size:.65rem;margin-right:5px;color:var(--muted);border:1px solid var(--border)}
+
+/* ─── MAIN CONTENT ─── */
+main{flex:1;padding:16px;max-width:900px;margin:0 auto;width:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+section{margin-bottom:18px}
+
+/* ─── CARDS ─── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card-title{font-size:.85rem;font-weight:600;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title svg{flex-shrink:0}
+
+/* ─── MODE SELECTOR ─── */
+.mode-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px}
+@media(min-width:480px){.mode-grid{grid-template-columns:repeat(3,1fr)}}
+.mode-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 12px;cursor:pointer;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;text-align:center;transition:all .2s;line-height:1.3}
+.mode-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,158,11,.08)}
+.mode-btn span{display:block;font-size:.7rem;color:inherit;opacity:.8;margin-top:2px}
+
+/* ─── FORM ELEMENTS ─── */
+.form-row{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
+@media(min-width:480px){.form-row.col2{grid-template-columns:1fr 1fr}}
+@media(min-width:600px){.form-row.col3{grid-template-columns:1fr 1fr 1fr}}
+@media(min-width:600px){.form-row.col4{grid-template-columns:repeat(4,1fr)}}
+label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;font-weight:500}
+input,select{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r3);padding:9px 11px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.875rem;outline:none;transition:border .2s}
+input:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--bg2)}
+.input-group{position:relative}
+.input-suffix{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.78rem;pointer-events:none}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r2);padding:9px 16px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-sm{padding:7px 12px;font-size:.78rem}
+.btn-gold{background:var(--gold);color:#111318}
+.btn-gold:hover{background:var(--gold2)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:rgba(239,68,68,.12);border:1px solid var(--red);color:var(--red)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-green{background:rgba(34,197,94,.12);border:1px solid var(--green);color:var(--green)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ─── TABLES ─── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r2);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{background:var(--bg3);color:var(--gold);font-weight:600;padding:8px 10px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(245,158,11,.04)}
+td{padding:7px 10px;text-align:center;color:var(--text)}
+td.neg{color:#f87171}
+td.pos{color:#4ade80}
+td.muted-cell{color:var(--muted)}
+.leg-row input{padding:6px 8px;font-size:.8rem}
+
+/* ─── RESULT BOXES ─── */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media(min-width:540px){.result-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:720px){.result-grid.col4{grid-template-columns:repeat(4,1fr)}}
+.result-item{background:var(--bg3);border-radius:var(--r2);padding:10px 12px;border:1px solid var(--border)}
+.result-label{font-size:.72rem;color:var(--muted);margin-bottom:3px}
+.result-value{font-size:1.05rem;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.result-unit{font-size:.72rem;color:var(--muted);margin-top:1px}
+.result-item.good .result-value{color:var(--green)}
+.result-item.bad .result-value{color:var(--red)}
+
+/* ─── ALERTS ─── */
+.alert{border-radius:var(--r2);padding:10px 14px;font-size:.82rem;margin-top:10px;border:1px solid}
+.alert-gold{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3);color:var(--gold)}
+.alert-green{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);color:var(--green)}
+.alert-red{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:var(--red)}
+.alert-blue{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.3);color:#93c5fd}
+
+/* ─── TIPS / MNEMONICS ─── */
+.tip-card{background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 var(--r2) var(--r2) 0;padding:12px 14px;margin-bottom:10px}
+.tip-card h4{font-size:.88rem;font-weight:600;color:var(--gold);margin-bottom:4px}
+.tip-card p,.tip-card li{font-size:.82rem;color:var(--text);line-height:1.6}
+.tip-card ul{padding-left:16px;margin-top:4px}
+.mnemonic-box{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.03));border:1.5px solid rgba(245,158,11,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.mnemonic-word{font-size:1.5rem;font-weight:800;color:var(--gold);letter-spacing:.05em;margin-bottom:6px}
+.mnemonic-def{font-size:.82rem;color:var(--text);line-height:1.7}
+.mnemonic-def strong{color:var(--gold)}
+.formula-box{background:var(--bg3);border-radius:var(--r2);padding:12px;margin-top:8px;font-size:.82rem;color:#93c5fd;font-family:'Courier New',monospace;border:1px solid var(--border);line-height:1.8}
+.section-head{font-size:.9rem;font-weight:700;color:var(--gold);margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+.section-head::after{content:'';flex:1;height:1px;background:var(--border);margin-left:8px}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-gold{background:rgba(245,158,11,.2);color:var(--gold);border:1px solid rgba(245,158,11,.4)}
+.badge-blue{background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.4)}
+.badge-green{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.4)}
+.badge-red{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.4)}
+
+/* ─── LEVELING ─── */
+.lev-add-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.lev-add-row input{padding:7px 9px;font-size:.82rem}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ─── FOOTER ─── */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:12px 16px;text-align:center;font-size:.72rem;color:var(--muted)}
+footer span{color:var(--gold);font-weight:600}
+.gcash-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,95,255,.15);border:1px solid rgba(0,95,255,.3);border-radius:20px;padding:3px 10px;color:#93c5fd;font-size:.7rem;margin-top:4px}
+
+/* ─── CALTECH HIGHLIGHT ─── */
+.calc-step{background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.calc-step-num{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;background:var(--gold);color:#111318;border-radius:50%;font-size:.75rem;font-weight:800;margin-right:6px}
+.calc-step p{font-size:.82rem;color:var(--text);line-height:1.7;margin-top:6px}
+.calc-step .mono{background:var(--bg);border-radius:4px;padding:2px 7px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE INSTALLER MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div style="font-size:2rem;margin-bottom:8px">📐</div>
+    <h2>PinasTools Installer</h2>
+    <p>CE Surveying & Traverse Calculator<br>Piliin ang iyong wika / Select language</p>
+    <div class="lang-grid">
+      <button class="lang-btn selected" data-lang="tl" onclick="selectLang(this)">🇵🇭 Tagalog<br><small style="font-size:.7rem;opacity:.7">Default</small></button>
+      <button class="lang-btn" data-lang="en" onclick="selectLang(this)">🇺🇸 English</button>
+      <button class="lang-btn" data-lang="ceb" onclick="selectLang(this)">Cebuano</button>
+      <button class="lang-btn" data-lang="ilo" onclick="selectLang(this)">Ilocano</button>
+    </div>
+    <button class="btn-primary" onclick="installLang()">I-install / Proceed</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="logo">CE</div>
+  <div class="header-info">
+    <h1>Surveying & Traverse</h1>
+    <span id="header-sub">Civil Engineering Board Exam Tool</span>
+  </div>
+  <div class="header-badge">PinasTools</div>
+</header>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)" id="tb0"><span class="tab-kbd">1</span>Calculator</button>
+  <button class="tab-btn" onclick="switchTab(1)" id="tb1"><span class="tab-kbd">2</span>Reference Table</button>
+  <button class="tab-btn" onclick="switchTab(2)" id="tb2"><span class="tab-kbd">3</span>Board Tips</button>
+  <button class="tab-btn" onclick="switchTab(3)" id="tb3"><span class="tab-kbd">4</span>Mnemonics & CalTech</button>
+</div>
+
+<!-- MAIN -->
+<main>
+
+<!-- TAB 1: CALCULATOR -->
+<div class="tab-panel active" id="panel0">
+  <div class="mode-grid">
+    <button class="mode-btn active" onclick="switchMode('A',this)">Mode A<span>Traverse Computation</span></button>
+    <button class="mode-btn" onclick="switchMode('B',this)">Mode B<span>Simple Curve</span></button>
+    <button class="mode-btn" onclick="switchMode('C',this)">Mode C<span>Differential Leveling</span></button>
+  </div>
+
+  <!-- MODE A: TRAVERSE -->
+  <div id="modeA">
+    <div class="card">
+      <div class="card-title">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        Traverse Legs — Ilagay ang mga dulo ng traverse
+      </div>
+      <div class="tbl-wrap" id="traverse-table-wrap">
+        <table id="leg-table">
+          <thead><tr>
+            <th>#</th>
+            <th>Bearing / Azimuth</th>
+            <th>Distance (m)</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="leg-tbody"></tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green btn-sm" onclick="addLeg()">+ Add Leg</button>
+        <button class="btn btn-gold btn-sm" onclick="computeTraverse()">Compute</button>
+        <button class="btn btn-outline btn-sm" onclick="clearTraverse()">Clear</button>
+      </div>
+    </div>
+
+    <div id="traverse-results" style="display:none">
+      <div class="card">
+        <div class="card-title">Results — Latitude at Departure</div>
+        <div class="tbl-wrap">
+          <table id="result-table">
+            <thead><tr>
+              <th>#</th><th>Bearing</th><th>Distance</th>
+              <th>Lat N(+)</th><th>Lat S(-)</th>
+              <th>Dep E(+)</th><th>Dep W(-)</th>
+              <th>Adj Lat</th><th>Adj Dep</th>
+            </tr></thead>
+            <tbody id="result-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Closure & Precision</div>
+        <div class="result-grid col4" id="closure-results"></div>
+        <div id="closure-alert"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">DMD Area Computation — Pamamaraan ng Double Meridian Distance</div>
+        <div class="tbl-wrap">
+          <table id="dmd-table">
+            <thead><tr><th>#</th><th>Adj Dep</th><th>DMD</th><th>Adj Lat</th><th>Double Area</th></tr></thead>
+            <tbody id="dmd-tbody"></tbody>
+          </table>
+        </div>
+        <div class="result-grid" id="area-result" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE B: SIMPLE CURVE -->
+  <div id="modeB" style="display:none">
+    <div class="card">
+      <div class="card-title">Simple Horizontal Curve — Mga Input</div>
+      <div class="form-row col2">
+        <div>
+          <label>Intersection Angle I (degrees)</label>
+          <div class="input-group"><input type="number" id="sc-I" placeholder="e.g. 45" step="0.001"><span class="input-suffix">°</span></div>
+        </div>
+        <div>
+          <label>Input Mode</label>
+          <select id="sc-mode" onchange="toggleSCMode()">
+            <option value="R">Given: Radius R</option>
+            <option value="D">Given: Degree of Curve D</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row col2">
+        <div id="sc-r-wrap">
+          <label>Radius R (meters)</label>
+          <div class="input-group"><input type="number" id="sc-R" placeholder="e.g. 200" step="0.01"><span class="input-suffix">m</span></div>
+        </div>
+        <div id="sc-d-wrap" style="display:none">
+          <label>Degree of Curve D</label>
+          <div class="input-group"><input type="number" id="sc-D" placeholder="e.g. 5" step="0.001"><span class="input-suffix">°</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold btn-sm" onclick="computeCurve()">Compute Curve</button>
+        <button class="btn btn-outline btn-sm" onclick="clearCurve()">Clear</button>
+      </div>
+    </div>
+    <div id="curve-results" style="display:none">
+      <div class="card">
+        <div class="card-title">Curve Elements — Mga Sagot</div>
+        <div class="result-grid" id="curve-result-grid"></div>
+        <div class="formula-box" id="curve-formulas" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE C: DIFFERENTIAL LEVELING -->
+  <div id="modeC" style="display:none">
+    <div class="card">
+      <div class="card-title">Differential Leveling — Mag-input ng rod readings</div>
+      <div class="form-row col2" style="margin-bottom:10px">
+        <div><label>Starting Elevation (m)</label><input type="number" id="lev-start" value="100.000" step="0.001"></div>
+        <div><label>Total Distance K (km) — para sa allowable error</label><input type="number" id="lev-K" value="1" step="0.1"></div>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:8px">
+        Mag-add ng readings: BS = Backsight, FS = Foresight, IS = Intermediate Sight
+      </div>
+      <div id="lev-entries"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px">
+        <div><label>Type</label>
+          <select id="lev-type"><option value="BS">BS (Backsight)</option><option value="FS">FS (Foresight)</option><option value="IS">IS (Intermediate)</option></select>
+        </div>
+        <div><label>Station</label><input type="text" id="lev-sta" placeholder="TP1, BM2..."></div>
+        <div><label>Reading (m)</label><input type="number" id="lev-val" placeholder="1.234" step="0.001"></div>
+        <div><button class="btn btn-green btn-sm" onclick="addLevEntry()" style="margin-bottom:0">Add</button></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold btn-sm" onclick="computeLeveling()">Compute</button>
+        <button class="btn btn-outline btn-sm" onclick="clearLeveling()">Clear</button>
+      </div>
+    </div>
+    <div id="lev-results" style="display:none">
+      <div class="card">
+        <div class="card-title">Leveling Table</div>
+        <div class="tbl-wrap">
+          <table id="lev-table">
+            <thead><tr><th>Station</th><th>BS</th><th>IS</th><th>FS</th><th>HI</th><th>Elevation</th></tr></thead>
+            <tbody id="lev-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Closure Check</div>
+        <div class="result-grid" id="lev-closure"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: REFERENCE TABLE -->
+<div class="tab-panel" id="panel1">
+  <div class="section-head">Bearing to Azimuth Conversion</div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Quadrant</th><th>Bearing Notation</th><th>Azimuth Formula</th><th>Example</th><th>Azimuth</th></tr></thead>
+        <tbody>
+          <tr><td class="pos">NE (I)</td><td>N θ° E</td><td>Az = θ</td><td>N 45° E</td><td>45°</td></tr>
+          <tr><td class="neg" style="color:#f59e0b">SE (II)</td><td>S θ° E</td><td>Az = 180° - θ</td><td>S 30° E</td><td>150°</td></tr>
+          <tr><td class="neg">SW (III)</td><td>S θ° W</td><td>Az = 180° + θ</td><td>S 45° W</td><td>225°</td></tr>
+          <tr><td class="muted-cell">NW (IV)</td><td>N θ° W</td><td>Az = 360° - θ</td><td>N 60° W</td><td>300°</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-head">Standard Surveying Formulas</div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Formula</th><th>Expression</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left">Latitude</td><td>L = d × cos(bearing)</td><td class="muted-cell">+ = North, - = South</td></tr>
+          <tr><td style="text-align:left">Departure</td><td>D = d × sin(bearing)</td><td class="muted-cell">+ = East, - = West</td></tr>
+          <tr><td style="text-align:left">Linear Misclosure</td><td>e = √(ΣL² + ΣD²)</td><td class="muted-cell">Closure error</td></tr>
+          <tr><td style="text-align:left">Precision Ratio</td><td>1 : (P/e)</td><td class="muted-cell">P = perimeter</td></tr>
+          <tr><td style="text-align:left">Bowditch Corr Lat</td><td>cL = -(ΣL/P) × d</td><td class="muted-cell">d = leg distance</td></tr>
+          <tr><td style="text-align:left">Bowditch Corr Dep</td><td>cD = -(ΣD/P) × d</td><td class="muted-cell">d = leg distance</td></tr>
+          <tr><td style="text-align:left">DMD (1st leg)</td><td>DMD₁ = Dep₁</td><td class="muted-cell">First departure</td></tr>
+          <tr><td style="text-align:left">DMD (nth leg)</td><td>DMDₙ = DMDₙ₋₁ + Depₙ₋₁ + Depₙ</td><td class="muted-cell">Recursive</td></tr>
+          <tr><td style="text-align:left">Double Area</td><td>2A = Σ(Lat × DMD)</td><td class="muted-cell">Take absolute value</td></tr>
+          <tr><td style="text-align:left">Tangent (curve)</td><td>T = R × tan(I/2)</td><td class="muted-cell">I = intersection angle</td></tr>
+          <tr><td style="text-align:left">Length of Curve</td><td>Lc = πRI/180</td><td class="muted-cell">I in degrees</td></tr>
+          <tr><td style="text-align:left">External Dist</td><td>E = R(sec(I/2) - 1)</td><td class="muted-cell">= R/cos(I/2) - R</td></tr>
+          <tr><td style="text-align:left">Middle Ordinate</td><td>M = R(1 - cos(I/2))</td><td class="muted-cell"></td></tr>
+          <tr><td style="text-align:left">Long Chord</td><td>C = 2R × sin(I/2)</td><td class="muted-cell"></td></tr>
+          <tr><td style="text-align:left">Degree of Curve</td><td>D = 1145.916/R</td><td class="muted-cell">Arc definition</td></tr>
+          <tr><td style="text-align:left">HI (leveling)</td><td>HI = Elev + BS</td><td class="muted-cell">Height of Instrument</td></tr>
+          <tr><td style="text-align:left">Elevation (FS)</td><td>Elev = HI - FS</td><td class="muted-cell">Foresight station</td></tr>
+          <tr><td style="text-align:left">Allowable Error</td><td>e_allow = m√K</td><td class="muted-cell">K = dist km, m = class const</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-head">Allowable Closure Errors — Survey Class</div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Survey Order</th><th>Traverse Precision</th><th>Leveling Error</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-red">1st Order</span></td><td>1:10,000+</td><td>4√K mm</td><td class="muted-cell">Geodetic, national control</td></tr>
+          <tr><td><span class="badge badge-gold">2nd Order</span></td><td>1:5,000+</td><td>8√K mm</td><td class="muted-cell">City/municipal surveys, LRA</td></tr>
+          <tr><td><span class="badge badge-blue">3rd Order</span></td><td>1:3,000+</td><td>12√K mm</td><td class="muted-cell">Topographic, engineering</td></tr>
+          <tr><td><span class="badge badge-green">Ordinary</span></td><td>1:1,000+</td><td>24√K mm</td><td class="muted-cell">Rough surveys, staking</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-head">Philippine Datum References</div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Datum</th><th>Full Name</th><th>Ellipsoid</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left"><span class="badge badge-gold">PRS92</span></td><td style="text-align:left">Philippine Reference System 1992</td><td>GRS80</td><td class="pos">Current</td><td class="muted-cell">NAMRIA standard, RA 10176</td></tr>
+          <tr><td style="text-align:left"><span class="badge badge-blue">WGS84</span></td><td style="text-align:left">World Geodetic System 1984</td><td>WGS84</td><td class="pos">GPS</td><td class="muted-cell">GPS coordinates use this</td></tr>
+          <tr><td style="text-align:left"><span class="badge badge-red">Luzon Datum</span></td><td style="text-align:left">Philippine Datum 1930</td><td>Clarke 1866</td><td class="neg">Old</td><td class="muted-cell">Pre-1992 cadastral maps</td></tr>
+          <tr><td style="text-align:left"><span class="badge badge-green">PTM</span></td><td style="text-align:left">Philippine Transverse Mercator</td><td>GRS80</td><td class="pos">Current</td><td class="muted-cell">Used with PRS92</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-head">Casio fx-991ES PLUS Quick Reference</div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Function</th><th>Keypress</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left">POL(x, y)</td><td style="font-family:monospace">SHIFT → REC button</td><td class="muted-cell">Rectangular → Polar (get r, θ)</td></tr>
+          <tr><td style="text-align:left">REC(r, θ)</td><td style="font-family:monospace">REC button</td><td class="muted-cell">Polar → Rect (get x=Dep, y=Lat)</td></tr>
+          <tr><td style="text-align:left">Store to A</td><td style="font-family:monospace">SHIFT → RCL → A</td><td class="muted-cell">Save result to variable A</td></tr>
+          <tr><td style="text-align:left">TABLE mode</td><td style="font-family:monospace">MODE → 7</td><td class="muted-cell">List values for f(x)</td></tr>
+          <tr><td style="text-align:left">STAT mode</td><td style="font-family:monospace">MODE → 3</td><td class="muted-cell">Sum, mean — use for ΣLat, ΣDep</td></tr>
+          <tr><td style="text-align:left">D°M'S" input</td><td style="font-family:monospace">° ' " button</td><td class="muted-cell">Enter degrees minutes seconds</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: BOARD TIPS -->
+<div class="tab-panel" id="panel2">
+  <div class="section-head">CE Board Exam — Surveying Tips (Taglish)</div>
+
+  <div class="tip-card">
+    <h4>Top 1: Palaging i-check ang quadrant ng bearing</h4>
+    <p>Ang pinakacommon na mali sa board exam ay maling sign ng Latitude o Departure. Tandaan:</p>
+    <ul>
+      <li><strong style="color:#4ade80">NE quadrant:</strong> Lat = +, Dep = + (Norte-Este = positive lahat)</li>
+      <li><strong style="color:#f59e0b">SE quadrant:</strong> Lat = -, Dep = + (Sur-Este)</li>
+      <li><strong style="color:#f87171">SW quadrant:</strong> Lat = -, Dep = - (Sur-Oeste = negative lahat)</li>
+      <li><strong style="color:#93c5fd">NW quadrant:</strong> Lat = +, Dep = - (Norte-Oeste)</li>
+    </ul>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 2: Traverse Sample Problem (Bataan context)</h4>
+    <p>Isang survey sa Balanga City, Bataan — 4 legs:</p>
+    <div class="formula-box">
+Leg 1: N 45°30' E, d = 120.50 m
+  Lat = 120.50 × cos(45.5°) = +84.62 m
+  Dep = 120.50 × sin(45.5°) = +86.12 m
+
+Leg 2: S 30°00' E, d = 95.20 m
+  Lat = 95.20 × cos(30°) = -82.43 m
+  Dep = 95.20 × sin(30°) = +47.60 m
+
+Leg 3: S 60°15' W, d = 110.30 m
+  Lat = 110.30 × cos(60.25°) = -54.77 m
+  Dep = 110.30 × sin(60.25°) = -95.93 m
+
+Leg 4: N 15°45' W, d = 88.40 m
+  Lat = 88.40 × cos(15.75°) = +85.06 m
+  Dep = 88.40 × sin(15.75°) = -24.01 m
+
+ΣLat = 84.62 - 82.43 - 54.77 + 85.06 = +32.48 ← may error!
+ΣDep = 86.12 + 47.60 - 95.93 - 24.01 = +13.78 ← may error!
+
+Misclosure = √(32.48² + 13.78²) = 35.29 m
+Perimeter = 120.50 + 95.20 + 110.30 + 88.40 = 414.40 m
+Precision = 1 : (414.40/35.29) ≈ 1:12 ← very poor (needs recheck)
+    </div>
+    <p style="margin-top:6px">Sa board exam, ang tamang answer ay usually 1:5000 to 1:20000. Kung mali ang sign, lalabas very poor na precision.</p>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 3: DMD Method para sa Area</h4>
+    <ul>
+      <li>DMD ng FIRST leg = Departure ng first leg</li>
+      <li>DMD ng nth leg = DMD(n-1) + Dep(n-1) + Dep(n)</li>
+      <li>DMD ng LAST leg = - Departure ng last leg (dapat equal, otherwise may misclosure)</li>
+      <li>Double Area = Σ(Adjusted Lat × DMD)</li>
+      <li>Area = |Double Area| / 2</li>
+      <li>I-check: DMD ng last leg dapat ito equals -(Dep ng last leg)</li>
+    </ul>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 4: Simple Curve — Kailan gagamitin ang alin</h4>
+    <ul>
+      <li><strong style="color:var(--gold)">Tangent T</strong> — distance from PC/PT to PI (intersection point). Ginagamit para malaman kung nasaan ang PC at PT sa centerline.</li>
+      <li><strong style="color:var(--gold)">External E</strong> — distance from PI to midpoint ng curve. Ginagamit sa sight distance checks.</li>
+      <li><strong style="color:var(--gold)">Middle Ordinate M</strong> — clearance from chord to curve midpoint. Kapareho ng clearing requirements.</li>
+      <li><strong style="color:var(--gold)">Chord C</strong> — straight line from PC to PT. Ginagamit sa stakeout kung walang enough setup.</li>
+    </ul>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 5: Differential Leveling — Mga maling praktikal</h4>
+    <ul>
+      <li>BS palagi sa naunang turning point (yung natiknan na). FS sa susunod na TP.</li>
+      <li>HI = Elevation ng instrument station + BS reading</li>
+      <li>Elevation ng FS station = HI - FS</li>
+      <li>Check: ΣBS - ΣFS = Elevation(last) - Elevation(first)</li>
+      <li>Allowable error = m√K ; m = 12mm para sa 3rd order; K = distance in km</li>
+      <li>Intermediate sights (IS) ay hindi kasali sa check computation!</li>
+    </ul>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 6: Philippine Land Registration Authority (LRA) Context</h4>
+    <ul>
+      <li>Lahat ng cadastral surveys sa Pilipinas ay ginagawa under DENR-LMB at NAMRIA</li>
+      <li>Original Certificate of Title (OCT) — unang registration ng lupa</li>
+      <li>Transfer Certificate of Title (TCT) — kapag nalipat na sa ibang tao</li>
+      <li>Ang geodetic engineers (GE) ang may authority mag-sign ng survey plans</li>
+      <li>PRS92 ang opisyal na datum ng lahat ng cadastral surveys ngayon (RA 10176)</li>
+      <li>Metes and bounds description — bearing at distance ang ginagamit, hindi GPS coordinates lang</li>
+      <li>Lotplan (Lot Plan) at Vicinity Map — required sa lahat ng land titling application</li>
+    </ul>
+  </div>
+
+  <div class="tip-card">
+    <h4>Top 7: Board Exam Time Management</h4>
+    <ul>
+      <li>Traverse problems: ~8-12 minutes kada buong computation. Use Casio REC( ) function.</li>
+      <li>Simple curve: ~3-5 minutes lang kung memorized ang formulas. TEMC mnemonic.</li>
+      <li>Leveling: ~5-8 minutes. Gawin table agad, huwag mag-mental math.</li>
+      <li>Magsimula sa pinakamadaling items. Huwag maiipit sa isang mahirap na problem.</li>
+      <li>Always check units — km vs m, degrees vs radians.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- TAB 4: MNEMONICS & CALTECH -->
+<div class="tab-panel" id="panel3">
+  <div class="section-head">Taglish Mnemonics para sa Board Exam</div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">TEMC</div>
+    <div class="mnemonic-def">
+      Para sa Simple Horizontal Curve elements:<br>
+      <strong>T</strong>angent length → <strong>E</strong>xternal distance → <strong>M</strong>iddle ordinate → <strong>C</strong>hord<br><br>
+      Tandaan: "TEMC sounds like 'TEMAK' — ang curve elements na hindi mo dapat makalimutan sa board!"
+    </div>
+    <div class="formula-box">
+T = R·tan(I/2)      ← Tangent
+E = R·(1/cos(I/2) - 1)  ← External
+M = R·(1 - cos(I/2))   ← Middle ordinate
+C = 2R·sin(I/2)     ← Long Chord
+Lc = πRI/180        ← Curve length
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">BLND</div>
+    <div class="mnemonic-def">
+      Para sa Bearing reading order:<br>
+      <strong>B</strong>earing: <strong>L</strong>ook at N or S first → <strong>N</strong>umber of degrees → then <strong>D</strong>irection (E or W)<br><br>
+      "N 45°30' E" — Norte, 45 degrees 30 minutes, Este.<br>
+      "BLND — Bisita Lagi Nang Determinado" para hindi ka malito sa bearing vs azimuth!
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">Norte-Este = PLUS</div>
+    <div class="mnemonic-def">
+      Sign rules para sa Latitude at Departure:<br>
+      <strong>Norte (+Lat)</strong> at <strong>Este (+Dep)</strong> = Positive<br>
+      <strong>Sur (-Lat)</strong> at <strong>Oeste (-Dep)</strong> = Negative<br><br>
+      "NE = dagdag, SW = bawas — simple lang!"<br>
+      SE = Lat(-) Dep(+) | NW = Lat(+) Dep(-)
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">CLONE</div>
+    <div class="mnemonic-def">
+      Para sa precision ratio ng traverse:<br>
+      <strong>C</strong>losure = <strong>L</strong>inear misclosure <strong>O</strong>ver <strong>N</strong>et distance = <strong>E</strong>rror ratio<br><br>
+      Precision = 1 : (Perimeter / Linear Misclosure)<br>
+      "CLONE ng perfect closure = 1:infinity!"
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">DMD — "Dalawang Meridian Distance"</div>
+    <div class="mnemonic-def">
+      Para sa DMD area computation:<br>
+      1. <strong>First DMD</strong> = First adjusted departure<br>
+      2. <strong>DMD(n)</strong> = DMD(n-1) + Dep(n-1) + Dep(n)<br>
+      3. <strong>Last DMD</strong> dapat equal sa last departure (baligtad na sign) — kung hindi, may mali!<br>
+      4. Double Area = Σ(Adjusted Lat × DMD)<br>
+      5. Area = |Double Area| / 2<br><br>
+      "Dalawang beses palakihin ang distansya, hatiin sa dalawa — simple!"
+    </div>
+  </div>
+
+  <div class="section-head">Casio fx-991ES PLUS CalTech Techniques</div>
+
+  <div class="calc-step">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span class="calc-step-num">1</span>
+      <strong style="font-size:.88rem;color:var(--gold)">REC( ) para sa Lat at Dep — ang pinaka-importanteng technique!</strong>
+    </div>
+    <p>
+      Ang <span class="mono">REC(r, θ)</span> function ay nagco-convert ng polar to rectangular.<br>
+      Para sa surveying: <span class="mono">REC(distance, bearing_angle)</span><br><br>
+      Keypress: <span class="mono">SHIFT → 2 → 3</span> (or yung REC button)<br><br>
+      Halimbawa: N 45°30' E, d = 120.50 m<br>
+      Press: <span class="mono">REC(120.50, 45.5)</span> → ENTER<br>
+      Result X = Departure = 86.12 (Este = positive)<br>
+      Press <span class="mono">SHIFT → ENG</span> para makita Y = Latitude = 84.62<br><br>
+      Para sa S 30° E: bearing angle = 30°, pero kailangan mong manually lagyan ng sign: Lat = -result, Dep = +result
+    </p>
+  </div>
+
+  <div class="calc-step">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span class="calc-step-num">2</span>
+      <strong style="font-size:.88rem;color:var(--gold)">POL( ) para sa distance at bearing — reverse computation</strong>
+    </div>
+    <p>
+      Kapag may Lat at Dep, gamitin ang <span class="mono">POL(x, y)</span> para makuha ang distance at angle.<br>
+      Keypress: <span class="mono">SHIFT → 2 → 2</span> (POL)<br><br>
+      <span class="mono">POL(Departure, Latitude)</span><br>
+      Result r = Distance | Result θ = bearing angle<br><br>
+      Halimbawa: POL(86.12, 84.62) → r = 120.50 m, θ = 45.5°<br>
+      "P para sa POL, para sa Pabalik na computation!"
+    </p>
+  </div>
+
+  <div class="calc-step">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span class="calc-step-num">3</span>
+      <strong style="font-size:.88rem;color:var(--gold)">Memory A-F para sa multiple traverse points</strong>
+    </div>
+    <p>
+      Mag-store ng intermediate results para hindi ka na mag-recompute.<br>
+      Store: Press <span class="mono">SHIFT → RCL → (A/B/C/D/E/F)</span><br>
+      Recall: Press <span class="mono">ALPHA → (A/B/C/D/E/F)</span><br><br>
+      Strategy para sa traverse:<br>
+      A = ΣLat running total<br>
+      B = ΣDep running total<br>
+      C = Perimeter running total<br><br>
+      After each leg: compute lat, add to A; compute dep, add to B; add distance to C.
+    </p>
+  </div>
+
+  <div class="calc-step">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span class="calc-step-num">4</span>
+      <strong style="font-size:.88rem;color:var(--gold)">STAT Mode para sa sums ng maraming values</strong>
+    </div>
+    <p>
+      Pinaka-mabilis na paraan para makuha ang ΣLat at ΣDep ng maraming legs:<br>
+      1. Press <span class="mono">MODE → 3</span> (STAT) → <span class="mono">1</span> (1-VAR)<br>
+      2. I-enter ang bawat latitude value (maging maingat sa signs)<br>
+      3. Press <span class="mono">SHIFT → 1 → 4 → 1</span> para makita ang Σx (sum)<br><br>
+      Gawin nang dalawang beses — isa para sa latitudes, isa para sa departures.<br>
+      "STAT = Swabe na Totaling para sa Abot-kayang Traverse!"
+    </p>
+  </div>
+
+  <div class="calc-step">
+    <div style="display:flex;align-items:center;margin-bottom:4px">
+      <span class="calc-step-num">5</span>
+      <strong style="font-size:.88rem;color:var(--gold)">TABLE Mode para i-list ang lahat ng Lat values</strong>
+    </div>
+    <p>
+      Para sa mga gusto mag-compute ng lahat ng cos at sin ng multiple bearings:<br>
+      1. Press <span class="mono">MODE → 7</span> (TABLE)<br>
+      2. Enter function: <span class="mono">f(X) = D cos(X)</span> (D = distance, X = bearing)<br>
+      3. Start: unang bearing, End: huling bearing, Step: increment<br><br>
+      Best para kapag uniform ang distances o gusto mong i-check multiple values.<br>
+      "TABLE mode = Tamang-tama para sa Abot-kayang List ng Latitudes!"
+    </p>
+  </div>
+
+  <div class="section-head">GEAS &amp; Real Board Mnemonics — General Knowledge</div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">Planets: "Mang Victor Espinosa Mag Jogging Sa Umaga Nang Pumayat"</div>
+    <div class="mnemonic-def">
+      <strong>M</strong>ercury · <strong>V</strong>enus · <strong>E</strong>arth · <strong>M</strong>ars · <strong>J</strong>upiter · <strong>S</strong>aturn · <strong>U</strong>ranus · <strong>N</strong>eptune · <strong>P</strong>luto<br>
+      Kahit na officially "dwarf planet" na si Pluto, laging kasama pa rin ito sa board exam questions. I-memorize ang order mula sa Araw papalabas.
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">Atmosphere Layers: "The Strong Man's Triceps Explode"</div>
+    <div class="mnemonic-def">
+      <strong>T</strong>roposphere · <strong>S</strong>tratosphere · <strong>M</strong>esosphere · <strong>T</strong>hermosphere · <strong>E</strong>xosphere<br>
+      Mula sa ibabaw ng lupa paataas. Ang troposphere (0–12 km) ang layer ng lahat ng weather. Ang ozone layer ay nasa stratosphere. Relevant sa atmospheric pressure problems sa fluid mechanics.
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">Compass Directions: "Never Eat Slimy Worms"</div>
+    <div class="mnemonic-def">
+      <strong>N</strong>orth · <strong>E</strong>ast · <strong>S</strong>outh · <strong>W</strong>est — clockwise order<br>
+      Direktang applicable sa surveying at traverse problems. Ang bearing notation sa Pilipinas: N θ° E, S θ° W, etc.
+    </div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">Navigation: "Can Dead Men Vote Twice"</div>
+    <div class="mnemonic-def">
+      <strong>C</strong>ompass + <strong>D</strong>eviation = <strong>M</strong>agnetic + <strong>V</strong>ariation = <strong>T</strong>rue<br>
+      Para sa nautical/aviation navigation at geodetic surveying. Ang magnetic declination (variation) sa Pilipinas ay humigit-kumulang 0°–3° East ngayon. Ang compass bearing + declination = true north bearing.
+    </div>
+    <div class="formula-box">Compass ± Deviation = Magnetic ± Variation = True (Geographic North)</div>
+  </div>
+
+  <div class="mnemonic-box">
+    <div class="mnemonic-word">"East is Least, West is Best"</div>
+    <div class="mnemonic-def">
+      Para sa magnetic variation correction:<br>
+      Kung ang declination ay <strong>East</strong> → <strong>subtract</strong> mula sa magnetic para makuha ang true (East is Least)<br>
+      Kung ang declination ay <strong>West</strong> → <strong>add</strong> sa magnetic para makuha ang true (West is Best)<br>
+      Mnemonic para sa GEAS navigation at geodetic engineering problems sa board exam.
+    </div>
+  </div>
+
+  <div class="section-head">Quick-Draw Formulas — Para sa Mabilis na Board Exam</div>
+  <div class="card">
+    <div class="formula-box">
+=== TRAVERSE ===
+Lat = d·cos(α)    Dep = d·sin(α)   [α = bearing angle from N or S]
+e = √(ΣL² + ΣD²)   Precision = 1:(P/e)
+Bowditch: cL_i = -(ΣL/P)·d_i   cD_i = -(ΣD/P)·d_i
+DMD₁ = Dep₁  |  DMDₙ = DMDₙ₋₁ + Depₙ₋₁ + Depₙ
+2A = Σ(AdjLat·DMD)  |  Area = |2A|/2
+
+=== SIMPLE CURVE ===
+R = 1145.916/D  (arc def)   T = R·tan(I/2)
+Lc = πRI/180  E = R/cos(I/2)-R  M = R(1-cos(I/2))  C = 2R·sin(I/2)
+PC = PI - T  (station)   PT = PC + Lc
+
+=== LEVELING ===
+HI = Elev_BM + BS   |   Elev_TP = HI - FS
+Check: ΣBS - ΣFS = Elev_end - Elev_start
+e_allow = m√K  [m=4(1st), 8(2nd), 12(3rd), 24(ord)] [K in km, e in mm]
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div><span>PinasTools</span> — CE Surveying & Traverse Calculator</div>
+  <div style="margin-top:2px;color:var(--muted)">Para sa mga CE board reviewees — Kaya natin 'to, Pilipino!</div>
+  <div style="margin-top:6px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+    <span class="gcash-badge">GCash Ready — Offline Tool</span>
+    <span class="gcash-badge" style="color:#4ade80;border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.1)">Works Offline</span>
+    <span class="gcash-badge" style="color:var(--gold);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)">PRS92 / WGS84</span>
+  </div>
+</footer>
+
+<script>
+// ─── LANGUAGE INSTALLER ───
+let LANG = localStorage.getItem('pinastools_lang');
+if(LANG){document.getElementById('modal-overlay').style.display='none';}
+
+function selectLang(btn){
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function installLang(){
+  const sel=document.querySelector('.lang-btn.selected');
+  LANG=sel?sel.dataset.lang:'tl';
+  localStorage.setItem('pinastools_lang',LANG);
+  document.getElementById('modal-overlay').style.display='none';
+}
+
+// ─── TABS ───
+function switchTab(i){
+  document.querySelectorAll('.tab-panel').forEach((p,idx)=>{
+    p.classList.toggle('active',idx===i);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,idx)=>{
+    b.classList.toggle('active',idx===i);
+  });
+}
+
+// ─── KEYBOARD SHORTCUTS 1-4 ───
+document.addEventListener('keydown',function(e){
+  if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;
+  if(e.key>='1'&&e.key<='4')switchTab(parseInt(e.key)-1);
+});
+
+// ─── MODE SELECTOR ───
+function switchMode(m,btn){
+  ['A','B','C'].forEach(x=>document.getElementById('mode'+x).style.display='none');
+  document.getElementById('mode'+m).style.display='block';
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── TRAVERSE COMPUTATION ───
+let legs=[];
+function addLeg(){
+  if(legs.length>=10){alert('Maximum 10 legs na!');return;}
+  const id=Date.now();
+  legs.push({id});
+  renderLegs();
+}
+function removeLeg(id){
+  legs=legs.filter(l=>l.id!==id);
+  renderLegs();
+}
+function renderLegs(){
+  const tb=document.getElementById('leg-tbody');
+  tb.innerHTML='';
+  legs.forEach((leg,i)=>{
+    const tr=document.createElement('tr');
+    tr.className='leg-row';
+    tr.innerHTML=`
+      <td style="font-weight:700;color:var(--gold)">${i+1}</td>
+      <td style="min-width:220px">
+        <div style="display:grid;grid-template-columns:auto 70px auto;gap:4px;align-items:center">
+          <select id="ns-${leg.id}" style="padding:6px 4px;font-size:.78rem;width:60px">
+            <option>N</option><option>S</option>
+          </select>
+          <input type="number" id="deg-${leg.id}" placeholder="deg" step="0.0001" min="0" max="90">
+          <select id="ew-${leg.id}" style="padding:6px 4px;font-size:.78rem;width:60px">
+            <option>E</option><option>W</option>
+          </select>
+        </div>
+      </td>
+      <td><input type="number" id="dist-${leg.id}" placeholder="m" step="0.001" min="0" style="max-width:100px"></td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeLeg(${leg.id})">✕</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function getBearingAngle(ns,deg,ew){
+  // Returns the bearing angle from N or S in degrees
+  return parseFloat(deg)||0;
+}
+
+function computeTraverse(){
+  if(legs.length<2){alert('Mag-add ng kahit 3 legs para sa traverse!');return;}
+  const data=[];
+  let perimeter=0;
+  let valid=true;
+  legs.forEach((leg,i)=>{
+    const ns=document.getElementById('ns-'+leg.id).value;
+    const deg=parseFloat(document.getElementById('deg-'+leg.id).value)||0;
+    const ew=document.getElementById('ew-'+leg.id).value;
+    const dist=parseFloat(document.getElementById('dist-'+leg.id).value)||0;
+    if(dist<=0){valid=false;return;}
+    const a=deg*Math.PI/180;
+    let lat=dist*Math.cos(a);
+    let dep=dist*Math.sin(a);
+    if(ns==='S')lat=-lat;
+    if(ew==='W')dep=-dep;
+    data.push({i:i+1,ns,deg,ew,dist,lat,dep});
+    perimeter+=dist;
+  });
+  if(!valid||data.length<2){alert('I-check ang mga distance values (dapat >0)!');return;}
+
+  const sumLat=data.reduce((s,d)=>s+d.lat,0);
+  const sumDep=data.reduce((s,d)=>s+d.dep,0);
+  const misclosure=Math.sqrt(sumLat*sumLat+sumDep*sumDep);
+  const precision=misclosure>0?perimeter/misclosure:Infinity;
+
+  // Bowditch correction
+  data.forEach(d=>{
+    d.corrLat=-(sumLat/perimeter)*d.dist;
+    d.corrDep=-(sumDep/perimeter)*d.dist;
+    d.adjLat=d.lat+d.corrLat;
+    d.adjDep=d.dep+d.corrDep;
+  });
+
+  // Render result table
+  const rb=document.getElementById('result-tbody');
+  rb.innerHTML='';
+  data.forEach(d=>{
+    const latN=d.lat>0?d.lat.toFixed(4):'';
+    const latS=d.lat<0?Math.abs(d.lat).toFixed(4):'';
+    const depE=d.dep>0?d.dep.toFixed(4):'';
+    const depW=d.dep<0?Math.abs(d.dep).toFixed(4):'';
+    const bear=`${d.ns} ${d.deg.toFixed(4)}° ${d.ew}`;
+    rb.innerHTML+=`<tr>
+      <td style="font-weight:700;color:var(--gold)">${d.i}</td>
+      <td style="white-space:nowrap">${bear}</td>
+      <td>${d.dist.toFixed(3)}</td>
+      <td class="pos">${latN}</td>
+      <td class="neg">${latS}</td>
+      <td class="pos">${depE}</td>
+      <td class="neg">${depW}</td>
+      <td>${d.adjLat.toFixed(4)}</td>
+      <td>${d.adjDep.toFixed(4)}</td>
+    </tr>`;
+  });
+  // Totals row
+  const tLatN=data.reduce((s,d)=>s+(d.lat>0?d.lat:0),0);
+  const tLatS=data.reduce((s,d)=>s+(d.lat<0?Math.abs(d.lat):0),0);
+  const tDepE=data.reduce((s,d)=>s+(d.dep>0?d.dep:0),0);
+  const tDepW=data.reduce((s,d)=>s+(d.dep<0?Math.abs(d.dep):0),0);
+  rb.innerHTML+=`<tr style="font-weight:700;border-top:2px solid var(--border)">
+    <td colspan="2" style="text-align:right;color:var(--muted)">TOTALS</td>
+    <td>${perimeter.toFixed(3)}</td>
+    <td class="pos">${tLatN.toFixed(4)}</td>
+    <td class="neg">${tLatS.toFixed(4)}</td>
+    <td class="pos">${tDepE.toFixed(4)}</td>
+    <td class="neg">${tDepW.toFixed(4)}</td>
+    <td>${data.reduce((s,d)=>s+d.adjLat,0).toFixed(4)}</td>
+    <td>${data.reduce((s,d)=>s+d.adjDep,0).toFixed(4)}</td>
+  </tr>`;
+
+  // Closure results
+  const precStr=misclosure>0?'1 : '+(precision.toFixed(0)):'Perfect (∞)';
+  const precClass=precision>=5000?'good':(precision>=1000?'':'bad');
+  document.getElementById('closure-results').innerHTML=`
+    <div class="result-item"><div class="result-label">Perimeter</div><div class="result-value">${perimeter.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">ΣLatitude</div><div class="result-value" style="color:${Math.abs(sumLat)<0.001?'var(--green)':'var(--red)'}">${sumLat.toFixed(4)}</div><div class="result-unit">m</div></div>
+    <div class="result-item"><div class="result-label">ΣDeparture</div><div class="result-value" style="color:${Math.abs(sumDep)<0.001?'var(--green)':'var(--red)'}">${sumDep.toFixed(4)}</div><div class="result-unit">m</div></div>
+    <div class="result-item"><div class="result-label">Linear Misclosure</div><div class="result-value">${misclosure.toFixed(4)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item ${precClass}"><div class="result-label">Precision Ratio</div><div class="result-value">${precStr}</div><div class="result-unit">1:N</div></div>
+  `;
+  const alert2=document.getElementById('closure-alert');
+  if(precision>=10000)alert2.innerHTML=`<div class="alert alert-green">Maganda! Precision = ${precStr} — Pwede para sa 1st/2nd order survey.</div>`;
+  else if(precision>=5000)alert2.innerHTML=`<div class="alert alert-green">OK. Precision = ${precStr} — Pasok sa 2nd order.</div>`;
+  else if(precision>=3000)alert2.innerHTML=`<div class="alert alert-gold">Acceptable. Precision = ${precStr} — 3rd order lang.</div>`;
+  else if(precision>=1000)alert2.innerHTML=`<div class="alert alert-red">Medyo mababa. Precision = ${precStr} — Ordinary survey lang. I-check ang measurements.</div>`;
+  else alert2.innerHTML=`<div class="alert alert-red">Masama ang precision (${precStr})! May mali sa bearings o distances. Double-check mo!</div>`;
+
+  // DMD computation
+  const db=document.getElementById('dmd-tbody');
+  db.innerHTML='';
+  let dmd=0,doubleAreaSum=0;
+  data.forEach((d,i)=>{
+    if(i===0) dmd=d.adjDep;
+    else dmd=dmd+data[i-1].adjDep+d.adjDep;
+    const da=d.adjLat*dmd;
+    doubleAreaSum+=da;
+    db.innerHTML+=`<tr>
+      <td style="font-weight:700;color:var(--gold)">${d.i}</td>
+      <td>${d.adjDep.toFixed(4)}</td>
+      <td>${dmd.toFixed(4)}</td>
+      <td>${d.adjLat.toFixed(4)}</td>
+      <td style="color:${da>=0?'var(--green)':'#f87171'}">${da.toFixed(4)}</td>
+    </tr>`;
+  });
+  db.innerHTML+=`<tr style="font-weight:700;border-top:2px solid var(--border)">
+    <td colspan="4" style="text-align:right;color:var(--muted)">Σ Double Area</td>
+    <td style="color:var(--gold)">${doubleAreaSum.toFixed(4)}</td>
+  </tr>`;
+  const area=Math.abs(doubleAreaSum)/2;
+  const areaSqm=area;
+  const areaHa=area/10000;
+  document.getElementById('area-result').innerHTML=`
+    <div class="result-item good"><div class="result-label">Traverse Area</div><div class="result-value">${areaSqm.toFixed(2)}</div><div class="result-unit">sq. meters</div></div>
+    <div class="result-item good"><div class="result-label">Area (hectares)</div><div class="result-value">${areaHa.toFixed(4)}</div><div class="result-unit">ha</div></div>
+    <div class="result-item"><div class="result-label">|Double Area|</div><div class="result-value">${Math.abs(doubleAreaSum).toFixed(4)}</div><div class="result-unit">m²</div></div>
+  `;
+  document.getElementById('traverse-results').style.display='block';
+}
+
+function clearTraverse(){
+  legs=[];
+  renderLegs();
+  document.getElementById('traverse-results').style.display='none';
+}
+
+// ─── SIMPLE CURVE ───
+function toggleSCMode(){
+  const v=document.getElementById('sc-mode').value;
+  document.getElementById('sc-r-wrap').style.display=v==='R'?'':'none';
+  document.getElementById('sc-d-wrap').style.display=v==='D'?'':'none';
+}
+function computeCurve(){
+  const I=parseFloat(document.getElementById('sc-I').value);
+  if(!I||I<=0||I>=180){alert('I-check ang intersection angle I (dapat 0°-180°)');return;}
+  const mode=document.getElementById('sc-mode').value;
+  let R;
+  if(mode==='R'){
+    R=parseFloat(document.getElementById('sc-R').value);
+    if(!R||R<=0){alert('I-enter ang valid na radius R');return;}
+  } else {
+    const D=parseFloat(document.getElementById('sc-D').value);
+    if(!D||D<=0){alert('I-enter ang valid na degree of curve D');return;}
+    R=1145.916/D;
+  }
+  const Irad=I*Math.PI/180;
+  const T=R*Math.tan(Irad/2);
+  const Lc=Math.PI*R*I/180;
+  const E=R/Math.cos(Irad/2)-R;
+  const M=R*(1-Math.cos(Irad/2));
+  const C=2*R*Math.sin(Irad/2);
+  const D2=1145.916/R;
+  document.getElementById('curve-result-grid').innerHTML=`
+    <div class="result-item good"><div class="result-label">Radius R</div><div class="result-value">${R.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">Degree of Curve D</div><div class="result-value">${D2.toFixed(4)}°</div><div class="result-unit">arc definition</div></div>
+    <div class="result-item good"><div class="result-label">Tangent T</div><div class="result-value">${T.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item good"><div class="result-label">Length of Curve Lc</div><div class="result-value">${Lc.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">External E</div><div class="result-value">${E.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">Middle Ordinate M</div><div class="result-value">${M.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">Long Chord C</div><div class="result-value">${C.toFixed(3)}</div><div class="result-unit">meters</div></div>
+    <div class="result-item"><div class="result-label">Intersection Angle I</div><div class="result-value">${I.toFixed(4)}°</div><div class="result-unit">degrees</div></div>
+  `;
+  document.getElementById('curve-formulas').innerHTML=
+`T = R·tan(I/2) = ${R.toFixed(2)}·tan(${(I/2).toFixed(2)}°) = ${T.toFixed(3)} m
+Lc = πRI/180 = π·${R.toFixed(2)}·${I.toFixed(2)}/180 = ${Lc.toFixed(3)} m
+E = R/cos(I/2)-R = ${R.toFixed(2)}/cos(${(I/2).toFixed(2)}°)-${R.toFixed(2)} = ${E.toFixed(3)} m
+M = R(1-cos(I/2)) = ${R.toFixed(2)}·(1-cos(${(I/2).toFixed(2)}°)) = ${M.toFixed(3)} m
+C = 2R·sin(I/2) = 2·${R.toFixed(2)}·sin(${(I/2).toFixed(2)}°) = ${C.toFixed(3)} m`;
+  document.getElementById('curve-results').style.display='block';
+}
+function clearCurve(){
+  document.getElementById('sc-I').value='';
+  document.getElementById('sc-R').value='';
+  document.getElementById('sc-D').value='';
+  document.getElementById('curve-results').style.display='none';
+}
+
+// ─── DIFFERENTIAL LEVELING ───
+let levEntries=[];
+function addLevEntry(){
+  const type=document.getElementById('lev-type').value;
+  const sta=document.getElementById('lev-sta').value.trim()||('STA-'+(levEntries.length+1));
+  const val=parseFloat(document.getElementById('lev-val').value);
+  if(isNaN(val)){alert('I-enter ang rod reading!');return;}
+  levEntries.push({type,sta,val});
+  document.getElementById('lev-sta').value='';
+  document.getElementById('lev-val').value='';
+  renderLevEntries();
+}
+function removeLevEntry(i){
+  levEntries.splice(i,1);
+  renderLevEntries();
+}
+function renderLevEntries(){
+  const c=document.getElementById('lev-entries');
+  if(levEntries.length===0){c.innerHTML='';return;}
+  let h='<div class="tbl-wrap" style="margin-bottom:8px"><table><thead><tr><th>#</th><th>Station</th><th>Type</th><th>Reading</th><th></th></tr></thead><tbody>';
+  levEntries.forEach((e,i)=>{
+    h+=`<tr><td>${i+1}</td><td>${e.sta}</td><td><span class="badge ${e.type==='BS'?'badge-green':e.type==='FS'?'badge-red':'badge-blue'}">${e.type}</span></td><td>${e.val.toFixed(3)}</td><td><button class="btn btn-danger btn-sm" onclick="removeLevEntry(${i})">✕</button></td></tr>`;
+  });
+  h+='</tbody></table></div>';
+  c.innerHTML=h;
+}
+function computeLeveling(){
+  if(levEntries.length<2){alert('Mag-add ng kahit BS at FS!');return;}
+  const startElev=parseFloat(document.getElementById('lev-start').value)||100;
+  const K=parseFloat(document.getElementById('lev-K').value)||1;
+  let elev=startElev;
+  let hi=0;
+  let sumBS=0,sumFS=0;
+  let firstBS=false;
+  const rows=[];
+  levEntries.forEach((e,i)=>{
+    const r={sta:e.sta,type:e.type,bs:'',is:'',fs:'',hi:'',elev:''};
+    if(e.type==='BS'){
+      r.bs=e.val.toFixed(3);
+      sumBS+=e.val;
+      if(!firstBS){hi=elev+e.val;firstBS=true;}
+      else{hi=elev+e.val;}
+      r.hi=hi.toFixed(3);
+      r.elev=elev.toFixed(3);
+    } else if(e.type==='FS'){
+      r.fs=e.val.toFixed(3);
+      sumFS+=e.val;
+      elev=hi-e.val;
+      r.elev=elev.toFixed(3);
+    } else {
+      r.is=e.val.toFixed(3);
+      r.elev=(hi-e.val).toFixed(3);
+    }
+    rows.push(r);
+  });
+  const tb=document.getElementById('lev-tbody');
+  tb.innerHTML='';
+  rows.forEach(r=>{
+    tb.innerHTML+=`<tr>
+      <td style="font-weight:600">${r.sta}</td>
+      <td class="pos">${r.bs}</td>
+      <td style="color:#93c5fd">${r.is}</td>
+      <td class="neg">${r.fs}</td>
+      <td style="color:var(--gold)">${r.hi}</td>
+      <td style="font-weight:700">${r.elev}</td>
+    </tr>`;
+  });
+  tb.innerHTML+=`<tr style="font-weight:700;border-top:2px solid var(--border)">
+    <td style="color:var(--muted)">CHECK</td>
+    <td class="pos">${sumBS.toFixed(3)}</td>
+    <td></td>
+    <td class="neg">${sumFS.toFixed(3)}</td>
+    <td></td>
+    <td style="color:var(--gold)">${(startElev+sumBS-sumFS).toFixed(3)}</td>
+  </tr>`;
+  const diff=sumBS-sumFS;
+  const elevDiff=elev-startElev;
+  const closureErr=Math.abs(diff-elevDiff);
+  const allowable=12*Math.sqrt(K); // 3rd order in mm
+  const allowableM=allowable/1000;
+  const good=closureErr<=allowableM;
+  document.getElementById('lev-closure').innerHTML=`
+    <div class="result-item"><div class="result-label">ΣBS</div><div class="result-value">${sumBS.toFixed(3)}</div><div class="result-unit">m</div></div>
+    <div class="result-item"><div class="result-label">ΣFS</div><div class="result-value">${sumFS.toFixed(3)}</div><div class="result-unit">m</div></div>
+    <div class="result-item"><div class="result-label">ΣBS - ΣFS</div><div class="result-value">${diff.toFixed(3)}</div><div class="result-unit">m</div></div>
+    <div class="result-item"><div class="result-label">Closure Error</div><div class="result-value" style="color:${good?'var(--green)':'var(--red)'}">${(closureErr*1000).toFixed(1)}</div><div class="result-unit">mm</div></div>
+    <div class="result-item"><div class="result-label">Allowable (3rd order)</div><div class="result-value">${allowable.toFixed(1)}</div><div class="result-unit">mm = 12√${K}km</div></div>
+    <div class="result-item ${good?'good':'bad'}"><div class="result-label">Status</div><div class="result-value">${good?'PASOK':'LABAS'}</div><div class="result-unit">${good?'Within tolerance':'Exceed allowable'}</div></div>
+  `;
+  document.getElementById('lev-results').style.display='block';
+}
+function clearLeveling(){
+  levEntries=[];
+  renderLevEntries();
+  document.getElementById('lev-results').style.display='none';
+}
+
+// ─── INIT ───
+(function(){
+  // Add 3 default legs
+  addLeg();addLeg();addLeg();
+})();
+</script>
+</body>
+</html>

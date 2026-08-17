@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concrete Mix Design Calculator | PinasTools CE</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#111318;--bg2:#1a1e27;--bg3:#222736;--gold:#f59e0b;--gold2:#fbbf24;
+--gold-dim:#92600a;--text:#e8eaf0;--muted:#8b92a8;--border:#2a2f40;
+--red:#ef4444;--green:#22c55e;--blue:#3b82f6;--radius:16px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.55}
+
+/* MODAL */
+#install-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
+#install-box{background:var(--bg2);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:28px 24px;max-width:380px;width:100%;text-align:center}
+#install-box h2{color:var(--gold);font-size:1.15rem;font-weight:700;margin-bottom:4px}
+#install-box p{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.lang-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.lang-btn{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:12px 8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;transition:.2s}
+.lang-btn:hover,.lang-btn.sel{border-color:var(--gold);color:var(--gold);background:rgba(245,158,11,.07)}
+#install-confirm{width:100%;background:var(--gold);color:#111;border:none;border-radius:10px;padding:12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s}
+#install-confirm:hover{background:var(--gold2)}
+.brand-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px}
+.brand-icon{width:38px;height:38px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#111}
+.brand-name{font-weight:700;font-size:1.1rem;color:var(--text)}
+.brand-name span{color:var(--gold)}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;color:#111;flex-shrink:0}
+.header-text h1{font-size:.95rem;font-weight:700;color:var(--text)}
+.header-text p{font-size:.75rem;color:var(--muted)}
+.header-badge{margin-left:auto;background:rgba(245,158,11,.12);border:1px solid var(--gold-dim);color:var(--gold);font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;flex-shrink:0}
+
+/* TABS */
+.tab-bar{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:65px;z-index:99;overflow-x:auto}
+.tab-bar::-webkit-scrollbar{height:3px}
+.tab-bar::-webkit-scrollbar-thumb{background:var(--border)}
+.tabs{display:flex;max-width:720px;margin:0 auto}
+.tab{flex:1;min-width:90px;padding:11px 6px 9px;text-align:center;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:.18s;white-space:nowrap;letter-spacing:.01em}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:hover:not(.active){color:var(--text)}
+.tab .shortcut{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:.6rem;padding:0 4px;margin-left:3px;color:var(--muted)}
+
+/* MAIN */
+main{max-width:720px;margin:0 auto;padding:16px}
+
+/* PANEL */
+.panel{display:none}
+.panel.active{display:block}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.card-title{font-size:.82rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+
+/* MODE SELECTOR */
+.mode-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.mode-btn{background:var(--bg3);border:1.5px solid var(--border);color:var(--muted);border-radius:10px;padding:9px 14px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;transition:.18s}
+.mode-btn.active{background:rgba(245,158,11,.1);border-color:var(--gold);color:var(--gold)}
+.mode-btn:hover:not(.active){border-color:var(--text);color:var(--text)}
+
+/* FORM */
+.field{margin-bottom:13px}
+label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:5px}
+label .unit{font-weight:400;color:var(--bg3);background:var(--border);padding:1px 5px;border-radius:4px;font-size:.7rem;margin-left:4px}
+input[type=number],select{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;color:var(--text);padding:10px 12px;font-family:'Outfit',sans-serif;font-size:.9rem;transition:.18s;-webkit-appearance:none}
+input[type=number]:focus,select:focus{outline:none;border-color:var(--gold)}
+select option{background:var(--bg2)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* CALCULATE BUTTON */
+.calc-btn{width:100%;background:var(--gold);color:#111;border:none;border-radius:10px;padding:13px;font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s;margin-top:4px}
+.calc-btn:hover{background:var(--gold2)}
+.calc-btn:active{transform:scale(.98)}
+
+/* RESULTS */
+.results{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px;display:none}
+.results.show{display:block}
+.res-title{font-size:.78rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.res-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px}
+.res-item .label{font-size:.7rem;color:var(--muted);margin-bottom:3px}
+.res-item .value{font-size:1.05rem;font-weight:700;color:var(--text)}
+.res-item .value span{font-size:.72rem;font-weight:400;color:var(--muted);margin-left:2px}
+.res-item.highlight{border-color:var(--gold-dim);background:rgba(245,158,11,.06)}
+.res-item.highlight .value{color:var(--gold)}
+.ratio-display{background:rgba(245,158,11,.07);border:1px solid var(--gold-dim);border-radius:10px;padding:12px;margin-top:10px;text-align:center}
+.ratio-display .ratio-label{font-size:.72rem;color:var(--muted);margin-bottom:2px}
+.ratio-display .ratio-val{font-size:1.2rem;font-weight:700;color:var(--gold)}
+
+/* TABLE STYLES */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead{background:rgba(245,158,11,.1)}
+th{padding:10px 10px;text-align:left;color:var(--gold);font-weight:700;font-size:.73rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:9px 10px;border-top:1px solid var(--border);color:var(--text);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+td.em{color:var(--gold);font-weight:600}
+td.muted{color:var(--muted);font-size:.75rem}
+
+/* BOARD TIPS */
+.tip-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.tip-card .tip-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tip-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.tip-icon.gold{background:rgba(245,158,11,.15);color:var(--gold)}
+.tip-icon.red{background:rgba(239,68,68,.12);color:var(--red)}
+.tip-icon.green{background:rgba(34,197,94,.12);color:var(--green)}
+.tip-icon.blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.tip-title{font-size:.88rem;font-weight:700;color:var(--text)}
+.tip-body{font-size:.82rem;color:var(--muted);line-height:1.6}
+.tip-body strong{color:var(--text)}
+.tip-body .gold{color:var(--gold);font-weight:600}
+.sample-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px}
+.sample-box .step{display:flex;gap:10px;margin-bottom:8px;font-size:.82rem}
+.sample-box .step:last-child{margin-bottom:0}
+.step-num{width:22px;height:22px;background:var(--gold);color:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0;margin-top:1px}
+.step-txt{color:var(--muted)}
+.step-txt strong{color:var(--text)}
+.ans{font-size:.88rem;font-weight:700;color:var(--green);margin-top:6px;padding:8px 12px;background:rgba(34,197,94,.08);border-radius:8px;border:1px solid rgba(34,197,94,.2)}
+
+/* MNEMONICS */
+.mnemonic{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:var(--radius);padding:15px;margin-bottom:11px}
+.mnemonic .phrase{font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.mnemonic .meaning{font-size:.82rem;color:var(--muted)}
+.mnemonic .meaning strong{color:var(--text)}
+.caltech-step{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.caltech-step h4{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.caltech-step h4 span{background:var(--gold);color:#111;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:5px}
+.key{display:inline-block;background:var(--bg3);border:1.5px solid var(--border);border-radius:5px;padding:2px 7px;font-size:.72rem;font-weight:700;color:var(--text);font-family:monospace;margin:1px}
+.caltech-step p,.caltech-step li{font-size:.82rem;color:var(--muted);margin-bottom:4px;line-height:1.55}
+.caltech-step li strong{color:var(--text)}
+
+/* SECTION HEAD */
+.section-head{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+/* ALERT */
+.alert{background:rgba(245,158,11,.07);border:1px solid var(--gold-dim);border-radius:10px;padding:11px 13px;font-size:.8rem;color:var(--muted);margin-top:10px;line-height:1.55}
+.alert strong{color:var(--gold)}
+.alert-red{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3);color:var(--red)}
+.alert-green{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.3);color:var(--green)}
+
+/* FOOTER */
+footer{text-align:center;padding:24px 16px;font-size:.75rem;color:var(--muted);border-top:1px solid var(--border);margin-top:8px}
+footer a{color:var(--gold);text-decoration:none}
+
+/* UTIL */
+.hidden{display:none!important}
+.mt8{margin-top:8px}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.badge{display:inline-block;background:rgba(245,158,11,.12);color:var(--gold);border:1px solid var(--gold-dim);border-radius:5px;font-size:.67rem;font-weight:700;padding:1px 6px;letter-spacing:.03em;vertical-align:middle}
+.badge.green{background:rgba(34,197,94,.1);color:var(--green);border-color:rgba(34,197,94,.25)}
+.badge.red{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.25)}
+.badge.blue{background:rgba(59,130,246,.1);color:var(--blue);border-color:rgba(59,130,246,.25)}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE INSTALLER MODAL -->
+<div id="install-overlay">
+  <div id="install-box">
+    <div class="brand-row">
+      <div class="brand-icon">PT</div>
+      <div class="brand-name">Pinas<span>Tools</span></div>
+    </div>
+    <h2>PinasTools Installer</h2>
+    <p>Piliin ang wika / Select language</p>
+    <div class="lang-opts">
+      <button class="lang-btn sel" data-lang="tl">Tagalog</button>
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="ceb">Cebuano</button>
+      <button class="lang-btn" data-lang="ilo">Ilocano</button>
+    </div>
+    <button id="install-confirm">Simulan / Start</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="header-inner">
+    <div class="logo">CE</div>
+    <div class="header-text">
+      <h1>Concrete Mix Design</h1>
+      <p>ACI 211 &amp; DPWH Volume Method</p>
+    </div>
+    <div class="header-badge">OFFLINE</div>
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <div class="tabs">
+    <div class="tab active" data-tab="0">Calculator<span class="shortcut">1</span></div>
+    <div class="tab" data-tab="1">Table<span class="shortcut">2</span></div>
+    <div class="tab" data-tab="2">Board Tips<span class="shortcut">3</span></div>
+    <div class="tab" data-tab="3">Mnemonics<span class="shortcut">4</span></div>
+  </div>
+</div>
+
+<main>
+
+<!-- TAB 1: CALCULATOR -->
+<div class="panel active" id="panel-0">
+
+  <div class="mode-tabs">
+    <button class="mode-btn active" data-mode="A">Mode A — ACI 211</button>
+    <button class="mode-btn" data-mode="B">Mode B — DPWH Volume</button>
+    <button class="mode-btn" data-mode="C">Mode C — w/c Ratio</button>
+  </div>
+
+  <!-- MODE A: ACI 211 -->
+  <div id="mode-A">
+    <div class="card">
+      <div class="card-title">ACI 211 Mix Design</div>
+      <div class="field">
+        <label>Required f'c <span class="unit">MPa</span></label>
+        <input type="number" id="A-fc" value="20.7" min="10" max="60" step="0.1">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Slump <span class="unit">mm</span></label>
+          <select id="A-slump">
+            <option value="25">25 (Stiff)</option>
+            <option value="50">50 (Low)</option>
+            <option value="75" selected>75 (Medium)</option>
+            <option value="100">100 (High)</option>
+            <option value="150">150 (Very High)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Max Aggregate <span class="unit">mm</span></label>
+          <select id="A-agg">
+            <option value="10">10 mm</option>
+            <option value="12.5">12.5 mm</option>
+            <option value="19" selected>19 mm</option>
+            <option value="25">25 mm</option>
+            <option value="37.5">37.5 mm</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Aggregate Type</label>
+          <select id="A-aggtype">
+            <option value="crushed" selected>Crushed</option>
+            <option value="rounded">Rounded</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cement Type</label>
+          <select id="A-cemtype">
+            <option value="I" selected>Type I (OPC)</option>
+            <option value="II">Type II (MH)</option>
+            <option value="V">Type V (HS)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcACI()">Kalkulahin / Calculate</button>
+    </div>
+
+    <div class="results" id="res-A">
+      <div class="res-title">Resulta — ACI 211 Mix Design</div>
+      <div class="res-grid">
+        <div class="res-item highlight">
+          <div class="label">w/c Ratio</div>
+          <div class="value" id="r-wc">—</div>
+        </div>
+        <div class="res-item highlight">
+          <div class="label">Cement Bags</div>
+          <div class="value" id="r-bags">— <span>bags/m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Water Content</div>
+          <div class="value" id="r-water">— <span>kg/m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Cement Content</div>
+          <div class="value" id="r-cem">— <span>kg/m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Fine Aggregate</div>
+          <div class="value" id="r-fa">— <span>kg/m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Coarse Aggregate</div>
+          <div class="value" id="r-ca">— <span>kg/m³</span></div>
+        </div>
+      </div>
+      <div class="ratio-display mt8">
+        <div class="ratio-label">Mix Proportion (Cement : FA : CA)</div>
+        <div class="ratio-val" id="r-ratio">1 : — : —</div>
+      </div>
+      <div class="alert mt8" id="r-note"></div>
+    </div>
+  </div>
+
+  <!-- MODE B: DPWH VOLUME -->
+  <div id="mode-B" class="hidden">
+    <div class="card">
+      <div class="card-title">DPWH Volume Method</div>
+      <div class="field">
+        <label>Mix Class</label>
+        <select id="B-class">
+          <option value="AA">Class AA — f'c 27.6 MPa (Columns, Beams)</option>
+          <option value="A" selected>Class A — f'c 20.7 MPa (Slabs, Footings)</option>
+          <option value="B">Class B — f'c 16.5 MPa (Walls, Piers)</option>
+          <option value="C">Class C — f'c 13.8 MPa (Fill, Sub-base)</option>
+          <option value="P">Class P — f'c 27.6 MPa (Pre-stressed)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Volume to Pour <span class="unit">m³</span></label>
+        <input type="number" id="B-vol" value="1" min="0.1" step="0.1">
+      </div>
+      <button class="calc-btn" onclick="calcDPWH()">Kalkulahin / Calculate</button>
+    </div>
+    <div class="results" id="res-B">
+      <div class="res-title">Resulta — DPWH Volume Method</div>
+      <div class="res-grid">
+        <div class="res-item highlight">
+          <div class="label">Cement</div>
+          <div class="value" id="b-cem">— <span>bags</span></div>
+        </div>
+        <div class="res-item highlight">
+          <div class="label">Sand (Buhangin)</div>
+          <div class="value" id="b-sand">— <span>m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Gravel (Graba)</div>
+          <div class="value" id="b-gravel">— <span>m³</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Water (Tubig)</div>
+          <div class="value" id="b-water">— <span>liters</span></div>
+        </div>
+      </div>
+      <div class="ratio-display mt8">
+        <div class="ratio-label">Proportion (Cem : Sand : Gravel)</div>
+        <div class="ratio-val" id="b-ratio">—</div>
+      </div>
+      <div class="alert mt8" id="b-note"></div>
+    </div>
+  </div>
+
+  <!-- MODE C: w/c RATIO -->
+  <div id="mode-C" class="hidden">
+    <div class="card">
+      <div class="card-title">Water-Cement Ratio Check</div>
+      <div class="field">
+        <label>Input Mode</label>
+        <select id="C-mode">
+          <option value="fc">Given f'c → Compute w/c</option>
+          <option value="wc">Given w/c → Compute f'c</option>
+        </select>
+      </div>
+      <div class="field" id="C-fc-field">
+        <label>Target f'c <span class="unit">MPa</span></label>
+        <input type="number" id="C-fc" value="20.7" min="5" max="70" step="0.1">
+      </div>
+      <div class="field hidden" id="C-wc-field">
+        <label>w/c Ratio <span class="unit">decimal</span></label>
+        <input type="number" id="C-wc" value="0.55" min="0.25" max="0.80" step="0.01">
+      </div>
+      <div class="field">
+        <label>Exposure Class</label>
+        <select id="C-exp">
+          <option value="mild">Mild (Protected)</option>
+          <option value="moderate" selected>Moderate (Humid)</option>
+          <option value="severe">Severe (Seawater / Chemicals)</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="calcWC()">Kalkulahin / Calculate</button>
+    </div>
+    <div class="results" id="res-C">
+      <div class="res-title">Resulta — w/c Ratio Analysis</div>
+      <div class="res-grid">
+        <div class="res-item highlight">
+          <div class="label">w/c Ratio</div>
+          <div class="value" id="c-wc">—</div>
+        </div>
+        <div class="res-item highlight">
+          <div class="label">Expected f'c</div>
+          <div class="value" id="c-fc">— <span>MPa</span></div>
+        </div>
+        <div class="res-item">
+          <div class="label">Max w/c (Exposure)</div>
+          <div class="value" id="c-maxwc">—</div>
+        </div>
+        <div class="res-item">
+          <div class="label">Durability Check</div>
+          <div class="value" id="c-check">—</div>
+        </div>
+      </div>
+      <div class="alert mt8" id="c-note"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 2: TABLE -->
+<div class="panel" id="panel-1">
+
+  <div class="section-head">DPWH Concrete Mix Classes</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Class</th><th>f'c (MPa)</th><th>Cem:Sand:Gravel</th><th>Bags/m³</th><th>Gamit / Use</th></tr></thead>
+      <tbody>
+        <tr><td class="em">AA</td><td>27.6</td><td>1:1.5:3</td><td class="em">12</td><td>Columns, beams, pre-cast</td></tr>
+        <tr><td class="em">A</td><td>20.7</td><td>1:2:4</td><td class="em">9.5</td><td>Slabs, footings, RCDG</td></tr>
+        <tr><td class="em">B</td><td>16.5</td><td>1:2.5:5</td><td class="em">7.5</td><td>Walls, piers, mass conc.</td></tr>
+        <tr><td class="em">C</td><td>13.8</td><td>1:3:6</td><td class="em">6.5</td><td>Fill, sidewalk, sub-base</td></tr>
+        <tr><td class="em">P</td><td>27.6</td><td>1:1.5:3</td><td class="em">12</td><td>Pre-stressed elements</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">w/c Ratio vs. f'c Strength (ACI 318, Type I Cement)</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>w/c Ratio</th><th>f'c (MPa) Non-Air</th><th>f'c (MPa) Air-Ent.</th><th>Grade</th></tr></thead>
+      <tbody>
+        <tr><td>0.40</td><td class="em">37.5</td><td>31.5</td><td><span class="badge green">Excellent</span></td></tr>
+        <tr><td>0.45</td><td class="em">33.0</td><td>27.5</td><td><span class="badge green">Very Good</span></td></tr>
+        <tr><td>0.50</td><td class="em">29.0</td><td>24.0</td><td><span class="badge">Good</span></td></tr>
+        <tr><td>0.55</td><td class="em">24.5</td><td>20.0</td><td><span class="badge">Acceptable</span></td></tr>
+        <tr><td>0.60</td><td class="em">20.5</td><td>16.5</td><td><span class="badge blue">Marginal</span></td></tr>
+        <tr><td>0.65</td><td class="em">17.0</td><td>13.5</td><td><span class="badge red">Low</span></td></tr>
+        <tr><td>0.70</td><td class="em">14.0</td><td>11.0</td><td><span class="badge red">Poor</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Slump Requirements by Element (NSCP / DPWH)</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Structural Element</th><th>Min Slump (mm)</th><th>Max Slump (mm)</th></tr></thead>
+      <tbody>
+        <tr><td>Walls, footings, caissons</td><td>25</td><td class="em">75</td></tr>
+        <tr><td>Slabs, beams, reinforced walls</td><td>25</td><td class="em">100</td></tr>
+        <tr><td>Columns</td><td>25</td><td class="em">100</td></tr>
+        <tr><td>Pavements &amp; slabs on grade</td><td>25</td><td class="em">75</td></tr>
+        <tr><td>Mass concrete</td><td>25</td><td class="em">50</td></tr>
+        <tr><td>Pump concrete (pumped)</td><td>75</td><td class="em">150</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Philippine Cement Brands Reference</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Brand</th><th>Type</th><th>Bag Weight</th><th>Availability</th></tr></thead>
+      <tbody>
+        <tr><td class="em">Holcim Excel</td><td>Type I Portland</td><td>40 kg</td><td>Nationwide</td></tr>
+        <tr><td class="em">Republic</td><td>Type I Portland</td><td>40 kg</td><td>Nationwide</td></tr>
+        <tr><td class="em">Eagle Cement</td><td>Type I Portland</td><td>40 kg</td><td>Luzon, Visayas</td></tr>
+        <tr><td class="em">APO Cement</td><td>Type I Portland</td><td>40 kg</td><td>Mindanao</td></tr>
+        <tr><td class="em">Rizal Cement</td><td>Type I Portland</td><td>40 kg</td><td>Metro Manila</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Key Constants to Memorize</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Constant</th><th>Value</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Unit wt. of concrete</td><td class="em">23.5 kN/m³</td><td>Normal weight, reinforced</td></tr>
+        <tr><td>Unit wt. of concrete (plain)</td><td class="em">24 kN/m³</td><td>Mass concrete</td></tr>
+        <tr><td>Water density</td><td class="em">1000 kg/m³</td><td>At standard conditions</td></tr>
+        <tr><td>1 bag cement (PH)</td><td class="em">40 kg</td><td>= 28.3 L volume</td></tr>
+        <tr><td>Cement specific gravity</td><td class="em">3.15</td><td>Type I, ACI default</td></tr>
+        <tr><td>FA specific gravity</td><td class="em">2.65</td><td>Average natural sand</td></tr>
+        <tr><td>CA specific gravity</td><td class="em">2.68</td><td>Average crushed stone</td></tr>
+        <tr><td>Min f'c per NSCP</td><td class="em">17.5 MPa</td><td>Structural members</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- TAB 3: BOARD TIPS -->
+<div class="panel" id="panel-2">
+
+  <div class="tip-card">
+    <div class="tip-head">
+      <div class="tip-icon gold">!</div>
+      <div class="tip-title">Board Exam Sample Problem</div>
+    </div>
+    <div class="tip-body">
+      Compute the number of cement bags needed for a <strong>10m x 8m x 0.15m slab</strong> using DPWH Class A mix.
+    </div>
+    <div class="sample-box">
+      <div class="step"><div class="step-num">1</div><div class="step-txt"><strong>Compute Volume:</strong> V = 10 × 8 × 0.15 = <strong>12 m³</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>Class A bags/m³</strong> = 9.5 bags/m³ (DPWH standard)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-txt"><strong>Cement bags</strong> = 12 × 9.5 = <strong>114 bags</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-txt"><strong>Sand</strong> = 12 × 0.50 = 6 m³ | <strong>Gravel</strong> = 12 × 1.00 = 12 m³</div></div>
+    </div>
+    <div class="ans">Sagot: 114 bags of cement | 6 m³ sand | 12 m³ gravel</div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-head">
+      <div class="tip-icon blue">i</div>
+      <div class="tip-title">DPWH vs ACI — Key Differences</div>
+    </div>
+    <div class="tip-body">
+      <strong>DPWH Volume Method</strong> — Simplified, field-use. Uses fixed proportions per class. Hindi na kailangan ng trial mix kung class-based ang project.<br><br>
+      <strong>ACI 211</strong> — Engineered approach. Considers slump, aggregate size, w/c ratio. Kailangan ng laboratory trial mix para sa final proportions.<br><br>
+      <span class="gold">DPWH</span> is used for government road/bridge/building projects. <span class="gold">ACI 211</span> is used for structural design and board exams.
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-head">
+      <div class="tip-icon red">!</div>
+      <div class="tip-title">Common Mistakes — Huwag Kamutin!</div>
+    </div>
+    <div class="tip-body">
+      <strong>1. Forgetting sand bulking</strong> — Basang buhangin ay lumalaki ng 20–30%. Palaging gamitin ang dry loose volume sa calculations.<br><br>
+      <strong>2. Wrong unit weight</strong> — Plain concrete = 24 kN/m³, Reinforced = 23.5 kN/m³. Huwag ipagpalit!<br><br>
+      <strong>3. Confusing f'c and fy</strong> — f'c = compressive strength ng concrete (MPa). fy = yield strength ng rebar (MPa). Different materials!<br><br>
+      <strong>4. Volume vs. weight mix</strong> — Class A "1:2:4" ay volume ratio, hindi weight ratio. Iba ang density ng bawat component.<br><br>
+      <strong>5. Forgetting standard deviation</strong> — Required f'cr = f'c + 1.34s (ACI 318). Add margin for quality control.
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-head">
+      <div class="tip-icon green">✓</div>
+      <div class="tip-title">Quality Control Tests</div>
+    </div>
+    <div class="tip-body">
+      <strong>Slump Test (ASTM C143)</strong> — Field test para sa workability. Fill cone in 3 layers, tamp 25x each. Lift cone, measure settlement (slump).<br><br>
+      <strong>Cylinder Test (ASTM C39)</strong> — 150mm dia × 300mm height. Cure 28 days. Test compressive strength. Minimum 2 cylinders per 50 m³ pour.<br><br>
+      <strong>Schmidt Hammer (Rebound)</strong> — Non-destructive test. Estimate strength ng existing concrete. Hindi kasingsaktong cylinder test pero mabilis.<br><br>
+      <strong>DPWH QC Requirement</strong> — At least 1 slump test at 1 set of cylinders per 50 m³ or per day of pour.
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-head">
+      <div class="tip-icon gold">*</div>
+      <div class="tip-title">Key Formulas para sa Board Exam</div>
+    </div>
+    <div class="tip-body">
+      <strong>Required average strength:</strong><br>
+      f'cr = f'c + 1.34s (known variability)<br>
+      f'cr = f'c + 2.33s − 3.5 (alternative)<br><br>
+      <strong>Water-cement ratio (Abrams Law):</strong><br>
+      f'c = A / B^(w/c) where A≈96.5, B≈8.2 (ksi units)<br><br>
+      <strong>Absolute volume method:</strong><br>
+      Vol = Weight / (SG × 1000)<br><br>
+      <strong>Remember:</strong> Sum of absolute volumes = 1 m³
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 4: MNEMONICS -->
+<div class="panel" id="panel-3">
+
+  <div class="section-head">Taglish Mnemonics — Madaling Matandaan</div>
+
+  <div class="mnemonic">
+    <div class="phrase">"CWSG" — Mix Order</div>
+    <div class="meaning"><strong>C</strong>ement, <strong>W</strong>ater, <strong>S</strong>and, <strong>G</strong>ravel — ang tamang pagkakasunod-sunod ng pag-iisip sa mix design. "Cement Water Sinabugan ng Gravel."</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"Mas mababa ang w/c, mas malakas ang concrete"</div>
+    <div class="meaning">Lower water-cement ratio = stronger concrete. W/c 0.40 &gt; 0.55 in terms of strength. "Tubig = kahinaan ng concrete."</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"1 bag = 40 kilo = 28.3 litro"</div>
+    <div class="meaning">1 bag ng semento = 40 kg weight = 28.3 liters volume (SG=3.15). I-memorize: <strong>40 at 28.3</strong>.</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"Class AA = Awesome Arko"</div>
+    <div class="meaning">DPWH Class AA gamit sa Columns (Arco/Arc) at Arches. f'c = 27.6 MPa. "Pinakamalakas sa lahat ng class."</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"Slump = Tamad na concrete"</div>
+    <div class="meaning">Mataas na slump = maraming tubig = madaling mag-pour PERO mas mahina. "High slump, weak dump." Limit slump per element type.</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"f'c = Field concrete | fy = Field rebar Yield"</div>
+    <div class="meaning">Huwag ipagpalit: <strong>f'c</strong> = compressive strength ng concrete (MPa). <strong>fy</strong> = yield strength ng reinforcing steel (MPa). Iba ang material!</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"23.5 at 24" — Unit Weights</div>
+    <div class="meaning"><strong>23.5 kN/m³</strong> = reinforced concrete. <strong>24 kN/m³</strong> = plain/mass concrete. "Ang reinforcement ay nagpapagaan (−0.5)." Hindi totoo pero makatutulong sa mnemonic.</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"3-2-1 ang DPWH Class A"</div>
+    <div class="meaning">Class A = 1 cement : 2 sand : 4 gravel. "Hindi 3-2-1, kundi 1-2-4 — reverse mo!" Trick para matandaan ang sequence.</div>
+  </div>
+
+  <div class="section-head">Casio fx-991ES/EX CalTech Techniques</div>
+
+  <div class="caltech-step">
+    <h4><span>TIP 1</span> w/c Formula sa CALC Mode</h4>
+    <p>Para paulit-ulit na mag-evaluate ng w/c formula given f'c:</p>
+    <ol style="margin-left:16px;margin-top:6px">
+      <li>Pindutin ang <span class="key">MODE</span> → <span class="key">5</span> (EQN) or gumamit ng CALC</li>
+      <li>I-type: <span class="key">0.85 - 0.05 × X</span> kung saan X = f'c sa formula</li>
+      <li>Pindutin <span class="key">CALC</span>, i-enter ang value ng f'c</li>
+      <li>Makukuha ang w/c nang mabilis</li>
+    </ol>
+  </div>
+
+  <div class="caltech-step">
+    <h4><span>TIP 2</span> Store f'c sa Memory, Compute Cement</h4>
+    <p>Para mag-solve ng multiple steps nang di na manu-manong mag-type:</p>
+    <ol style="margin-left:16px;margin-top:6px">
+      <li>I-solve ang w/c: <span class="key">ANS → STO → A</span></li>
+      <li>Water content: <span class="key">200 → STO → B</span> (for 19mm agg)</li>
+      <li>Cement = B ÷ A: <span class="key">RCL B ÷ RCL A =</span></li>
+      <li>Bags = ÷ 40: <span class="key">ANS ÷ 40 =</span></li>
+    </ol>
+  </div>
+
+  <div class="caltech-step">
+    <h4><span>TIP 3</span> TABLE Mode — w/c vs f'c</h4>
+    <p>Gumawa ng automatic table ng w/c at kaukulang f'c:</p>
+    <ol style="margin-left:16px;margin-top:6px">
+      <li><span class="key">MODE</span> → <span class="key">7</span> (TABLE)</li>
+      <li>I-type: <span class="key">96.5 ÷ 8.2^X</span> (Abrams-like formula)</li>
+      <li>Start: <span class="key">0.40</span>, End: <span class="key">0.70</span>, Step: <span class="key">0.05</span></li>
+      <li>Makikita ang table ng f'c values para bawat w/c</li>
+    </ol>
+  </div>
+
+  <div class="caltech-step">
+    <h4><span>TIP 4</span> Volume ng Slab — Quick Compute</h4>
+    <p>Para sa slab/footing volume at cement bags:</p>
+    <ol style="margin-left:16px;margin-top:6px">
+      <li>L × W × t: <span class="key">10 × 8 × 0.15 =</span> → 12 m³</li>
+      <li>Cement bags (Class A): <span class="key">ANS × 9.5 =</span></li>
+      <li>Sand: <span class="key">12 × 0.50 =</span> | Gravel: <span class="key">12 × 1 =</span></li>
+      <li>Para mas mabilis: <span class="key">STO M+</span> ang volume, tapos RCL sa sunod na step</li>
+    </ol>
+  </div>
+
+  <div class="caltech-step">
+    <h4><span>TIP 5</span> Absolute Volume Check</h4>
+    <p>Verify na ang sum ng absolute volumes = 1 m³:</p>
+    <ol style="margin-left:16px;margin-top:6px">
+      <li>Vol cement = C ÷ (3150): <span class="key">350 ÷ 3150 =</span></li>
+      <li>Vol water = W ÷ 1000: <span class="key">200 ÷ 1000 =</span></li>
+      <li>Vol CA = CA ÷ (SG × 1000): <span class="key">900 ÷ 2680 =</span></li>
+      <li>Add all: dapat ≈ 1.00. Ang kulang = FA volume.</li>
+    </ol>
+  </div>
+
+  <div class="section-head">GEAS &amp; Real Board Mnemonics — Chemistry</div>
+
+  <div class="mnemonic">
+    <div class="phrase">"Do what you Oughter, add acid to water!"</div>
+    <div class="meaning">NEVER add water to acid — ang acid ang dapat ibuhos sa tubig, hindi ang kabaligtaran. Exothermic reaction: pag naibuhos ang tubig sa acid, maaring mag-splatter at mapaso ka. <strong>Acid to water = safe. Water to acid = accident!</strong></div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"Acid to Water: All is Well. Water to Acid: What an Accident!"</div>
+    <div class="meaning">Dalawang bersyon ng parehong panuntunan. Sa concrete mix context: kapag gumagamit ng chemical admixtures o cleaning agents, laging dilute sa tubig bago gamitin. Relevant din sa curing compound application.</div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">Periodic Table Group 1: "HaLiNa Kayo Rubi at Cesar sa France"</div>
+    <div class="meaning">
+      <strong>H</strong>ydrogen · <strong>Li</strong>thium · <strong>Na</strong>trium (Sodium) · <strong>K</strong>alium (Potassium) · <strong>Rb</strong>idium · <strong>Cs</strong>ium · <strong>Fr</strong>ancium<br>
+      Alkali metals — Group 1. Highly reactive, pwedeng mag-react sa tubig. Relevant sa concrete chemistry at soil corrosion problems.
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">Group 2 Alkaline Earth: "Be, MgCano kay Sr. BaRat?"</div>
+    <div class="meaning">
+      <strong>Be</strong>ryllium · <strong>Mg</strong>nesium · <strong>Ca</strong>lcium · <strong>Sr</strong>ontium · <strong>Ba</strong>rium · <strong>Ra</strong>dium<br>
+      Calcium at Magnesium ang pinakacommon sa concrete chemistry (cement hydration, aggregate reaction). Ca(OH)₂ = portlandite ang byproduct ng cement hydration.
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"OIL RIG" — Redox Reactions</div>
+    <div class="meaning">
+      <strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss · <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain<br>
+      Importanteng concept sa corrosion ng reinforcing steel. Kapag nag-corrode ang rebar: Fe → Fe²⁺ (oxidation = nawawalan ng electrons). Ang chloride attack sa concrete ay nagdudulot ng corrosion ng rebar.
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <div class="phrase">"RED CAT, AN OX" — Electrochemistry</div>
+    <div class="meaning">
+      <strong>Red</strong>uction at <strong>Cat</strong>hode · <strong>An</strong>ode = <strong>Ox</strong>idation<br>
+      Para sa rebar corrosion: ang cathode ay ang lugar kung saan nag-rereduce ang oxygen (O₂ + 2H₂O + 4e⁻ → 4OH⁻). Ang anode ay kung saan nag-corrode ang bakal. Cathodic protection ay kontrahin ito gamit ang impressed current.
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<footer>
+  <strong style="color:var(--gold)">PinasTools CE</strong> — Concrete Mix Design Calculator<br>
+  Offline-ready. Para sa mga CE board aspirants. <a href="https://pinastools.com">pinastools.com</a>
+</footer>
+
+<script>
+// ====== LANGUAGE INSTALLER ======
+(function(){
+  const stored = localStorage.getItem('pinastools_lang');
+  if(stored){ document.getElementById('install-overlay').style.display='none'; return; }
+  let sel = 'tl';
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel'); sel=btn.dataset.lang;
+    });
+  });
+  document.getElementById('install-confirm').addEventListener('click',()=>{
+    localStorage.setItem('pinastools_lang',sel);
+    document.getElementById('install-overlay').style.display='none';
+  });
+})();
+
+// ====== TAB SWITCHING ======
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.panel');
+function switchTab(i){
+  tabs.forEach((t,idx)=>{ t.classList.toggle('active',idx===i); });
+  panels.forEach((p,idx)=>{ p.classList.toggle('active',idx===i); });
+}
+tabs.forEach((t,i)=>t.addEventListener('click',()=>switchTab(i)));
+
+// Keyboard shortcuts 1-4
+let inputFocused=false;
+document.addEventListener('focusin',e=>{ if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) inputFocused=true; });
+document.addEventListener('focusout',()=>{ inputFocused=false; });
+document.addEventListener('keydown',e=>{
+  if(inputFocused) return;
+  if(e.key>='1'&&e.key<='4') switchTab(+e.key-1);
+});
+
+// ====== MODE SWITCHING (Tab 1) ======
+const modeBtns=document.querySelectorAll('.mode-btn');
+const modes=['A','B','C'];
+function switchMode(m){
+  modeBtns.forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
+  modes.forEach(id=>{ document.getElementById('mode-'+id).classList.toggle('hidden',id!==m); });
+}
+modeBtns.forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
+
+// Mode C toggle
+document.getElementById('C-mode').addEventListener('change',function(){
+  const fc=this.value==='fc';
+  document.getElementById('C-fc-field').classList.toggle('hidden',!fc);
+  document.getElementById('C-wc-field').classList.toggle('hidden',fc);
+});
+
+// ====== ACI 211 CALCULATOR ======
+// ACI 211 water content table (non-air-entrained, kg/m³)
+// [slump_25,slump_50,slump_75,slump_100,slump_150] per agg size
+const waterTable={
+  10:  [207,228,237,244,268],
+  12.5:[199,216,228,235,252],
+  19:  [181,202,213,219,235],
+  25:  [175,193,202,208,222],
+  37.5:[163,181,190,197,209]
+};
+
+// w/c ratio vs f'c (non-air, Type I), interpolate
+const wcTable=[
+  {fc:45, wc:0.38},{fc:40,wc:0.42},{fc:35,wc:0.47},
+  {fc:30,wc:0.54},{fc:25,wc:0.61},{fc:20,wc:0.69},{fc:15,wc:0.79}
+];
+
+function interpWC(fc){
+  if(fc>=45) return 0.38;
+  if(fc<=15) return 0.79;
+  for(let i=0;i<wcTable.length-1;i++){
+    const a=wcTable[i], b=wcTable[i+1];
+    if(fc<=a.fc && fc>=b.fc){
+      const t=(fc-b.fc)/(a.fc-b.fc);
+      return +(b.wc+(a.wc-b.wc)*t).toFixed(3);
+    }
+  }
+  return 0.55;
+}
+
+function getWaterContent(slump,aggSize){
+  const sizes=[10,12.5,19,25,37.5];
+  const slumps=[25,50,75,100,150];
+  const si=sizes.findIndex(s=>s==aggSize);
+  const sli=slumps.findIndex(s=>s==slump);
+  if(si<0||sli<0) return 200;
+  return waterTable[aggSize][sli];
+}
+
+function calcACI(){
+  const fc=parseFloat(document.getElementById('A-fc').value);
+  const slump=parseInt(document.getElementById('A-slump').value);
+  const aggSize=parseFloat(document.getElementById('A-agg').value);
+  const aggType=document.getElementById('A-aggtype').value;
+  const cemType=document.getElementById('A-cemtype').value;
+
+  if(!fc||fc<10||fc>80){ alert('I-enter ang valid na f\'c (10–80 MPa)'); return; }
+
+  // Design f'c with 8.5 MPa margin (no test data, ACI 318 Table 26.4.3.1)
+  const fcr = fc + 8.5;
+
+  // Get w/c ratio
+  let wc = interpWC(fcr);
+
+  // Rounded agg allows slightly higher w/c (+0.05 per ACI)
+  if(aggType==='rounded') wc = Math.min(0.80, wc+0.05);
+
+  // Water content
+  let water = getWaterContent(slump, aggSize);
+  // Rounded agg: -15 kg water reduction per ACI 211
+  if(aggType==='rounded') water = water - 15;
+
+  // Cement content
+  const cement = Math.round(water / wc);
+
+  // Absolute volume method (assume SG: cem=3.15, water=1.00, air=2%)
+  const volCem = cement / (3.15*1000);
+  const volWater = water / 1000;
+  const volAir = 0.02;
+  const volAgg = 1 - volCem - volWater - volAir;
+
+  // CA fraction by volume (ACI 211 Table A1.5.3, approx)
+  // Fraction of CA for given aggsize and FM of sand ≈ 2.6
+  const caFrac = {10:0.44, 12.5:0.48, 19:0.57, 25:0.62, 37.5:0.67};
+  const fCA = caFrac[aggSize] || 0.57;
+  const volCA = volAgg * fCA;
+  const volFA = volAgg * (1-fCA);
+
+  // Weights (SG: FA=2.65, CA=2.68)
+  const wFA = Math.round(volFA * 2.65 * 1000);
+  const wCA = Math.round(volCA * 2.68 * 1000);
+  const bags = (cement/40).toFixed(1);
+
+  // Proportions
+  const ratioFA = (wFA/cement).toFixed(2);
+  const ratioCA = (wCA/cement).toFixed(2);
+
+  document.getElementById('r-wc').textContent = wc.toFixed(2);
+  document.getElementById('r-bags').innerHTML = `${bags} <span>bags/m³</span>`;
+  document.getElementById('r-water').innerHTML = `${water} <span>kg/m³</span>`;
+  document.getElementById('r-cem').innerHTML = `${cement} <span>kg/m³</span>`;
+  document.getElementById('r-fa').innerHTML = `${wFA} <span>kg/m³</span>`;
+  document.getElementById('r-ca').innerHTML = `${wCA} <span>kg/m³</span>`;
+  document.getElementById('r-ratio').textContent = `1 : ${ratioFA} : ${ratioCA}`;
+
+  let note = `<strong>Design f'cr = ${fcr.toFixed(1)} MPa</strong> (f'c + 8.5 MPa margin, ACI 318). `;
+  if(wc < 0.45) note += 'Mababang w/c — kailangan ng superplasticizer para sa workability. ';
+  if(cemType!=='I') note += `Cement Type ${cemType} — adjust curing time accordingly. `;
+  note += `Cement type: <strong>${cemType === 'I'?'OPC (Type I)':cemType==='II'?'Moderate Heat (Type II)':'High Sulfate Resistance (Type V)'}</strong>.`;
+  document.getElementById('r-note').innerHTML = note;
+  document.getElementById('res-A').classList.add('show');
+}
+
+// ====== DPWH VOLUME METHOD ======
+const dpwhData = {
+  AA: { fc:27.6, cem:12, sand:0.40, gravel:0.80, water:180, ratio:'1:1.5:3', use:'Columns, Beams, Pre-cast' },
+  A:  { fc:20.7, cem:9.5,sand:0.50, gravel:1.00, water:200, ratio:'1:2:4',   use:'Slabs, Footings, RCDG' },
+  B:  { fc:16.5, cem:7.5,sand:0.60, gravel:1.20, water:215, ratio:'1:2.5:5', use:'Walls, Piers, Mass Concrete' },
+  C:  { fc:13.8, cem:6.5,sand:0.70, gravel:1.40, water:225, ratio:'1:3:6',   use:'Fill, Sidewalks, Sub-base' },
+  P:  { fc:27.6, cem:12, sand:0.40, gravel:0.80, water:175, ratio:'1:1.5:3', use:'Pre-stressed Elements' }
+};
+
+function calcDPWH(){
+  const cls=document.getElementById('B-class').value;
+  const vol=parseFloat(document.getElementById('B-vol').value);
+  if(!vol||vol<=0){ alert('I-enter ang valid na volume (m³)'); return; }
+  const d=dpwhData[cls];
+  const bags = Math.ceil(d.cem * vol);
+  const sand = +(d.sand * vol).toFixed(2);
+  const gravel = +(d.gravel * vol).toFixed(2);
+  const water = Math.round(d.water * vol);
+
+  document.getElementById('b-cem').innerHTML = `${bags} <span>bags</span>`;
+  document.getElementById('b-sand').innerHTML = `${sand} <span>m³</span>`;
+  document.getElementById('b-gravel').innerHTML = `${gravel} <span>m³</span>`;
+  document.getElementById('b-water').innerHTML = `${water} <span>liters</span>`;
+  document.getElementById('b-ratio').textContent = d.ratio;
+  document.getElementById('b-note').innerHTML =
+    `<strong>Class ${cls}</strong> — f'c ${d.fc} MPa. Gamit sa: ${d.use}. ` +
+    `Para sa ${vol} m³, kailangan ng <strong>${bags} bags</strong> na semento. ` +
+    `Note: Adjust for sand bulking (wet sand expands ~20–30%). DPWH per QC specs.`;
+  document.getElementById('res-B').classList.add('show');
+}
+
+// ====== W/C RATIO CALCULATOR ======
+function fcFromWC(wc){
+  // Linear interpolation from wcTable
+  for(let i=0;i<wcTable.length-1;i++){
+    const a=wcTable[i], b=wcTable[i+1];
+    if(wc>=a.wc && wc<=b.wc){
+      const t=(wc-a.wc)/(b.wc-a.wc);
+      return +(a.fc-(a.fc-b.fc)*t).toFixed(1);
+    }
+  }
+  if(wc<=0.38) return 48;
+  if(wc>=0.80) return 12;
+  return 20;
+}
+
+const maxWCByExposure = { mild:0.65, moderate:0.55, severe:0.45 };
+
+function calcWC(){
+  const mode=document.getElementById('C-mode').value;
+  const exp=document.getElementById('C-exp').value;
+  let wc, fc;
+
+  if(mode==='fc'){
+    fc=parseFloat(document.getElementById('C-fc').value);
+    if(!fc) return;
+    wc = interpWC(fc + 8.5); // design fc
+  } else {
+    wc=parseFloat(document.getElementById('C-wc').value);
+    if(!wc) return;
+    fc = fcFromWC(wc);
+  }
+
+  const maxWC = maxWCByExposure[exp];
+  const pass = wc <= maxWC;
+
+  document.getElementById('c-wc').textContent = wc.toFixed(2);
+  document.getElementById('c-fc').innerHTML = `${fc} <span>MPa</span>`;
+  document.getElementById('c-maxwc').textContent = maxWC.toFixed(2);
+  document.getElementById('c-check').innerHTML = pass
+    ? '<span style="color:var(--green);font-weight:700">PASS</span>'
+    : '<span style="color:var(--red);font-weight:700">FAIL</span>';
+
+  const expLabel = {mild:'Mild (Protected)',moderate:'Moderate (Humid, exposed)',severe:'Severe (Seawater/Chemicals)'}[exp];
+  document.getElementById('c-note').className = 'alert mt8 '+(pass?'alert-green':'alert-red');
+  document.getElementById('c-note').innerHTML = pass
+    ? `<strong>PASS:</strong> w/c ${wc.toFixed(2)} ay mas mababa sa maximum na ${maxWC} para sa ${expLabel} exposure. Sapat ang durability.`
+    : `<strong>FAIL:</strong> w/c ${wc.toFixed(2)} ay LUMAGPAS sa maximum na ${maxWC} para sa ${expLabel} exposure. Ibaba ang w/c para sa durability compliance (ACI 318 Table 19.3.3.1).`;
+
+  document.getElementById('res-C').classList.add('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beam & Moment Calculator – PinasTools CE</title>
+<meta name="description" content="Civil Engineering Beam & Moment Calculator para sa CE Board Exam. Simply Supported, Cantilever, Fixed-Fixed, Propped Cantilever. Offline-ready.">
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111318;--bg2:#1a1d25;--bg3:#22263000;--card:#1e2130;
+  --gold:#f59e0b;--gold2:#fbbf24;--gold3:#fde68a;
+  --text:#f1f5f9;--muted:#94a3b8;--border:#2d3348;
+  --red:#ef4444;--green:#22c55e;--blue:#3b82f6;
+  --r:16px;--r2:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;min-height:100vh;line-height:1.5}
+
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
+#modal{background:var(--card);border:1.5px solid var(--gold);border-radius:var(--r);padding:28px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 0 40px rgba(245,158,11,.18)}
+#modal h2{color:var(--gold);font-size:1.25rem;font-weight:700;margin-bottom:4px}
+#modal p{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.lang-btn{background:var(--bg2);border:1.5px solid var(--border);color:var(--text);border-radius:var(--r2);padding:12px 8px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:.2s}
+.lang-btn:hover,.lang-btn.active{border-color:var(--gold);background:rgba(245,158,11,.12);color:var(--gold)}
+.lang-btn .flag{font-size:1.4rem;display:block;margin-bottom:4px}
+#modal-continue{width:100%;background:var(--gold);color:#111;border:none;border-radius:var(--r2);padding:13px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s}
+#modal-continue:hover{background:var(--gold2)}
+.modal-brand{font-size:.75rem;color:var(--muted);margin-top:12px}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),#d97706);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#111}
+.logo-text{font-size:.95rem;font-weight:700;color:var(--text);line-height:1.1}
+.logo-sub{font-size:.7rem;color:var(--gold);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.badge{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);color:var(--gold);font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px}
+
+/* TABS */
+.tabs-bar{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:65px;z-index:99;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tabs-inner{max-width:960px;margin:0 auto;display:flex;gap:0}
+.tab-btn{flex:none;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:11px 16px;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s;text-transform:uppercase;letter-spacing:.04em}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-num{opacity:.5;font-size:.75em;margin-right:4px}
+
+/* MAIN */
+main{max-width:960px;margin:0 auto;padding:20px 14px 80px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card-title{font-size:.8rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.card-title svg{flex-shrink:0}
+
+/* FORM */
+.form-grid{display:grid;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.form-row{grid-template-columns:1fr}}
+label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+select,input[type=number],input[type=text]{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:'Outfit',sans-serif;font-size:.95rem;padding:10px 12px;outline:none;transition:.2s;-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+select:focus,input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,158,11,.12)}
+select option{background:var(--card)}
+
+/* SUBROW */
+.sub-row{display:none}
+.sub-row.show{display:grid}
+
+/* BTN */
+.btn-calc{width:100%;background:linear-gradient(135deg,var(--gold),#d97706);color:#111;border:none;border-radius:var(--r2);padding:13px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:4px;transition:.2s;letter-spacing:.02em}
+.btn-calc:hover{filter:brightness(1.08)}
+.btn-clear{width:100%;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:var(--r2);padding:11px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:.2s}
+.btn-clear:hover{border-color:var(--muted);color:var(--text)}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:420px){.results-grid{grid-template-columns:1fr}}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 12px;text-align:center}
+.result-card.highlight{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.06)}
+.result-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.result-value{font-size:1.35rem;font-weight:700;color:var(--text)}
+.result-value.gold{color:var(--gold)}
+.result-unit{font-size:.75rem;color:var(--muted);margin-top:1px}
+
+/* FORMULA BOX */
+.formula-box{background:var(--bg);border-left:3px solid var(--gold);border-radius:0 var(--r2) var(--r2) 0;padding:12px 14px;font-size:.82rem;color:var(--muted);margin-top:12px}
+.formula-box code{color:var(--gold3);font-family:monospace;font-size:.88rem}
+.formula-line{margin-bottom:4px}
+.formula-line:last-child{margin-bottom:0}
+
+/* SVG DIAGRAM */
+#beam-svg-wrap{background:var(--bg);border-radius:var(--r2);padding:8px;overflow:hidden}
+#beam-svg-wrap svg{width:100%;height:auto;display:block}
+
+/* ALERT */
+.alert{border-radius:var(--r2);padding:11px 14px;font-size:.83rem;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
+.alert-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d}
+.alert-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+.alert-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+
+/* TABLE TAB */
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{background:rgba(245,158,11,.1)}
+th{padding:9px 10px;text-align:left;font-weight:700;color:var(--gold);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid var(--border)}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--muted)}
+td:first-child{color:var(--text);font-weight:600}
+td code{background:var(--bg);color:var(--gold3);font-family:monospace;font-size:.8rem;padding:1px 5px;border-radius:4px;white-space:nowrap}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--border)}
+
+/* BOARD TIPS */
+.tip-item{border-left:3px solid var(--gold);padding:10px 14px;margin-bottom:10px;background:var(--bg2);border-radius:0 var(--r2) var(--r2) 0}
+.tip-title{font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.tip-body{font-size:.82rem;color:var(--muted);line-height:1.6}
+.tip-body b{color:var(--text)}
+.mistake{border-left-color:var(--red)}
+.mistake .tip-title{color:#fca5a5}
+
+.prob-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:12px}
+.prob-q{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:10px}
+.prob-step{font-size:.8rem;color:var(--muted);margin-bottom:4px;padding-left:10px;border-left:2px solid var(--border)}
+.prob-step b{color:var(--gold3)}
+.prob-ans{font-size:.88rem;font-weight:700;color:var(--green);margin-top:8px}
+
+.sign-box{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.sign-box{grid-template-columns:1fr}}
+.sign-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center}
+.sign-card .sign-sym{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.sign-card .sign-label{font-size:.75rem;color:var(--muted)}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* MNEMONICS */
+.mnem-card{background:var(--bg2);border:1px solid rgba(245,158,11,.25);border-radius:var(--r2);padding:16px;margin-bottom:12px}
+.mnem-key{font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:6px}
+.mnem-meaning{font-size:.82rem;color:var(--muted);line-height:1.6}
+.mnem-meaning code{color:var(--gold3);font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px}
+.caltech-step{background:var(--bg);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px;border:1px solid var(--border)}
+.caltech-step .step-num{display:inline-block;background:var(--gold);color:#111;border-radius:50%;width:20px;height:20px;font-size:.7rem;font-weight:800;text-align:center;line-height:20px;margin-right:7px;flex-shrink:0}
+.caltech-step .step-text{font-size:.82rem;color:var(--muted);line-height:1.6}
+.caltech-step .step-text b{color:var(--text)}
+.caltech-step .step-text code{color:var(--gold3);font-family:monospace}
+
+/* SECTION HEADING */
+.sec-head{font-size:.75rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-head::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FOOTER */
+footer{text-align:center;padding:20px;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--gold);text-decoration:none}
+
+/* SHORTCUT HINT */
+.shortcut-hint{font-size:.7rem;color:var(--muted);text-align:right;padding:6px 14px 0;opacity:.7}
+
+/* GCASH BADGE */
+.gcash-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,114,206,.15);border:1px solid rgba(0,114,206,.3);color:#60a5fa;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE INSTALLER MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div style="font-size:1.6rem;margin-bottom:8px">🏗️</div>
+    <h2>PinasTools Installer</h2>
+    <p>Select your preferred language / Piliin ang iyong wika</p>
+    <div class="lang-grid">
+      <button class="lang-btn active" data-lang="tl" onclick="selectLang(this)"><span class="flag">🇵🇭</span>Tagalog</button>
+      <button class="lang-btn" data-lang="en" onclick="selectLang(this)"><span class="flag">🇺🇸</span>English</button>
+      <button class="lang-btn" data-lang="ceb" onclick="selectLang(this)"><span class="flag">🌊</span>Cebuano</button>
+      <button class="lang-btn" data-lang="ilo" onclick="selectLang(this)"><span class="flag">⛰️</span>Ilocano</button>
+    </div>
+    <button id="modal-continue" onclick="closeModal()">Simulan / Continue</button>
+    <div class="modal-brand">PinasTools CE · Bataan Peninsula State University</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">⚙</div>
+      <div>
+        <div class="logo-text">Beam &amp; Moment Calculator</div>
+        <div class="logo-sub">PinasTools CE · BPSU</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <span class="gcash-badge">GCash Ready</span>
+      <span class="badge">Offline</span>
+    </div>
+  </div>
+</header>
+
+<!-- TABS BAR -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="switchTab(0)" id="tab0"><span class="tab-num">1</span>Calculator</button>
+    <button class="tab-btn" onclick="switchTab(1)" id="tab1"><span class="tab-num">2</span>Table</button>
+    <button class="tab-btn" onclick="switchTab(2)" id="tab2"><span class="tab-num">3</span>Board Tips</button>
+    <button class="tab-btn" onclick="switchTab(3)" id="tab3"><span class="tab-num">4</span>Mnemonics &amp; CalTech</button>
+  </div>
+</div>
+<div class="shortcut-hint">Keys 1–4 to switch tabs</div>
+
+<main>
+
+<!-- TAB 1: CALCULATOR -->
+<div class="tab-panel active" id="panel0">
+
+  <div class="card">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+      Beam Configuration
+    </div>
+    <div class="form-grid">
+      <div>
+        <label>Beam Type</label>
+        <select id="beamType" onchange="updateBeamUI()">
+          <option value="ss">Simply Supported</option>
+          <option value="cant">Cantilever</option>
+          <option value="ff">Fixed-Fixed</option>
+          <option value="pc">Propped Cantilever</option>
+        </select>
+      </div>
+      <div>
+        <label>Load Type</label>
+        <select id="loadType" onchange="updateLoadUI()">
+          <option value="udl">UDL (w, kN/m)</option>
+          <option value="pt_mid">Point Load at Midspan</option>
+          <option value="pt_a">Point Load at Distance a</option>
+        </select>
+      </div>
+      <div>
+        <label>Span L (m)</label>
+        <input type="number" id="spanL" value="6" min="0.1" step="0.1" placeholder="e.g. 6">
+      </div>
+      <div id="wRow">
+        <label>UDL w (kN/m)</label>
+        <input type="number" id="wLoad" value="10" min="0" step="0.5" placeholder="e.g. 10">
+      </div>
+      <div id="pRow" class="sub-row">
+        <label>Point Load P (kN)</label>
+        <input type="number" id="pLoad" value="50" min="0" step="1" placeholder="e.g. 50">
+      </div>
+      <div id="aRow" class="sub-row">
+        <label>Distance a from Left (m)</label>
+        <input type="number" id="aLoad" value="2" min="0" step="0.1" placeholder="e.g. 2">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      Section Properties (para sa Deflection)
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Modulus E (GPa)</label>
+        <select id="eVal">
+          <option value="200">Steel — 200 GPa</option>
+          <option value="25" selected>Concrete — 25 GPa</option>
+          <option value="10">Wood — 10 GPa</option>
+          <option value="custom">Custom...</option>
+        </select>
+      </div>
+      <div id="eCustomRow" class="sub-row">
+        <label>Custom E (GPa)</label>
+        <input type="number" id="eCustom" value="200" min="1" step="1">
+      </div>
+      <div>
+        <label>Moment of Inertia I (×10⁶ mm⁴)</label>
+        <input type="number" id="iVal" value="200" min="0.001" step="1" placeholder="e.g. 200">
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn-calc" onclick="calculate()">Kalkulahin / Calculate</button>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn-clear" onclick="clearResults()">I-clear / Clear</button>
+    </div>
+  </div>
+
+  <!-- DIAGRAM -->
+  <div class="card" id="diagramCard">
+    <div class="card-title">Beam Diagram</div>
+    <div id="beam-svg-wrap">
+      <svg id="beamSvg" viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+        <text x="200" y="80" text-anchor="middle" fill="#94a3b8" font-size="13" font-family="Outfit,sans-serif">Mag-input at kalkulahin para makita ang diagram.</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="card" id="resultsCard" style="display:none">
+    <div class="card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Mga Resulta / Results
+    </div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="formula-box" id="formulaBox"></div>
+  </div>
+
+  <div id="errorBox" style="display:none"></div>
+
+</div><!-- end panel0 -->
+
+<!-- TAB 2: TABLE -->
+<div class="tab-panel" id="panel1">
+
+  <div class="sec-head">Standard Beam Formulas</div>
+  <div class="tbl-wrap" style="margin-bottom:16px">
+    <table>
+      <thead>
+        <tr>
+          <th>Beam Type</th>
+          <th>Loading</th>
+          <th>Max Moment</th>
+          <th>Max Shear</th>
+          <th>Max Deflection</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Simply Supported</td>
+          <td>UDL w</td>
+          <td><code>wL²/8</code></td>
+          <td><code>wL/2</code></td>
+          <td><code>5wL⁴/384EI</code></td>
+        </tr>
+        <tr>
+          <td>Simply Supported</td>
+          <td>Point P at midspan</td>
+          <td><code>PL/4</code></td>
+          <td><code>P/2</code></td>
+          <td><code>PL³/48EI</code></td>
+        </tr>
+        <tr>
+          <td>Simply Supported</td>
+          <td>Point P at dist a</td>
+          <td><code>Pab/L</code></td>
+          <td><code>Pb/L</code> (left)</td>
+          <td><code>Pa(3L²−4a²)√(stuff)/48EI</code></td>
+        </tr>
+        <tr>
+          <td>Cantilever</td>
+          <td>UDL w</td>
+          <td><code>wL²/2</code></td>
+          <td><code>wL</code></td>
+          <td><code>wL⁴/8EI</code></td>
+        </tr>
+        <tr>
+          <td>Cantilever</td>
+          <td>Point P at free end</td>
+          <td><code>PL</code></td>
+          <td><code>P</code></td>
+          <td><code>PL³/3EI</code></td>
+        </tr>
+        <tr>
+          <td>Fixed-Fixed</td>
+          <td>UDL w</td>
+          <td><code>wL²/12</code> (ends)</td>
+          <td><code>wL/2</code></td>
+          <td><code>wL⁴/384EI</code></td>
+        </tr>
+        <tr>
+          <td>Fixed-Fixed</td>
+          <td>Point P at midspan</td>
+          <td><code>PL/8</code> (ends)</td>
+          <td><code>P/2</code></td>
+          <td><code>PL³/192EI</code></td>
+        </tr>
+        <tr>
+          <td>Propped Cantilever</td>
+          <td>UDL w</td>
+          <td><code>wL²/8</code> (fixed)</td>
+          <td><code>5wL/8</code> (fixed)</td>
+          <td><code>wL⁴/185EI</code> (approx)</td>
+        </tr>
+        <tr>
+          <td>Propped Cantilever</td>
+          <td>Point P at midspan</td>
+          <td><code>5PL/16</code> (fixed)</td>
+          <td><code>11P/16</code> (fixed)</td>
+          <td><code>PL³/107EI</code> (approx)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-head">Common E Values (Modulus of Elasticity)</div>
+  <div class="tbl-wrap" style="margin-bottom:16px">
+    <table>
+      <thead>
+        <tr><th>Material</th><th>E (GPa)</th><th>E (kN/mm²)</th><th>Gamit / Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Structural Steel</td><td>200</td><td>200</td><td>Columns, beams, frames</td></tr>
+        <tr><td>Aluminum</td><td>70</td><td>70</td><td>Light structures</td></tr>
+        <tr><td>Concrete (normal)</td><td>25–30</td><td>25–30</td><td>RC structures</td></tr>
+        <tr><td>Concrete (high-strength)</td><td>30–40</td><td>30–40</td><td>High-rise, bridges</td></tr>
+        <tr><td>Wood (Douglas Fir)</td><td>10–14</td><td>10–14</td><td>Timber structures</td></tr>
+        <tr><td>Bamboo</td><td>15–20</td><td>15–20</td><td>Sustainable construction</td></tr>
+        <tr><td>Glass</td><td>70</td><td>70</td><td>Facade, curtain walls</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-head">Standard I-Values (Wide Flange Steel)</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Section</th><th>I (×10⁶ mm⁴)</th><th>S (×10³ mm³)</th><th>Weight (kg/m)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>W150×22</td><td>12.1</td><td>151</td><td>22.0</td></tr>
+        <tr><td>W200×36</td><td>34.4</td><td>325</td><td>35.9</td></tr>
+        <tr><td>W250×49</td><td>70.8</td><td>535</td><td>48.4</td></tr>
+        <tr><td>W310×60</td><td>129</td><td>844</td><td>60.0</td></tr>
+        <tr><td>W360×79</td><td>227</td><td>1280</td><td>79.0</td></tr>
+        <tr><td>W410×100</td><td>397</td><td>1960</td><td>100</td></tr>
+        <tr><td>W460×113</td><td>554</td><td>2390</td><td>113</td></tr>
+        <tr><td>W530×138</td><td>862</td><td>3220</td><td>138</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end panel1 -->
+
+<!-- TAB 3: BOARD TIPS -->
+<div class="tab-panel" id="panel2">
+
+  <div class="sec-head">CE Board Exam Tips — Structural Analysis</div>
+
+  <div class="card">
+    <div class="card-title">Sample Problem 1 — Simply Supported UDL</div>
+    <div class="prob-box">
+      <div class="prob-q">Problem: Ang simply supported beam ay may span na 8 m at may UDL na 15 kN/m. Hanapin ang maximum moment, maximum shear, at maximum deflection. Gamitin: E = 200 GPa, I = 300 × 10⁶ mm⁴.</div>
+      <div class="prob-step"><b>Step 1:</b> Max Moment → <code>M = wL²/8 = 15(8²)/8 = 120 kN·m</code></div>
+      <div class="prob-step"><b>Step 2:</b> Max Shear → <code>V = wL/2 = 15(8)/2 = 60 kN</code> (sa supports)</div>
+      <div class="prob-step"><b>Step 3:</b> δ = 5wL⁴/384EI → i-convert: w=15 N/mm, L=8000 mm, E=200000 MPa, I=300×10⁶ mm⁴</div>
+      <div class="prob-step"><b>Step 3 cont:</b> <code>δ = 5(15)(8000⁴)/(384 × 200000 × 300×10⁶) = 26.7 mm</code></div>
+      <div class="prob-ans">Sagot: M = 120 kN·m, V = 60 kN, δ = 26.7 mm</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sample Problem 2 — Cantilever with Point Load</div>
+    <div class="prob-box">
+      <div class="prob-q">Problem: Isang cantilever beam, L = 4 m, P = 20 kN sa free end. Hanapin M, V, at δ. E = 25 GPa, I = 150 × 10⁶ mm⁴.</div>
+      <div class="prob-step"><b>Step 1:</b> Max Moment (sa fixed end) → <code>M = PL = 20 × 4 = 80 kN·m</code></div>
+      <div class="prob-step"><b>Step 2:</b> Max Shear → <code>V = P = 20 kN</code> (constant throughout)</div>
+      <div class="prob-step"><b>Step 3:</b> <code>δ = PL³/3EI = 20×10³×(4000)³/(3×25000×150×10⁶) = 56.9 mm</code></div>
+      <div class="prob-ans">Sagot: M = 80 kN·m, V = 20 kN, δ = 56.9 mm</div>
+    </div>
+  </div>
+
+  <div class="sec-head">Sign Convention — Dapat Malaman!</div>
+  <div class="sign-box" style="margin-bottom:14px">
+    <div class="sign-card"><div class="sign-sym pos">+M</div><div class="sign-label">Sagging — beam baluktot pababa (concave up) = POSITIVE moment</div></div>
+    <div class="sign-card"><div class="sign-sym neg">−M</div><div class="sign-label">Hogging — beam baluktot pataas (concave down) = NEGATIVE moment</div></div>
+    <div class="sign-card"><div class="sign-sym pos">+V</div><div class="sign-label">Left side ng cut: upward force = POSITIVE shear</div></div>
+    <div class="sign-card"><div class="sign-sym neg">−V</div><div class="sign-label">Left side ng cut: downward force = NEGATIVE shear</div></div>
+  </div>
+
+  <div class="sec-head">Common Mistakes — Iwasang Gawin!</div>
+
+  <div class="tip-item mistake">
+    <div class="tip-title">Unit Conversion Error</div>
+    <div class="tip-body">Malaking mistake ang pagsasama ng <b>kN/m at N/mm</b> nang walang conversion. Para sa deflection formula: i-convert lahat sa N at mm o kN at m — consistent ka lang. <b>1 kN/m = 1 N/mm</b></div>
+  </div>
+
+  <div class="tip-item mistake">
+    <div class="tip-title">Paglimot ng EI sa Denominator</div>
+    <div class="tip-body">Ang deflection formula ay <b>laging may EI sa denominator</b>. Mas mataas ang EI, mas maliit ang deflection. "DISME" — Deflection Is Smaller with More E.</div>
+  </div>
+
+  <div class="tip-item mistake">
+    <div class="tip-title">Fixed-Fixed — End Moments vs Midspan</div>
+    <div class="tip-body">Sa fixed-fixed beam, <b>maximum moment ay sa mga fixed ends</b>, hindi sa midspan. Midspan moment = <code>wL²/24</code> (para sa UDL), ends = <code>wL²/12</code>.</div>
+  </div>
+
+  <div class="tip-item mistake">
+    <div class="tip-title">Propped Cantilever — Statically Indeterminate</div>
+    <div class="tip-body">Hindi mo ma-solve ito gamit lang ang statics. Kailangan ng <b>compatibility equation</b> o three-moment theorem. Sa board exam, i-memorize ang reactions: <code>Ra = 3wL/8</code> (simple end), <code>Rb = 5wL/8</code> (fixed end).</div>
+  </div>
+
+  <div class="sec-head">Key Formulas to Memorize</div>
+
+  <div class="tip-item">
+    <div class="tip-title">Mga Formula para sa Board Exam</div>
+    <div class="tip-body">
+      <b>Simply Supported UDL:</b> M = wL²/8, V = wL/2, δ = 5wL⁴/384EI<br>
+      <b>Simply Supported Point (midspan):</b> M = PL/4, V = P/2, δ = PL³/48EI<br>
+      <b>Cantilever UDL:</b> M = wL²/2, V = wL, δ = wL⁴/8EI<br>
+      <b>Cantilever Point (free end):</b> M = PL, V = P, δ = PL³/3EI<br>
+      <b>Fixed-Fixed UDL:</b> M_end = wL²/12, M_mid = wL²/24, δ = wL⁴/384EI<br>
+      <b>Fixed-Fixed Point:</b> M_end = PL/8, M_mid = PL/8, δ = PL³/192EI
+    </div>
+  </div>
+
+  <div class="tip-item">
+    <div class="tip-title">Shear Diagram Rules</div>
+    <div class="tip-body">
+      <b>Concentrated load</b> → vertical jump sa shear diagram<br>
+      <b>UDL</b> → slanted/inclined line sa shear diagram<br>
+      <b>Walang load</b> → horizontal line sa shear diagram<br>
+      <b>Zero shear</b> → location ng maximum moment!<br>
+      Ang integral ng shear diagram = moment diagram
+    </div>
+  </div>
+
+</div><!-- end panel2 -->
+
+<!-- TAB 4: MNEMONICS & CALTECH -->
+<div class="tab-panel" id="panel3">
+
+  <div class="sec-head">Taglish Mnemonics — Matandaan Mo Na!</div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"Sa Simply Supported, WALONG Bahagi"</div>
+    <div class="mnem-meaning">
+      → Simply Supported + UDL: <code>M = wL²/8</code><br>
+      "WALO" = 8 sa denominator. Tandaan: <b>W</b>alo para sa <b>W</b>-shaped (distributed) load sa SS beam.
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"CANtilever = KALAHATI lang ng SS"</div>
+    <div class="mnem-meaning">
+      → Cantilever UDL: <code>M = wL²/2</code> — apat na beses na mas malaki kaysa SS!<br>
+      Kaya mag-ingat — ang cantilever ay mas mapanganib pagdating sa moments. "Double the danger, half the constraint."
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"DISME" — Deflection Is Smaller with More E</div>
+    <div class="mnem-meaning">
+      → <code>δ ∝ 1/EI</code> — mas mataas ang EI, mas maliit ang deflection.<br>
+      Gamitin ang matibay na materyales (steel > concrete > wood) para mabawasan ang deflection.
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"5-P-8" para sa Simply Supported + 5wL⁴/384EI</div>
+    <div class="mnem-meaning">
+      → Coefficient: <b>5</b>, denominator: <b>384</b> EI<br>
+      <code>5÷384 ≈ 0.01302</code> — i-memorize ito para mabilis ang computation sa board.
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"Fixed-Fixed = Dalawang beses na tigas"</div>
+    <div class="mnem-meaning">
+      → Fixed-Fixed ay statically <b>indeterminate sa degree 2</b>.<br>
+      Moments sa ends: <code>wL²/12</code> (dalawang beses na mas maliit kaysa cantilever na <code>wL²/6</code>).<br>
+      Deflection: <code>wL⁴/384EI</code> — same coefficient sa SS!
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"SHEAR = REACTION minus LOAD"</div>
+    <div class="mnem-meaning">
+      Para makuha ang shear sa kahit saang punto:<br>
+      <code>V(x) = Ra − w·x</code> (para sa UDL)<br>
+      Ang zero shear ay nangyayari sa <code>x = Ra/w</code> — doon ang maximum moment!
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"Distributed load = SLANTED shear"</div>
+    <div class="mnem-meaning">
+      Shear diagram rules mnemonic:<br>
+      <b>D</b>istributed → <b>D</b>iagonal (slanted line)<br>
+      <b>C</b>oncentrated → <b>C</b>hange (vertical jump)<br>
+      <b>N</b>othing → <b>N</b>o change (horizontal)
+    </div>
+  </div>
+
+  <div class="sec-head">Casio fx-991ES/EX PLUS Techniques</div>
+
+  <div class="card">
+    <div class="card-title">MODE 5-1: SOLVE Mode — Para sa Unknown Reactions</div>
+    <div class="caltech-step">
+      <span class="step-num">1</span>
+      <span class="step-text"><b>Mag-press ng [MODE][5][1]</b> para sa Equation Solver. Para sa simply supported beam na may UDL: i-type ang equation <code>Ra + Rb - w*L = 0</code></span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">2</span>
+      <span class="step-text">I-store ang known values: <code>w → [ALPHA][A]</code>, <code>L → [ALPHA][B]</code>. Gamitin ang CALC para sa repeated evaluation.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">3</span>
+      <span class="step-text">Para sa moment equation: <code>Ra*L - w*L*L/2 = 0</code>, SOLVE para sa Ra. Automatic ang Rb = wL - Ra.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">MODE 8: EQN Mode — Para sa Fixed-Fixed (Simultaneous Equations)</div>
+    <div class="caltech-step">
+      <span class="step-num">1</span>
+      <span class="step-text"><b>Mag-press ng [MODE][8][1]</b> para sa 2 unknowns o <b>[MODE][8][2]</b> para sa 3 unknowns.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">2</span>
+      <span class="step-text">Para sa fixed-fixed beam: dalawang equilibrium equations → ang calculator ay mag-sosolve ng Ma at Mb (end moments) automatically.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">3</span>
+      <span class="step-text">I-enter ang coefficients ng bawat equation row by row. Press [=] pagkatapos ng bawat value. Lalabas ang solution agad.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Variable Memory A–F: I-store ang E at I</div>
+    <div class="caltech-step">
+      <span class="step-num">1</span>
+      <span class="step-text"><b>I-store ang E:</b> Type <code>200000</code> (MPa) → press <code>[SHIFT][RCL][A]</code> (stores in A). Gamitin ang <code>[ALPHA][A]</code> sa equations.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">2</span>
+      <span class="step-text"><b>I-store ang I:</b> Type <code>300E6</code> → press <code>[SHIFT][RCL][B]</code>. Ngayon sa deflection formula: <code>5*w*L^4÷(384*A*B)</code></span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">3</span>
+      <span class="step-text"><b>Tip:</b> A=E, B=I, C=L, D=w, E=P, F=spare. I-memorize ang layout mo para hindi ka malito sa board exam.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">CALC Mode: Para sa Repeated Formula Evaluation</div>
+    <div class="caltech-step">
+      <span class="step-num">1</span>
+      <span class="step-text">I-type ang formula gamit ang variables, e.g. <code>5*D*C^4÷(384*A*B)</code>. Press <code>[CALC]</code>.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">2</span>
+      <span class="step-text">Mag-prompt ang calculator para sa bawat variable. I-enter ang values, press <code>[=]</code> pagkatapos ng bawat isa.</span>
+    </div>
+    <div class="caltech-step">
+      <span class="step-num">3</span>
+      <span class="step-text"><b>Time-saver:</b> Sa susunod na problem, press <code>[CALC]</code> ulit — lalabas ang dating values bilang default. I-overwrite lang ang nagbago.</span>
+    </div>
+  </div>
+
+  <div class="sec-head">Support Type Quick Reference</div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">PIN (Hinged) Support → 2 reactions</div>
+    <div class="mnem-meaning">Horizontal (H) + Vertical (V) reactions. Walang moment reaction. Pwedeng mag-rotate ang beam. → Symbol: triangle with pin sa vertex.</div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">ROLLER Support → 1 reaction</div>
+    <div class="mnem-meaning">Vertical reaction lang. Pwedeng mag-move horizontally at mag-rotate. → Ginagamit sa isang end ng simply supported beam para payagan ang thermal expansion.</div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">FIXED Support → 3 reactions</div>
+    <div class="mnem-meaning">Horizontal + Vertical + Moment reactions. Hindi pwedeng mag-move o mag-rotate. → Ito ang nagdudulot ng statically indeterminate condition sa fixed-fixed beams.</div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">"PSR" — Pin, Simple, Roller (3 types na laging nasa board)</div>
+    <div class="mnem-meaning">
+      <b>P</b>in = 2 rxn | <b>S</b>imple (roller) = 1 rxn | <b>F</b>ixed = 3 rxn<br>
+      Degree of Indeterminacy = Total Reactions − 3 (for 2D structure)
+    </div>
+  </div>
+
+  <div class="sec-head">GEAS &amp; Real Board Mnemonics</div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">Mohs Hardness Scale: "The Girls Can Flirt And Other Queer Things Can Do"</div>
+    <div class="mnem-meaning">
+      <b>T</b>alc (1) · <b>G</b>ypsum (2) · <b>C</b>alcite (3) · <b>F</b>luorite (4) · <b>A</b>patite (5) · <b>O</b>rthoclase (6) · <b>Q</b>uartz (7) · <b>T</b>opaz (8) · <b>C</b>orundum (9) · <b>D</b>iamond (10)<br>
+      Tandaan: 1 = pinaka-malambot, 10 = pinaka-matigas. Relevant sa materials selection at mineralogy problems.
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">Spring Shear Stress: "64 Prisoners niRape ng 3 nurse"</div>
+    <div class="mnem-meaning">
+      → <code>τ = 64PR / πd³</code> (spring shear stress formula)<br>
+      Ang numerator ay 64PR; denominator ay πd³. Huwag ipagpalit ang d (wire diameter) at D (mean coil diameter).
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">Hollow Shaft Shear: "1sang 6sing Taga-Divisoria, PI naDapa 4 times dahil walang dalang d d"</div>
+    <div class="mnem-meaning">
+      → <code>τ = 16TD / π(D⁴ − d⁴)</code> (max shear stress on hollow shaft / circular ring)<br>
+      T = torque, D = outer diameter, d = inner diameter. Pag solid shaft: <code>τ = 16T / πD³</code>
+    </div>
+  </div>
+
+  <div class="mnem-card">
+    <div class="mnem-key">Max Shear Stress (Solid Shaft): "16 Torque over Pi D cubed"</div>
+    <div class="mnem-meaning">
+      → <code>τ_max = 16T / πD³</code><br>
+      "Sixteen Torque, Pi D-cube" — i-chant ito para matandaan. Board exam constant: pag solid circular shaft at torsion problem, ito ang formula.
+    </div>
+  </div>
+
+</div><!-- end panel3 -->
+
+</main>
+
+<footer>
+  PinasTools CE — Beam &amp; Moment Calculator v1.0<br>
+  Para sa mga CE students ng <a href="#">Bataan Peninsula State University</a> at lahat ng Pinoy engineers.<br>
+  Offline-ready · GCash Ready · <a href="#">PinasTools.ph</a>
+</footer>
+
+<script>
+// ─── LANGUAGE MODAL ──────────────────────────────────────────────────────────
+(function(){
+  if(localStorage.getItem('pinastools_lang')){
+    document.getElementById('modal-overlay').style.display='none';
+  }
+})();
+
+let selectedLang = 'tl';
+function selectLang(btn){
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedLang = btn.dataset.lang;
+}
+function closeModal(){
+  localStorage.setItem('pinastools_lang', selectedLang);
+  const o = document.getElementById('modal-overlay');
+  o.style.opacity='0';
+  o.style.transition='opacity .3s';
+  setTimeout(()=>o.style.display='none', 300);
+}
+
+// ─── TAB SWITCHING ───────────────────────────────────────────────────────────
+let activeTab = 0;
+function switchTab(idx){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  activeTab = idx;
+}
+
+let inputFocused = false;
+document.querySelectorAll('input, select').forEach(el=>{
+  el.addEventListener('focus',()=>inputFocused=true);
+  el.addEventListener('blur',()=>inputFocused=false);
+});
+document.addEventListener('keydown',e=>{
+  if(inputFocused) return;
+  if(e.key>='1'&&e.key<='4') switchTab(parseInt(e.key)-1);
+});
+
+// ─── LOAD / BEAM UI ──────────────────────────────────────────────────────────
+function updateLoadUI(){
+  const lt = document.getElementById('loadType').value;
+  const wRow = document.getElementById('wRow');
+  const pRow = document.getElementById('pRow');
+  const aRow = document.getElementById('aRow');
+  wRow.style.display = lt==='udl' ? '' : 'none';
+  pRow.classList.toggle('show', lt!=='udl');
+  aRow.classList.toggle('show', lt==='pt_a');
+}
+function updateBeamUI(){ /* future: update diagram label */ }
+
+document.getElementById('eVal').addEventListener('change',function(){
+  const cr = document.getElementById('eCustomRow');
+  cr.classList.toggle('show', this.value==='custom');
+});
+
+// ─── CALCULATION ENGINE ──────────────────────────────────────────────────────
+function getE(){
+  const sel = document.getElementById('eVal').value;
+  if(sel==='custom') return parseFloat(document.getElementById('eCustom').value)||200;
+  return parseFloat(sel);
+}
+
+function calculate(){
+  const beamType = document.getElementById('beamType').value;
+  const loadType = document.getElementById('loadType').value;
+  const L = parseFloat(document.getElementById('spanL').value);
+  const w = parseFloat(document.getElementById('wLoad').value)||0;
+  const P = parseFloat(document.getElementById('pLoad').value)||0;
+  const aM = parseFloat(document.getElementById('aLoad').value)||0;
+  const E_gpa = getE();
+  const I_m6 = parseFloat(document.getElementById('iVal').value)||1;
+
+  // Convert for deflection: E in N/mm² = MPa, I in mm⁴
+  const E = E_gpa * 1000; // MPa
+  const I = I_m6 * 1e6;  // mm⁴
+  // L in mm for deflection
+  const Lmm = L * 1000;
+
+  const errBox = document.getElementById('errorBox');
+  errBox.style.display='none';
+
+  // Validate
+  if(isNaN(L)||L<=0){showError('Mag-enter ng valid span L > 0.'); return;}
+  if(loadType==='pt_a'&&(aM<=0||aM>=L)){showError('Distance a ay dapat nasa pagitan ng 0 at L.'); return;}
+  if(loadType!=='udl'&&P<=0){showError('Mag-enter ng valid point load P > 0.'); return;}
+  if(loadType==='udl'&&w<=0){showError('Mag-enter ng valid UDL w > 0.'); return;}
+
+  let M=0,V=0,delta_mm=0,Ra=0,Rb=0,formulaLines=[],reactions='';
+
+  if(beamType==='ss'){
+    if(loadType==='udl'){
+      M = w*L*L/8;
+      V = w*L/2;
+      delta_mm = (5*w*Math.pow(Lmm,4))/(384*E*I);
+      Ra = Rb = w*L/2;
+      formulaLines=[
+        'M = wL²/8 = '+w+'×'+L+'²/8',
+        'V = wL/2 = '+w+'×'+L+'/2',
+        'δ = 5wL⁴/384EI',
+        'Ra = Rb = wL/2'
+      ];
+      reactions='Ra = Rb = '+(Ra.toFixed(2))+' kN';
+    } else if(loadType==='pt_mid'){
+      M = P*L/4;
+      V = P/2;
+      delta_mm = (P*1000*Math.pow(Lmm,3))/(48*E*I);
+      Ra = Rb = P/2;
+      formulaLines=[
+        'M = PL/4 = '+P+'×'+L+'/4',
+        'V = P/2 = '+P+'/2',
+        'δ = PL³/48EI',
+        'Ra = Rb = P/2'
+      ];
+      reactions='Ra = Rb = '+(Ra.toFixed(2))+' kN';
+    } else { // pt_a
+      const b = L - aM;
+      Ra = P*b/L;
+      Rb = P*aM/L;
+      M = P*aM*b/L;
+      V = Math.max(Ra,Rb);
+      // max deflection approx at a <= b case
+      const a3 = aM, b3 = b;
+      if(a3<=b3){
+        delta_mm = (P*1000*a3*1000*(3*Math.pow(Lmm,2)-4*Math.pow(a3*1000,2)))/(48*E*I);
+      } else {
+        delta_mm = (P*1000*b3*1000*(3*Math.pow(Lmm,2)-4*Math.pow(b3*1000,2)))/(48*E*I);
+      }
+      formulaLines=[
+        'b = L - a = '+L+' - '+aM+' = '+b.toFixed(2)+' m',
+        'Ra = Pb/L = '+P+'×'+b.toFixed(2)+'/'+L,
+        'Rb = Pa/L = '+P+'×'+aM+'/'+L,
+        'M = Pab/L = '+P+'×'+aM+'×'+b.toFixed(2)+'/'+L
+      ];
+      reactions='Ra = '+(Ra.toFixed(2))+' kN, Rb = '+(Rb.toFixed(2))+' kN';
+    }
+  } else if(beamType==='cant'){
+    if(loadType==='udl'){
+      M = w*L*L/2;
+      V = w*L;
+      delta_mm = (w*Math.pow(Lmm,4))/(8*E*I);
+      Ra = w*L;
+      formulaLines=[
+        'M = wL²/2 = '+w+'×'+L+'²/2 (sa fixed end)',
+        'V = wL = '+w+'×'+L,
+        'δ = wL⁴/8EI',
+        'R (fixed end) = wL'
+      ];
+      reactions='R_fixed = '+(Ra.toFixed(2))+' kN, M_fixed = '+(M.toFixed(2))+' kN·m';
+    } else if(loadType==='pt_mid'){
+      // point at free end (midspan n/a for cantilever — treat as free end)
+      M = P*L;
+      V = P;
+      delta_mm = (P*1000*Math.pow(Lmm,3))/(3*E*I);
+      Ra = P;
+      formulaLines=[
+        'M = PL = '+P+'×'+L+' (sa fixed end)',
+        'V = P = '+P+' kN',
+        'δ = PL³/3EI',
+        'R_fixed = P'
+      ];
+      reactions='R_fixed = '+(Ra.toFixed(2))+' kN, M_fixed = '+(M.toFixed(2))+' kN·m';
+    } else {
+      const aa = aM;
+      M = P*aa;
+      V = P;
+      delta_mm = (P*1000*Math.pow(aa*1000,2)*(3*Lmm - aa*1000))/(6*E*I);
+      formulaLines=[
+        'M = P×a = '+P+'×'+aa+' (sa fixed end, load @ a from free end)',
+        'V = P = '+P+' kN',
+        'δ = Pa²(3L-a)/6EI at free end'
+      ];
+      reactions='R_fixed = '+(P.toFixed(2))+' kN, M_fixed = '+(M.toFixed(2))+' kN·m';
+    }
+  } else if(beamType==='ff'){
+    if(loadType==='udl'){
+      M = w*L*L/12; // end moment (fixed end)
+      const Mmid = w*L*L/24;
+      V = w*L/2;
+      delta_mm = (w*Math.pow(Lmm,4))/(384*E*I);
+      Ra = Rb = w*L/2;
+      formulaLines=[
+        'M_end = wL²/12 = '+w+'×'+L+'²/12 (sa fixed ends)',
+        'M_mid = wL²/24 = '+w+'×'+L+'²/24 (sa midspan)',
+        'V = wL/2',
+        'δ = wL⁴/384EI (sa midspan)',
+        'Ra = Rb = wL/2'
+      ];
+      reactions='Ra = Rb = '+(Ra.toFixed(2))+' kN, M_end = '+(M.toFixed(2))+' kN·m';
+    } else if(loadType==='pt_mid'){
+      M = P*L/8; // end moment
+      V = P/2;
+      delta_mm = (P*1000*Math.pow(Lmm,3))/(192*E*I);
+      Ra = Rb = P/2;
+      formulaLines=[
+        'M_end = PL/8 = '+P+'×'+L+'/8 (sa fixed ends)',
+        'M_mid = PL/8 (equal)',
+        'V = P/2',
+        'δ = PL³/192EI',
+        'Ra = Rb = P/2'
+      ];
+      reactions='Ra = Rb = '+(Ra.toFixed(2))+' kN, M_end = '+(M.toFixed(2))+' kN·m';
+    } else {
+      const b = L-aM;
+      M = P*aM*b*b/(L*L); // M_a at left fixed
+      const Mb = P*aM*aM*b/(L*L); // M_b at right fixed
+      Ra = P*b*b*(L+2*aM)/(L*L*L);
+      Rb = P*aM*aM*(L+2*b)/(L*L*L);
+      V = Math.max(Ra,Rb);
+      delta_mm = (2*P*1000*Math.pow(aM*1000,3)*Math.pow(b*1000,3))/(3*E*I*Math.pow(Lmm,3));
+      formulaLines=[
+        'Ma = Pab²/L²',
+        'Mb = Pa²b/L²',
+        'Ra = Pb²(L+2a)/L³',
+        'Rb = Pa²(L+2b)/L³'
+      ];
+      reactions='Ra = '+(Ra.toFixed(2))+' kN, Rb = '+(Rb.toFixed(2))+' kN';
+    }
+  } else if(beamType==='pc'){
+    // Propped Cantilever: fixed at A, simple support at B
+    if(loadType==='udl'){
+      M = w*L*L/8; // at fixed end A
+      Ra = 5*w*L/8; // at fixed end
+      Rb = 3*w*L/8; // at simple support
+      V = Ra;
+      delta_mm = w*Math.pow(Lmm,4)/(185*E*I); // approx
+      formulaLines=[
+        'M_fixed = wL²/8',
+        'R_fixed = 5wL/8 = '+((5*w*L/8).toFixed(2))+' kN',
+        'R_simple = 3wL/8 = '+((3*w*L/8).toFixed(2))+' kN',
+        'δ_max ≈ wL⁴/185EI (approx)'
+      ];
+      reactions='R_fixed = '+(Ra.toFixed(2))+' kN, R_simple = '+(Rb.toFixed(2))+' kN';
+    } else if(loadType==='pt_mid'){
+      M = 5*P*L/16; // at fixed end
+      Ra = 11*P/16; // at fixed end
+      Rb = 5*P/16;
+      V = Ra;
+      delta_mm = P*1000*Math.pow(Lmm,3)/(107*E*I);
+      formulaLines=[
+        'M_fixed = 5PL/16',
+        'R_fixed = 11P/16 = '+((11*P/16).toFixed(2))+' kN',
+        'R_simple = 5P/16 = '+((5*P/16).toFixed(2))+' kN',
+        'δ_max ≈ PL³/107EI (approx)'
+      ];
+      reactions='R_fixed = '+(Ra.toFixed(2))+' kN, R_simple = '+(Rb.toFixed(2))+' kN';
+    } else {
+      const b=L-aM;
+      Rb = P*aM*aM*(3*L-aM)/(2*L*L*L); // simple support reaction (approx)
+      Ra = P - Rb;
+      M = Ra*aM - 0; // approx moment at a
+      // better: M at fixed end
+      M = P*aM*b*(L+b)/(2*L*L);
+      V = Ra;
+      delta_mm = 0; // complex, skip exact
+      formulaLines=[
+        'R_simple ≈ Pa²(3L-a)/2L³',
+        'R_fixed = P - R_simple',
+        'M_fixed ≈ Pab(L+b)/2L²',
+        '(Propped cantilever with point load at distance a)'
+      ];
+      reactions='R_fixed = '+(Ra.toFixed(2))+' kN, R_simple = '+(Rb.toFixed(2))+' kN';
+    }
+  }
+
+  showResults(M, V, delta_mm, reactions, formulaLines, beamType, loadType, L, w, P, aM);
+  drawDiagram(beamType, loadType, L, w, P, aM, Ra, Rb);
+}
+
+function showResults(M,V,delta_mm,reactions,formulaLines,beamType,loadType,L,w,P,aM){
+  const rc = document.getElementById('resultsCard');
+  const rg = document.getElementById('resultsGrid');
+  const fb = document.getElementById('formulaBox');
+
+  const btNames={ss:'Simply Supported',cant:'Cantilever',ff:'Fixed-Fixed',pc:'Propped Cantilever'};
+
+  rg.innerHTML = `
+    <div class="result-card highlight">
+      <div class="result-label">Max Moment M</div>
+      <div class="result-value gold">${M.toFixed(3)}</div>
+      <div class="result-unit">kN·m</div>
+    </div>
+    <div class="result-card highlight">
+      <div class="result-label">Max Shear V</div>
+      <div class="result-value gold">${V.toFixed(3)}</div>
+      <div class="result-unit">kN</div>
+    </div>
+    <div class="result-card">
+      <div class="result-label">Max Deflection δ</div>
+      <div class="result-value">${delta_mm.toFixed(4)}</div>
+      <div class="result-unit">mm</div>
+    </div>
+    <div class="result-card" style="grid-column:1/-1">
+      <div class="result-label">Support Reactions</div>
+      <div class="result-value" style="font-size:1rem">${reactions}</div>
+    </div>
+  `;
+
+  fb.innerHTML = '<div style="color:var(--gold3);font-weight:700;margin-bottom:6px;font-size:.8rem">Mga Formula na Ginamit / Formulas Used ('+btNames[beamType]+'):</div>' +
+    formulaLines.map(l=>`<div class="formula-line"><code>${l}</code></div>`).join('');
+
+  rc.style.display='block';
+}
+
+function clearResults(){
+  document.getElementById('resultsCard').style.display='none';
+  document.getElementById('errorBox').style.display='none';
+  drawBlankDiagram();
+}
+
+function showError(msg){
+  const eb = document.getElementById('errorBox');
+  eb.innerHTML = `<div class="alert alert-err"><span>⚠</span><span>${msg}</span></div>`;
+  eb.style.display='block';
+  document.getElementById('resultsCard').style.display='none';
+}
+
+// ─── SVG DIAGRAM ─────────────────────────────────────────────────────────────
+function drawBlankDiagram(){
+  const svg = document.getElementById('beamSvg');
+  svg.innerHTML = `<text x="200" y="80" text-anchor="middle" fill="#94a3b8" font-size="13" font-family="Outfit,sans-serif">Mag-input at kalkulahin para makita ang diagram.</text>`;
+}
+
+function drawDiagram(beamType, loadType, L, w, P, a, Ra, Rb){
+  const svg = document.getElementById('beamSvg');
+  const W=400, H=160;
+  const bx=60, by=80, bw=280, bh=10;
+  const ex=bx+bw;
+  let html='';
+
+  // Beam line
+  html+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="#2d3348"/>`;
+
+  // Label L
+  html+=`<text x="${bx+bw/2}" y="${by+bh+22}" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Outfit,sans-serif">L = ${L} m</text>`;
+  html+=`<line x1="${bx}" y1="${by+bh+12}" x2="${ex}" y2="${by+bh+12}" stroke="#2d3348" stroke-width="1"/>`;
+  html+=`<polygon points="${bx},${by+bh+8} ${bx-4},${by+bh+16} ${bx+4},${by+bh+16}" fill="#94a3b8"/>`;
+  html+=`<polygon points="${ex},${by+bh+8} ${ex-4},${by+bh+16} ${ex+4},${by+bh+16}" fill="#94a3b8"/>`;
+
+  // Support symbols
+  if(beamType==='ss'){
+    // Left: pin
+    html+=pinSupport(bx,by+bh);
+    // Right: roller
+    html+=rollerSupport(ex,by+bh);
+  } else if(beamType==='cant'){
+    // Left: fixed wall
+    html+=fixedSupport(bx,by);
+    // Right: free end marker
+    html+=`<line x1="${ex}" y1="${by-8}" x2="${ex}" y2="${by+bh+8}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+    html+=`<text x="${ex+5}" y="${by+bh/2+4}" fill="#94a3b8" font-size="9" font-family="Outfit,sans-serif">Free</text>`;
+  } else if(beamType==='ff'){
+    html+=fixedSupport(bx,by);
+    html+=fixedSupportRight(ex,by);
+  } else if(beamType==='pc'){
+    html+=fixedSupport(bx,by);
+    html+=rollerSupport(ex,by+bh);
+  }
+
+  // Load arrows
+  if(loadType==='udl'){
+    const nArrows=8;
+    const spacing=bw/(nArrows-1);
+    for(let i=0;i<nArrows;i++){
+      const ax2=bx+i*spacing;
+      html+=arrowDown(ax2,by-5,18,'#f59e0b');
+    }
+    html+=`<line x1="${bx}" y1="${by-23}" x2="${ex}" y2="${by-23}" stroke="#f59e0b" stroke-width="1.5"/>`;
+    html+=`<text x="${bx+bw/2}" y="${by-28}" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="Outfit,sans-serif">w = ${w} kN/m</text>`;
+  } else if(loadType==='pt_mid'){
+    const mx=bx+bw/2;
+    html+=arrowDown(mx,by-5,24,'#f59e0b');
+    html+=`<text x="${mx}" y="${by-32}" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="Outfit,sans-serif">P = ${P} kN</text>`;
+    html+=`<line x1="${mx}" y1="${by+bh+12}" x2="${mx}" y2="${by+bh+20}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>`;
+    html+=`<text x="${mx}" y="${by+bh+30}" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Outfit,sans-serif">L/2</text>`;
+  } else {
+    const px2=bx+(a/L)*bw;
+    html+=arrowDown(px2,by-5,24,'#f59e0b');
+    html+=`<text x="${px2}" y="${by-32}" text-anchor="middle" fill="#f59e0b" font-size="10" font-family="Outfit,sans-serif">P = ${P} kN</text>`;
+    html+=`<line x1="${bx}" y1="${by+bh+14}" x2="${px2}" y2="${by+bh+14}" stroke="#60a5fa" stroke-width="1"/>`;
+    html+=`<polygon points="${px2},${by+bh+10} ${px2-3},${by+bh+18} ${px2+3},${by+bh+18}" fill="#60a5fa"/>`;
+    html+=`<text x="${bx+(px2-bx)/2}" y="${by+bh+24}" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="Outfit,sans-serif">a = ${a} m</text>`;
+  }
+
+  // Reaction labels
+  if(beamType==='cant'){
+    html+=`<text x="${bx-2}" y="${by+bh+44}" text-anchor="middle" fill="#22c55e" font-size="9" font-family="Outfit,sans-serif">R=${Ra.toFixed(1)}kN</text>`;
+  } else {
+    html+=`<text x="${bx}" y="${by+bh+44}" text-anchor="middle" fill="#22c55e" font-size="9" font-family="Outfit,sans-serif">Ra=${Ra.toFixed(1)}kN</text>`;
+    html+=`<text x="${ex}" y="${by+bh+44}" text-anchor="middle" fill="#22c55e" font-size="9" font-family="Outfit,sans-serif">Rb=${Rb.toFixed(1)}kN</text>`;
+  }
+
+  svg.innerHTML=html;
+}
+
+function arrowDown(x,y,len,color){
+  return `<line x1="${x}" y1="${y}" x2="${x}" y2="${y+len}" stroke="${color}" stroke-width="1.8"/>
+  <polygon points="${x},${y+len} ${x-4},${y+len-6} ${x+4},${y+len-6}" fill="${color}"/>`;
+}
+function pinSupport(x,y){
+  return `<polygon points="${x},${y} ${x-10},${y+16} ${x+10},${y+16}" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="${x-12}" y1="${y+18}" x2="${x+12}" y2="${y+18}" stroke="#94a3b8" stroke-width="1.5"/>`;
+}
+function rollerSupport(x,y){
+  return `<polygon points="${x},${y} ${x-10},${y+14} ${x+10},${y+14}" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="${x-7}" cy="${y+17}" r="2.5" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+  <circle cx="${x+7}" cy="${y+17}" r="2.5" fill="none" stroke="#94a3b8" stroke-width="1.2"/>`;
+}
+function fixedSupport(x,y){
+  return `<rect x="${x-12}" y="${y}" width="12" height="20" fill="#2d3348" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="${x-12}" y1="${y}" x2="${x-18}" y2="${y+6}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x-12}" y1="${y+5}" x2="${x-18}" y2="${y+11}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x-12}" y1="${y+10}" x2="${x-18}" y2="${y+16}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x-12}" y1="${y+15}" x2="${x-18}" y2="${y+21}" stroke="#94a3b8" stroke-width="1"/>`;
+}
+function fixedSupportRight(x,y){
+  return `<rect x="${x}" y="${y}" width="12" height="20" fill="#2d3348" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="${x+12}" y1="${y}" x2="${x+18}" y2="${y+6}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x+12}" y1="${y+5}" x2="${x+18}" y2="${y+11}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x+12}" y1="${y+10}" x2="${x+18}" y2="${y+16}" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="${x+12}" y1="${y+15}" x2="${x+18}" y2="${y+21}" stroke="#94a3b8" stroke-width="1"/>`;
+}
+
+// init
+updateLoadUI();
+</script>
+</body>
+</html>

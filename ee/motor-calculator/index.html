@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motor Calculator | PinasTools EE</title>
+<meta name="description" content="Electric Motor Calculator para sa EE Board Exam. HP/kW, FLC, efficiency, slip, torque — lahat nandito!">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111318;--bg2:#1a1d26;--bg3:#22263a;
+  --gold:#f59e0b;--gold2:#fbbf24;--gold3:#78350f;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;
+  --border:#2a2e3f;--radius:16px;--radiusSm:10px;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;padding-bottom:80px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* MODAL */
+#langModal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+#langModal.hidden{display:none}
+.modal-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:32px 24px;
+  max-width:380px;width:100%;text-align:center;
+}
+.modal-box h2{font-size:1.5rem;font-weight:700;margin-bottom:6px}
+.modal-box h2 span{color:var(--gold)}
+.modal-box p{color:var(--text2);font-size:0.9rem;margin-bottom:24px;line-height:1.5}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.lang-btn{
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:var(--radiusSm);padding:14px 10px;
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.lang-btn:hover,.lang-btn.active{border-color:var(--gold);color:var(--gold);background:#1f1c10}
+.lang-btn .flag{font-size:1.4rem;display:block;margin-bottom:4px}
+
+/* HEADER */
+.app-header{
+  background:linear-gradient(135deg,#1a1d26 0%,#111318 100%);
+  border-bottom:1px solid var(--border);
+  padding:16px 20px 14px;position:sticky;top:0;z-index:100;
+}
+.header-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),#d97706);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:800;color:#111;
+}
+.logo-text{line-height:1.1}
+.logo-text .name{font-size:1rem;font-weight:700;color:var(--gold)}
+.logo-text .sub{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em}
+.lang-pill{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;font-size:0.78rem;
+  color:var(--text2);cursor:pointer;transition:all 0.2s;
+}
+.lang-pill:hover{border-color:var(--gold);color:var(--gold)}
+
+/* TABS */
+.tabs-wrap{max-width:700px;margin:0 auto;padding:16px 16px 0}
+.tabs{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--bg2);border-radius:var(--radius);
+  padding:4px;gap:2px;border:1px solid var(--border);
+}
+.tab-btn{
+  background:transparent;border:none;border-radius:12px;
+  padding:10px 6px;font-family:'Outfit',sans-serif;
+  font-size:0.82rem;font-weight:600;color:var(--text3);
+  cursor:pointer;transition:all 0.2s;
+}
+.tab-btn.active{background:var(--gold);color:#111}
+.tab-btn span{display:block;font-size:1rem;margin-bottom:2px}
+
+/* CONTENT */
+.content{max-width:700px;margin:0 auto;padding:16px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* CARDS */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;margin-bottom:16px;
+}
+.card-title{
+  font-size:1rem;font-weight:700;color:var(--gold);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.card-title span{font-size:1.1rem}
+
+/* FORM ELEMENTS */
+.field-group{margin-bottom:14px}
+.field-label{
+  display:block;font-size:0.8rem;font-weight:600;
+  color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;
+}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+input[type=number],select{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border);
+  border-radius:var(--radiusSm);padding:11px 14px;
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:0.95rem;
+  outline:none;transition:border-color 0.2s;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--bg3)}
+
+.toggle-row{display:flex;gap:8px;margin-bottom:14px}
+.toggle-btn{
+  flex:1;background:var(--bg3);border:1.5px solid var(--border);
+  border-radius:var(--radiusSm);padding:10px;
+  font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:all 0.2s;
+}
+.toggle-btn.active{border-color:var(--gold);color:var(--gold);background:#1f1c10}
+
+/* CALC BUTTON */
+.calc-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),#d97706);
+  border:none;border-radius:var(--radiusSm);padding:13px;
+  font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;
+  color:#111;cursor:pointer;transition:transform 0.15s,opacity 0.15s;
+  margin-top:4px;
+}
+.calc-btn:hover{opacity:0.92;transform:translateY(-1px)}
+.calc-btn:active{transform:translateY(0)}
+
+/* RESULT BOX */
+.result-box{
+  margin-top:14px;background:var(--bg3);border:1.5px solid var(--gold3);
+  border-radius:var(--radiusSm);padding:16px;display:none;
+}
+.result-box.show{display:block}
+.result-main{font-size:1.8rem;font-weight:800;color:var(--gold);line-height:1}
+.result-label{font-size:0.8rem;color:var(--text2);margin-top:4px}
+.result-formula{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
+  font-size:0.78rem;color:var(--text3);font-family:monospace;line-height:1.5;
+}
+.result-multi{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.result-item{background:var(--bg2);border-radius:8px;padding:10px;text-align:center}
+.result-item .val{font-size:1.1rem;font-weight:700;color:var(--gold2)}
+.result-item .lbl{font-size:0.72rem;color:var(--text3);margin-top:2px}
+
+/* TABLE TAB */
+.table-wrap{overflow-x:auto;border-radius:var(--radiusSm);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+thead{background:var(--bg3)}
+th{padding:10px 12px;text-align:left;font-weight:700;color:var(--gold);
+   white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(245,158,11,0.04)}
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:20px;
+  font-size:0.7rem;font-weight:700;
+}
+.badge-green{background:#052e16;color:var(--green)}
+.badge-blue{background:#0c1a2e;color:var(--blue)}
+.badge-purple{background:#1a0a2e;color:var(--purple)}
+.badge-gold{background:#1c1205;color:var(--gold)}
+
+/* TIPS TAB */
+.mnemonic-card{
+  background:linear-gradient(135deg,#1c1205,#111318);
+  border:1.5px solid var(--gold3);border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;
+}
+.mnemonic-title{font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.mnemonic-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 0;border-bottom:1px solid rgba(245,158,11,0.1);
+}
+.mnemonic-item:last-child{border-bottom:none;padding-bottom:0}
+.mnemonic-key{
+  min-width:28px;height:28px;background:var(--gold);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:800;color:#111;flex-shrink:0;
+}
+.mnemonic-text{font-size:0.85rem;color:var(--text2);line-height:1.4}
+.mnemonic-text strong{color:var(--text)}
+
+.problem-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;
+}
+.problem-num{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold);color:#111;border-radius:6px;
+  padding:3px 10px;font-size:0.78rem;font-weight:800;margin-bottom:10px;
+}
+.problem-q{font-size:0.9rem;font-weight:600;margin-bottom:12px;line-height:1.4;color:var(--text)}
+.problem-step{
+  font-size:0.82rem;color:var(--text2);padding:6px 0;
+  border-bottom:1px solid var(--border);line-height:1.5;
+}
+.problem-step:last-child{border-bottom:none}
+.problem-step .step-num{color:var(--gold);font-weight:700}
+.problem-ans{
+  margin-top:10px;background:var(--bg3);border-radius:8px;
+  padding:10px;font-size:0.9rem;font-weight:700;color:var(--green);
+}
+
+.trap-card{
+  background:linear-gradient(135deg,#1a0a0a,#111318);
+  border:1.5px solid var(--red);border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;
+}
+.trap-title{font-size:1rem;font-weight:700;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.trap-item{
+  display:flex;gap:10px;padding:6px 0;
+  border-bottom:1px solid rgba(239,68,68,0.1);font-size:0.85rem;color:var(--text2);
+}
+.trap-item:last-child{border-bottom:none}
+.trap-icon{font-size:1rem;flex-shrink:0}
+
+.context-card{
+  background:linear-gradient(135deg,#0a1a0a,#111318);
+  border:1.5px solid #15803d;border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;
+}
+.context-title{font-size:1rem;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+/* SECTION DIVIDER */
+.section-div{
+  text-align:center;font-size:0.72rem;font-weight:700;
+  color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;
+  margin:20px 0 14px;display:flex;align-items:center;gap:10px;
+}
+.section-div::before,.section-div::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* CALTECH TAB */
+.caltech-card{
+  background:linear-gradient(135deg,#0a0f1a,#111318);
+  border:1.5px solid var(--blue);border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;
+}
+.caltech-title{font-size:1rem;font-weight:700;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.casio-step{
+  background:var(--bg3);border-radius:8px;padding:10px 14px;
+  margin-bottom:8px;font-size:0.82rem;color:var(--text2);line-height:1.5;
+  border-left:3px solid var(--blue);
+}
+.casio-step .key{
+  display:inline-block;background:#1e3a5f;color:var(--blue);
+  border:1px solid var(--blue);border-radius:4px;padding:1px 6px;
+  font-size:0.72rem;font-weight:700;font-family:monospace;margin:0 2px;
+}
+.casio-step .screen{
+  display:inline-block;background:#0a1a0a;color:var(--green);
+  border:1px solid #15803d;border-radius:4px;padding:1px 8px;
+  font-size:0.78rem;font-family:monospace;margin:0 2px;
+}
+.worked-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;
+}
+.worked-title{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--blue);color:#111;border-radius:6px;
+  padding:3px 10px;font-size:0.78rem;font-weight:800;margin-bottom:10px;
+}
+.worked-q{font-size:0.9rem;font-weight:600;margin-bottom:12px;line-height:1.4;color:var(--text)}
+.worked-step{
+  font-size:0.82rem;color:var(--text2);padding:6px 0;
+  border-bottom:1px solid var(--border);line-height:1.5;
+}
+.worked-step:last-child{border-bottom:none}
+.worked-step .sn{color:var(--blue);font-weight:700}
+.worked-ans{
+  margin-top:10px;background:var(--bg3);border-radius:8px;
+  padding:10px;font-size:0.9rem;font-weight:700;color:var(--green);
+}
+.mem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.mem-box{
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  padding:12px;text-align:center;
+}
+.mem-box .mem-formula{font-size:1rem;font-weight:800;color:var(--gold);font-family:monospace;margin-bottom:4px}
+.mem-box .mem-desc{font-size:0.72rem;color:var(--text3);line-height:1.3}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:8px 0 env(safe-area-inset-bottom,8px);
+  display:flex;justify-content:space-around;z-index:200;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:0.65rem;font-weight:600;color:var(--text3);
+  text-decoration:none;padding:4px 10px;
+  transition:color 0.2s;
+}
+.nav-item:hover{color:var(--gold)}
+.nav-item span{font-size:1.1rem}
+
+/* RESPONSIVE */
+@media(min-width:480px){
+  .content,.tabs-wrap,.header-inner{padding-left:24px;padding-right:24px}
+  .field-row-3{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:360px){
+  .field-row,.field-row-3{grid-template-columns:1fr}
+  .result-multi{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE MODAL -->
+<div id="langModal">
+  <div class="modal-box">
+    <h2>Piliin ang <span>Wika</span></h2>
+    <p>Choose your preferred language para sa PinasTools Motor Calculator</p>
+    <div class="lang-grid">
+      <button class="lang-btn active" onclick="setLang('tl')">
+        <span class="flag">🇵🇭</span>Tagalog
+      </button>
+      <button class="lang-btn" onclick="setLang('en')">
+        <span class="flag">🇺🇸</span>English
+      </button>
+      <button class="lang-btn" onclick="setLang('ceb')">
+        <span class="flag">🇵🇭</span>Cebuano
+      </button>
+      <button class="lang-btn" onclick="setLang('ilo')">
+        <span class="flag">🇵🇭</span>Ilocano
+      </button>
+    </div>
+    <button class="calc-btn" onclick="confirmLang()">Ituloy / Continue</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="app-header">
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <div class="name">Motor Calc</div>
+        <div class="sub">PinasTools EE</div>
+      </div>
+    </div>
+    <button class="lang-pill" onclick="showLangModal()" id="langDisplay">🇵🇭 Tagalog</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs" style="grid-template-columns:repeat(4,1fr)">
+    <button class="tab-btn active" onclick="showTab('calc',this)">
+      <span>🔧</span><span id="tab1Lbl">Calculator</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('table',this)">
+      <span>📊</span><span id="tab2Lbl">Table</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('tips',this)">
+      <span>💡</span><span id="tab3Lbl">Board Tips</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('caltech',this)">
+      <span>🧮</span><span id="tab4Lbl">CalTech</span>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="content">
+
+<!-- ===== CALCULATOR TAB ===== -->
+<div id="tab-calc" class="tab-panel active">
+
+  <!-- HP ↔ kW -->
+  <div class="card">
+    <div class="card-title"><span>⚡</span><span id="l-hpkw">HP ↔ kW Converter</span></div>
+    <div class="toggle-row">
+      <button class="toggle-btn active" id="btnHPtoKW" onclick="setHpDir('hp')">HP → kW</button>
+      <button class="toggle-btn" id="btnKWtoHP" onclick="setHpDir('kw')">kW → HP</button>
+    </div>
+    <div class="field-group">
+      <label class="field-label" id="l-hpInput">Horsepower (HP)</label>
+      <input type="number" id="hpInput" placeholder="e.g. 5" min="0" step="any">
+    </div>
+    <button class="calc-btn" onclick="calcHP()"><span id="l-calcHp">I-convert</span></button>
+    <div class="result-box" id="hpResult">
+      <div class="result-main" id="hpResultVal">—</div>
+      <div class="result-label" id="hpResultLbl">kW</div>
+      <div class="result-formula" id="hpResultFormula"></div>
+    </div>
+  </div>
+
+  <!-- FLC -->
+  <div class="card">
+    <div class="card-title"><span>🔌</span><span id="l-flcTitle">Full Load Current (FLC)</span></div>
+    <div class="toggle-row">
+      <button class="toggle-btn active" id="btn1ph" onclick="setPhase(1)">1-Phase</button>
+      <button class="toggle-btn" id="btn3ph" onclick="setPhase(3)">3-Phase</button>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Power (kW)</label>
+        <input type="number" id="flcPower" placeholder="e.g. 3.73" min="0" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Voltage (V)</label>
+        <input type="number" id="flcVoltage" placeholder="e.g. 230" min="0" step="any">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Power Factor</label>
+        <input type="number" id="flcPF" placeholder="e.g. 0.85" min="0" max="1" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Efficiency η</label>
+        <input type="number" id="flcEff" placeholder="e.g. 0.90" min="0" max="1" step="any">
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcFLC()"><span id="l-calcFlc">Kalkulahin ang FLC</span></button>
+    <div class="result-box" id="flcResult">
+      <div class="result-main" id="flcResultVal">—</div>
+      <div class="result-label">Amperes (A)</div>
+      <div class="result-formula" id="flcResultFormula"></div>
+    </div>
+  </div>
+
+  <!-- EFFICIENCY -->
+  <div class="card">
+    <div class="card-title"><span>📈</span><span id="l-effTitle">Motor Efficiency</span></div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label" id="l-pout">Output Power (kW)</label>
+        <input type="number" id="effPout" placeholder="e.g. 7.46" min="0" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label" id="l-pin">Input Power (kW)</label>
+        <input type="number" id="effPin" placeholder="e.g. 8.50" min="0" step="any">
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcEff()"><span id="l-calcEff">Kalkulahin ang Efficiency</span></button>
+    <div class="result-box" id="effResult">
+      <div class="result-main" id="effResultVal">—</div>
+      <div class="result-label">% Efficiency</div>
+      <div class="result-formula" id="effResultFormula"></div>
+    </div>
+  </div>
+
+  <!-- SLIP -->
+  <div class="card">
+    <div class="card-title"><span>🌀</span><span id="l-slipTitle">Slip Calculator</span></div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Frequency f (Hz)</label>
+        <input type="number" id="slipFreq" placeholder="60" value="60" min="0" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label">No. of Poles P</label>
+        <select id="slipPoles">
+          <option value="2">2</option>
+          <option value="4" selected>4</option>
+          <option value="6">6</option>
+          <option value="8">8</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Rotor Speed Nr (RPM)</label>
+      <input type="number" id="slipNr" placeholder="e.g. 1750" min="0" step="any">
+    </div>
+    <button class="calc-btn" onclick="calcSlip()"><span id="l-calcSlip">Kalkulahin ang Slip</span></button>
+    <div class="result-box" id="slipResult">
+      <div class="result-multi" id="slipResultMulti"></div>
+      <div class="result-formula" id="slipResultFormula"></div>
+    </div>
+  </div>
+
+  <!-- TORQUE -->
+  <div class="card">
+    <div class="card-title"><span>🔩</span><span id="l-torqueTitle">Torque Calculator</span></div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Power (kW)</label>
+        <input type="number" id="torquePower" placeholder="e.g. 5.593" min="0" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Speed N (RPM)</label>
+        <input type="number" id="torqueSpeed" placeholder="e.g. 1750" min="0" step="any">
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcTorque()"><span id="l-calcTorque">Kalkulahin ang Torque</span></button>
+    <div class="result-box" id="torqueResult">
+      <div class="result-main" id="torqueResultVal">—</div>
+      <div class="result-label">N·m</div>
+      <div class="result-formula" id="torqueResultFormula"></div>
+    </div>
+  </div>
+
+  <!-- SERVICE FACTOR -->
+  <div class="card">
+    <div class="card-title"><span>🛡️</span><span id="l-sfTitle">Service Factor & Derating</span></div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Nameplate HP</label>
+        <input type="number" id="sfHP" placeholder="e.g. 10" min="0" step="any">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Service Factor</label>
+        <select id="sfFactor">
+          <option value="1.0">1.0 (Standard)</option>
+          <option value="1.15" selected>1.15 (NEMA Std)</option>
+          <option value="1.25">1.25 (Heavy)</option>
+          <option value="1.4">1.4 (Severe)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" id="l-altitude">Altitude Derating</label>
+      <select id="sfAlt">
+        <option value="1.0">≤1000m (No derating)</option>
+        <option value="0.97">1000–1500m (−3%)</option>
+        <option value="0.94">1500–2000m (−6%)</option>
+        <option value="0.90">2000–3000m (−10%)</option>
+      </select>
+    </div>
+    <button class="calc-btn" onclick="calcSF()"><span id="l-calcSF">Kalkulahin ang Derated HP</span></button>
+    <div class="result-box" id="sfResult">
+      <div class="result-multi" id="sfResultMulti"></div>
+      <div class="result-formula" id="sfResultFormula"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TABLE TAB ===== -->
+<div id="tab-table" class="tab-panel">
+
+  <div class="card">
+    <div class="card-title"><span>📋</span><span id="l-flcTableTitle">NEC/PEC FLC Table — 3-Phase (460V)</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>HP</th><th>kW</th><th>FLC 230V</th><th>FLC 460V</th><th>FLC 2.3kV</th>
+          </tr>
+        </thead>
+        <tbody id="flcTableBody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:0.72rem;color:var(--text3);margin-top:8px">Source: NEC Table 430.250 / PEC 2017 equivalent</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>⚡</span><span id="l-voltStdTitle">Philippine Industrial Voltage Standards</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Voltage Class</th><th>Nominal</th><th>Range</th><th>Typical Use</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">Low</span></td><td>230V</td><td>207–253V</td><td>Single-phase motors, small 3-phase up to 5HP</td></tr>
+          <tr><td><span class="badge badge-blue">Low</span></td><td>460V</td><td>414–506V</td><td>3-phase motors, industrial standard (>5HP)</td></tr>
+          <tr><td><span class="badge badge-purple">Medium</span></td><td>2,300V</td><td>2.07–2.53kV</td><td>Large motors 100HP+, compressors</td></tr>
+          <tr><td><span class="badge badge-gold">Medium</span></td><td>4,160V</td><td>3.74–4.58kV</td><td>Very large motors, substations</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>🔄</span><span id="l-motorTypeTitle">Motor Types Comparison</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Type</th><th>Slip</th><th>Start Torque</th><th>Speed Control</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-green">Squirrel Cage</span></td>
+            <td>2–5%</td><td>Moderate</td><td>VFD needed</td><td>Low</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Wound Rotor</span></td>
+            <td>0–20%</td><td>High</td><td>External resist.</td><td>Medium</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-purple">Synchronous</span></td>
+            <td>0% (exact)</td><td>Low</td><td>Fixed speed</td><td>High</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-gold">DC Shunt</span></td>
+            <td>N/A</td><td>Moderate</td><td>Excellent</td><td>High</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📐</span><span id="l-syncTitle">Synchronous Speeds (f=60Hz, PH Standard)</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Poles (P)</th><th>Ns (RPM)</th><th>Typical Motor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td>3,600</td><td>High-speed pumps, blowers</td></tr>
+          <tr><td>4</td><td>1,800</td><td>General industrial (most common)</td></tr>
+          <tr><td>6</td><td>1,200</td><td>Fans, compressors</td></tr>
+          <tr><td>8</td><td>900</td><td>Low-speed conveyors</td></tr>
+          <tr><td>10</td><td>720</td><td>Heavy machinery</td></tr>
+          <tr><td>12</td><td>600</td><td>Cranes, hoists</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== BOARD TIPS TAB ===== -->
+<div id="tab-tips" class="tab-panel">
+
+  <div class="mnemonic-card">
+    <div class="mnemonic-title"><span>🧠</span><span id="l-mnemonicTitle">Board Exam Mnemonics</span></div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">S</div>
+      <div class="mnemonic-text"><strong>"Sixty-Forty Rule"</strong> — Slip formula: s = (Ns − Nr) / Ns × 100%. Remember: Synchronous MINUS rotor, OVER synchronous. Palagi Ns ang denominator!</div>
+    </div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">H</div>
+      <div class="mnemonic-text"><strong>"746 Watts"</strong> — 1 HP = 746W = 0.746 kW. Para sa quick estimate: 1 HP ≈ 0.75 kW (close enough pero gamitin ang exact na 0.746 sa exam!)</div>
+    </div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">P</div>
+      <div class="mnemonic-text"><strong>"PIN = Pout ÷ η"</strong> — Input power = output power divided by efficiency. Kung 90% efficient at 10 kW output → Pin = 10/0.9 = 11.11 kW</div>
+    </div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">N</div>
+      <div class="mnemonic-text"><strong>"120f over P"</strong> — Synchronous speed Ns = 120 × frequency / poles. Sa PH: 60Hz standard. 4-pole motor → Ns = 120×60/4 = 1800 RPM</div>
+    </div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">T</div>
+      <div class="mnemonic-text"><strong>"TAv = P"</strong> (Torque × Angular velocity = Power) — T = P / ω = P / (2πN/60). Result is in N·m. Huwag kalimutang i-convert ang RPM to rad/s!</div>
+    </div>
+    <div class="mnemonic-item">
+      <div class="mnemonic-key">√3</div>
+      <div class="mnemonic-text"><strong>"Root Three Factor"</strong> — 3-phase power: P = √3 × V × I × PF. Ang √3 ≈ 1.732. Sa calculator: mag-type ng 1.732 kung wala square root button sa exam room.</div>
+    </div>
+  </div>
+
+  <div class="section-div" id="l-sampleProb">Sample Board Problems</div>
+
+  <div class="problem-card">
+    <div class="problem-num">📝 Problem 1</div>
+    <div class="problem-q" id="prob1q">A 3-phase, 10 HP, 460V induction motor runs at 1,746 RPM. PF = 0.85, η = 0.92. Ano ang full load current?</div>
+    <div class="problem-step"><span class="step-num">Step 1:</span> I-convert HP to kW: 10 HP × 0.746 = 7.46 kW (output power)</div>
+    <div class="problem-step"><span class="step-num">Step 2:</span> I-solve ang input power: Pin = Pout/η = 7.46/0.92 = 8.109 kW</div>
+    <div class="problem-step"><span class="step-num">Step 3:</span> I-apply ang 3-phase FLC formula: I = P/(√3 × V × PF) = 8,109/(1.732 × 460 × 0.85)</div>
+    <div class="problem-step"><span class="step-num">Step 4:</span> I = 8,109 / 677.3 = <strong>11.97 A ≈ 12 A</strong></div>
+    <div class="problem-ans">✅ Sagot: ≈ 12 Amperes</div>
+  </div>
+
+  <div class="problem-card">
+    <div class="problem-num">📝 Problem 2</div>
+    <div class="problem-q" id="prob2q">A 4-pole, 60Hz induction motor has a rotor speed of 1,710 RPM. What is the percent slip?</div>
+    <div class="problem-step"><span class="step-num">Step 1:</span> I-solve ang synchronous speed: Ns = 120f/P = (120 × 60)/4 = 1,800 RPM</div>
+    <div class="problem-step"><span class="step-num">Step 2:</span> I-apply ang slip formula: s = (Ns − Nr)/Ns × 100%</div>
+    <div class="problem-step"><span class="step-num">Step 3:</span> s = (1800 − 1710)/1800 × 100% = 90/1800 × 100% = <strong>5%</strong></div>
+    <div class="problem-ans">✅ Sagot: 5% slip (typical para sa squirrel cage)</div>
+  </div>
+
+  <div class="problem-card">
+    <div class="problem-num">📝 Problem 3</div>
+    <div class="problem-q" id="prob3q">A motor delivers 5 HP at 1,750 RPM. Ano ang developed torque sa N·m?</div>
+    <div class="problem-step"><span class="step-num">Step 1:</span> I-convert HP to Watts: 5 HP × 746 = 3,730 W = 3.73 kW</div>
+    <div class="problem-step"><span class="step-num">Step 2:</span> I-convert RPM to rad/s: ω = 2π × N/60 = 2π × 1750/60 = 183.26 rad/s</div>
+    <div class="problem-step"><span class="step-num">Step 3:</span> T = P/ω = 3,730/183.26 = <strong>20.35 N·m</strong></div>
+    <div class="problem-ans">✅ Sagot: ≈ 20.35 N·m</div>
+  </div>
+
+  <div class="trap-card">
+    <div class="trap-title"><span>⚠️</span><span id="l-trapTitle">Common Board Exam Traps!</span></div>
+    <div class="trap-item">
+      <div class="trap-icon">🪤</div>
+      <div><strong>HP vs kW:</strong> Palaging tanungin ang sarili — HP o kW ang hinahanap? Malaking trap ito! Kung "output" ang tanong → HP muna i-convert sa kW bago kalkulahin.</div>
+    </div>
+    <div class="trap-item">
+      <div class="trap-icon">🪤</div>
+      <div><strong>Input vs Output:</strong> "Motor efficiency" means Pin at labas, Pout sa shaft. Huwag i-reverse! Pin > Pout palagi dahil may losses.</div>
+    </div>
+    <div class="trap-item">
+      <div class="trap-icon">🪤</div>
+      <div><strong>√3 Factor:</strong> Para sa 3-phase, may √3 = 1.732. Para sa 1-phase, WALA. Kung malito: tingnan ang "phase" sa problem.</div>
+    </div>
+    <div class="trap-item">
+      <div class="trap-icon">🪤</div>
+      <div><strong>Line vs Phase Voltage:</strong> Sa delta connection, Vline = Vphase. Sa wye, Vline = √3 × Vphase. Ang 460V sa exam ay LINE voltage.</div>
+    </div>
+    <div class="trap-item">
+      <div class="trap-icon">🪤</div>
+      <div><strong>Exact vs Approximate:</strong> 1 HP = 0.746 kW (exact). Huwag gumamit ng 0.75 sa final answer — 0.75 kW is ≈0.67% off pero marker-dependent.</div>
+    </div>
+  </div>
+
+  <div class="context-card">
+    <div class="context-title"><span>🏭</span><span id="l-bepzTitle">BEPZ/PEZA Factory Motor Sizing Context</span></div>
+    <p style="font-size:0.85rem;color:var(--text2);line-height:1.6">
+      Sa mga BEPZ (Bataan Export Processing Zone) at PEZA factories, ang karaniwang motor configurations ay:
+    </p>
+    <br>
+    <div style="font-size:0.82rem;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--green)">Pangkalahatan na Setup:</strong><br>
+      • Supply: 460V, 3-phase, 60Hz (industrial standard PH)<br>
+      • Motor types: Mostly SCIM (Squirrel Cage) dahil mababa ang maintenance<br>
+      • Service factor: 1.15 (NEMA standard) — handa sa 115% load<br>
+      • Protection: IP55 minimum sa factory floor (dust + water resistant)<br><br>
+      <strong style="color:var(--green)">Motor Sizing Rule (PEC Section 4.30):</strong><br>
+      • Branch circuit conductor: 125% ng FLC<br>
+      • Overcurrent protection: 250% ng FLC (inverse time breaker)<br>
+      • Sa exam: conductor = 1.25 × FLC, breaker = 2.5 × FLC<br><br>
+      <strong style="color:var(--green)">Halimbawa (10 HP, 460V, 3-phase):</strong><br>
+      • FLC ≈ 14A (NEC table)<br>
+      • Conductor size: 14A × 1.25 = 17.5A → use #12 AWG (20A rated)<br>
+      • Breaker: 14A × 2.5 = 35A → use 40A standard size
+    </div>
+  </div>
+
+</div><!-- end tips -->
+
+<!-- ===== CALTECH TAB ===== -->
+<div id="tab-caltech" class="tab-panel">
+
+  <!-- Quick Memory Boxes -->
+  <div class="card">
+    <div class="card-title"><span>🧠</span>Motor Formula Memory Tricks</div>
+    <div class="mem-grid">
+      <div class="mem-box">
+        <div class="mem-formula">746 W</div>
+        <div class="mem-desc">1 HP = 746 Watts<br>= 0.746 kW (exact)</div>
+      </div>
+      <div class="mem-box">
+        <div class="mem-formula">120f/P</div>
+        <div class="mem-desc">Synchronous speed<br>Ns = 120×f÷Poles</div>
+      </div>
+      <div class="mem-box">
+        <div class="mem-formula">√3 ≈ 1.732</div>
+        <div class="mem-desc">3-phase factor<br>Memorize this!</div>
+      </div>
+      <div class="mem-box">
+        <div class="mem-formula">Pout/η</div>
+        <div class="mem-desc">Input power = Output<br>divided by efficiency</div>
+      </div>
+      <div class="mem-box">
+        <div class="mem-formula">(Ns−Nr)/Ns</div>
+        <div class="mem-desc">Slip formula<br>× 100 for percent</div>
+      </div>
+      <div class="mem-box">
+        <div class="mem-formula">P/2πN/60</div>
+        <div class="mem-desc">Torque in N·m<br>N must be in RPM</div>
+      </div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text3);margin-top:4px">
+      💡 Tip: Sa Casio fx-991ES/EX — pag nalimutan mo ang formula, SOLVE mode ang sagot!
+    </div>
+  </div>
+
+  <!-- REAL ECE BOARD MNEMONICS -->
+  <div class="card" style="border:1.5px solid var(--gold3);background:linear-gradient(135deg,#1c1205,#111318)">
+    <div class="card-title"><span>📚</span>Real ECE Board Mnemonics</div>
+
+    <div class="mem-grid">
+      <div class="mem-box" style="grid-column:1/-1;text-align:left;padding:14px">
+        <div class="mem-formula" style="font-size:1.1rem;margin-bottom:8px">"Generightor" — Generator vs Motor</div>
+        <div class="mem-desc" style="font-size:.82rem;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--gold)">Gene-RIGHTOR</strong> = Generator converts mechanical → electrical energy<br>
+          <strong style="color:var(--gold)">Motor</strong> = mechanical OUTPUT device (electrical → mechanical)<br>
+          Trick: "Generightor generates electricity — Motor moves things!"<br>
+          <span style="font-size:.75rem;color:var(--text3)">Board tip: Pag may "back EMF" sa problem → motor mode. Pag "EMF generated" → generator mode.</span>
+        </div>
+      </div>
+
+      <div class="mem-box" style="grid-column:1/-1;text-align:left;padding:14px">
+        <div class="mem-formula" style="font-size:1rem;margin-bottom:8px">"Father over Mother equals Anak" — Turns/Voltage/Current</div>
+        <div class="mem-desc" style="font-size:.82rem;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--gold)">F</strong>ather (N₁ primary turns) ÷ <strong style="color:var(--gold)">M</strong>other (N₂ secondary) = <strong style="color:var(--gold)">A</strong>nak (ratio a)<br>
+          N₁/N₂ = V₁/V₂ = I₂/I₁<br>
+          <span style="color:var(--gold);font-size:.8rem">Paalala: Current ay BALIGTAD! I₂ nasa taas ng ratio, I₁ nasa ibaba.</span>
+        </div>
+      </div>
+
+      <div class="mem-box" style="text-align:left;padding:12px">
+        <div class="mem-formula" style="font-size:.95rem;margin-bottom:6px">SHM Formula Mnemonic</div>
+        <div class="mem-desc" style="font-size:.8rem;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--gold)">x = A cos(ωt + φ)</strong><br>
+          "A Cos ang Omega Time Phase"<br>
+          A = amplitude, ω = angular frequency (rad/s), φ = phase angle<br>
+          ω = 2πf = 2π/T<br>
+          <span style="font-size:.72rem;color:var(--text3)">Sa motor: ω ay rotor speed; sa SHM: ω ay oscillation frequency</span>
+        </div>
+      </div>
+
+      <div class="mem-box" style="text-align:left;padding:12px">
+        <div class="mem-formula" style="font-size:.95rem;margin-bottom:6px">120f/P Speed Trick</div>
+        <div class="mem-desc" style="font-size:.8rem;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--gold)">Ns = 120 × f / P</strong><br>
+          "Isang Dalawang Pulos — 120f sa Poles"<br>
+          Sa PH (60 Hz): 2P=3600, 4P=1800, 6P=1200, 8P=900<br>
+          <span style="font-size:.72rem;color:var(--text3)">Kabisahin ang 4 na values na ito — lagi itong tinatanong!</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;font-size:.78rem;color:var(--text3);padding:10px;background:var(--bg3);border-radius:8px">
+      💡 CalTech tip: I-store ang √3 = 1.732050808 sa variable A sa simula ng exam.<br>
+      Tapos gamitin: <span style="font-family:monospace;color:var(--gold)">P ÷ (A × V × PF × η)</span> para sa 3-phase FLC — walang re-type!
+    </div>
+  </div>
+
+  <!-- Casio SOLVE Mode -->
+  <div class="caltech-card">
+    <div class="caltech-title"><span>🔢</span>Casio fx-991ES/EX — SOLVE Mode para sa Motor</div>
+    <p style="font-size:0.82rem;color:var(--text2);margin-bottom:12px;line-height:1.5">
+      Ang SOLVE mode ay pwedeng gamitin para hanapin ang unknown variable sa anumang motor formula. Ito ang pinaka-powerful na CalTech tool sa board exam!
+    </p>
+
+    <div style="font-size:0.8rem;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">
+      Paano gamitin ang SOLVE (Slip Example):
+    </div>
+    <div class="casio-step">
+      <strong>Goal:</strong> Hanapin ang rotor speed (Nr) kung Ns=1800, slip=5%<br>
+      Formula: s = (Ns − Nr) / Ns
+    </div>
+    <div class="casio-step">
+      <strong>Step 1:</strong> Pindutin ang <span class="key">MODE</span> → piliin <span class="screen">EQN</span> o gamitin ang CALC:<br>
+      Type: <span class="screen">0.05 = (1800 - X) / 1800</span>
+    </div>
+    <div class="casio-step">
+      <strong>Step 2:</strong> Pindutin ang <span class="key">SHIFT</span> <span class="key">CALC</span> (SOLVE button)<br>
+      Mag-aassign ng initial value → pindutin <span class="key">=</span>
+    </div>
+    <div class="casio-step">
+      <strong>Step 3:</strong> Lalabas: <span class="screen">X = 1710</span> ✅<br>
+      Ito na ang Nr = 1,710 RPM
+    </div>
+
+    <div style="font-size:0.8rem;font-weight:700;color:var(--blue);margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em">
+      √3 Quick Compute (3-phase FLC):
+    </div>
+    <div class="casio-step">
+      Sa <strong>fx-991ES:</strong> <span class="key">√</span> <span class="key">3</span> <span class="key">=</span> → <span class="screen">1.732050808</span><br>
+      Para sa FLC: <span class="key">P</span> <span class="key">÷</span> <span class="key">(</span> <span class="key">√3</span> <span class="key">×</span> <span class="key">V</span> <span class="key">×</span> <span class="key">PF</span> <span class="key">×</span> <span class="key">η</span> <span class="key">)</span> <span class="key">=</span>
+    </div>
+    <div class="casio-step">
+      <strong>Pro tip:</strong> I-store ang √3 sa variable! <span class="key">√3</span> <span class="key">→</span> <span class="key">STO</span> <span class="key">A</span><br>
+      Tapos sa formula gamitin na lang <span class="key">A</span> — mas mabilis at walang rounding error!
+    </div>
+
+    <div style="font-size:0.8rem;font-weight:700;color:var(--blue);margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em">
+      Percentage Mode — Slip at Efficiency:
+    </div>
+    <div class="casio-step">
+      Para sa slip: Type <span class="screen">90 ÷ 1800 × 100</span> <span class="key">=</span> → <span class="screen">5%</span><br>
+      O kaya: <span class="screen">(1800 - 1710) ÷ 1800</span> <span class="key">%</span> <span class="key">=</span> → direct na percent
+    </div>
+    <div class="casio-step">
+      Para sa efficiency: <span class="screen">7460 ÷ 8109</span> <span class="key">×</span> <span class="screen">100</span> <span class="key">=</span> → <span class="screen">91.99%</span><br>
+      Short cut: pindutin <span class="key">%</span> pagkatapos ng division para automatic × 100
+    </div>
+
+    <div style="font-size:0.8rem;font-weight:700;color:var(--blue);margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em">
+      Multiplication Chain — FLC 3-Phase:
+    </div>
+    <div class="casio-step">
+      Formula: I = P ÷ (√3 × V × PF × η)<br>
+      <strong>Calculator sequence:</strong><br>
+      Type denominator first: <span class="screen">1.732 × 460 × 0.85 × 0.92</span> <span class="key">=</span><br>
+      → <span class="screen">623.57</span> (store to memory: <span class="key">STO</span> <span class="key">B</span>)<br>
+      Then: <span class="screen">8109 ÷ B</span> <span class="key">=</span> → <span class="screen">13.0 A</span>
+    </div>
+    <div class="casio-step">
+      <strong>Alt method:</strong> Use ANS key!<br>
+      <span class="screen">1.732 × 460 × 0.85 × 0.92</span> <span class="key">=</span> → then type <span class="screen">8109 ÷ ANS</span> <span class="key">=</span><br>
+      <span class="key">ANS</span> automatically recalls the last result — walang re-type!
+    </div>
+  </div>
+
+  <!-- Worked Example 1 -->
+  <div class="section-div">Worked CalTech Examples</div>
+
+  <div class="worked-card">
+    <div class="worked-title">🧮 CalTech Example 1</div>
+    <div class="worked-q">
+      Find the FLC of a 10 HP, 3-phase, 460V motor. PF = 0.85, η = 0.90.<br>
+      <em style="font-size:0.8rem;color:var(--text3)">Using Casio fx-991ES step-by-step</em>
+    </div>
+    <div class="worked-step"><span class="sn">Step 1 — Convert HP to W:</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">10 × 746 =</span> → <span style="color:var(--green)">7460 W</span><br>
+      Ito ang output power (Pout). Store: <span style="font-family:monospace;color:var(--blue)">STO A</span>
+    </div>
+    <div class="worked-step"><span class="sn">Step 2 — Input power (Pin = Pout ÷ η):</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">7460 ÷ 0.90 =</span> → <span style="color:var(--green)">8288.89 W</span><br>
+      Store: <span style="font-family:monospace;color:var(--blue)">STO B</span>
+    </div>
+    <div class="worked-step"><span class="sn">Step 3 — Compute denominator (√3 × V × PF):</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">1.732 × 460 × 0.85 =</span> → <span style="color:var(--green)">677.50</span><br>
+      Store: <span style="font-family:monospace;color:var(--blue)">STO C</span>
+    </div>
+    <div class="worked-step"><span class="sn">Step 4 — FLC = Pin ÷ (√3 × V × PF):</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">B ÷ C =</span> → <span style="color:var(--green)">12.24 A</span><br>
+      (or type: <span style="font-family:monospace;color:var(--gold)">8288.89 ÷ ANS =</span> kung naka-store pa ang denominator)
+    </div>
+    <div class="worked-ans">✅ FLC ≈ 12.24 A — check mo sa NEC table (≈12–14 A range para sa 10HP, 460V)</div>
+  </div>
+
+  <!-- Worked Example 2 -->
+  <div class="worked-card">
+    <div class="worked-title">🧮 CalTech Example 2</div>
+    <div class="worked-q">
+      A 6-pole, 60Hz motor runs at 1,164 RPM. Find: (a) synchronous speed, (b) slip %, (c) torque if power = 15 kW.<br>
+      <em style="font-size:0.8rem;color:var(--text3)">Multi-part problem — isang chain calculation lang sa Casio!</em>
+    </div>
+    <div class="worked-step"><span class="sn">(a) Synchronous Speed:</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">120 × 60 ÷ 6 =</span> → <span style="color:var(--green)">Ns = 1200 RPM</span><br>
+      Store: <span style="font-family:monospace;color:var(--blue)">STO A</span>
+    </div>
+    <div class="worked-step"><span class="sn">(b) Slip %:</span><br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">( A - 1164 ) ÷ A × 100 =</span><br>
+      = <span style="font-family:monospace;color:var(--gold)">(1200 - 1164) ÷ 1200 × 100 =</span> → <span style="color:var(--green)">slip = 3%</span>
+    </div>
+    <div class="worked-step"><span class="sn">(c) Torque in N·m:</span><br>
+      Formula: T = P ÷ (2π × N ÷ 60)<br>
+      Pindutin: <span style="font-family:monospace;color:var(--gold)">2 × π × 1164 ÷ 60 =</span> → <span style="color:var(--green)">ω = 121.9 rad/s</span> (store STO B)<br>
+      Then: <span style="font-family:monospace;color:var(--gold)">15000 ÷ B =</span> → <span style="color:var(--green)">T = 123.1 N·m</span><br>
+      <em style="font-size:0.75rem;color:var(--text3)">Note: π key sa Casio fx-991ES = SHIFT + EXP</em>
+    </div>
+    <div class="worked-ans">✅ Ns = 1200 RPM | Slip = 3% | Torque = 123.1 N·m</div>
+  </div>
+
+  <!-- Board Exam CalTech Tips -->
+  <div class="caltech-card">
+    <div class="caltech-title"><span>📋</span>Board Exam CalTech Tips</div>
+    <div class="casio-step">
+      <strong>🔑 SHIFT + CALC = SOLVE</strong> — Pinakamahalagang button sa board exam. Kahit anong equation na may unknown, SOLVE mode ang gagamitin. Practice mo ito!
+    </div>
+    <div class="casio-step">
+      <strong>🔑 Store intermediate results</strong> — Huwag mag-retype! Gamitin ang <span class="key">STO</span> <span class="key">A</span>–<span class="key">F</span> para sa bawat sub-answer. Maiiwasan ang maling type-in.
+    </div>
+    <div class="casio-step">
+      <strong>🔑 Check mode bago kalkulahin</strong> — Siguruhing COMP mode (Mode 1) ang nakaset, hindi STAT o CMPLX mode. Kung may nakitang nakakaibang display, RESET ang mode: <span class="key">MODE</span> <span class="key">1</span>
+    </div>
+    <div class="casio-step">
+      <strong>🔑 π at √3 — store agad pagpasok sa exam</strong><br>
+      √3 → <span class="key">STO</span> <span class="key">A</span> (i-set sa simula pa lang)<br>
+      π ≈ 3.14159 → usually built-in na key (<span class="key">SHIFT</span> <span class="key">EXP</span>)<br>
+      2π ÷ 60 ≈ 0.10472 → <span class="key">STO</span> <span class="key">B</span> (para sa torque problems)
+    </div>
+    <div class="casio-step">
+      <strong>🔑 Unit trap — palaging W hindi kW sa torque!</strong><br>
+      T = P(W) ÷ ω(rad/s) → sagot ay N·m<br>
+      Kung P ay nasa kW → × 1000 muna bago ÷ ω<br>
+      <em style="color:var(--red)">Common mistake: 15 kW ÷ ω = maling sagot! Dapat 15,000 W ÷ ω</em>
+    </div>
+  </div>
+
+</div><!-- end caltech -->
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="/" class="nav-item">
+    <span>🏠</span>Home
+  </a>
+  <a href="#" class="nav-item" onclick="showTab('calc',null);return false">
+    <span>🔧</span><span id="nav1">Calc</span>
+  </a>
+  <a href="#" class="nav-item" onclick="showTab('table',null);return false">
+    <span>📊</span><span id="nav2">Table</span>
+  </a>
+  <a href="#" class="nav-item" onclick="showTab('tips',null);return false">
+    <span>💡</span><span id="nav3">Tips</span>
+  </a>
+  <a href="#" class="nav-item" onclick="showTab('caltech',null);return false">
+    <span>🧮</span><span id="nav4">CalTech</span>
+  </a>
+</nav>
+
+<script defer src="/_vercel/insights/script.js"></script>
+
+<script>
+// ======= LANGUAGE SYSTEM =======
+const LANG_KEY = 'pinastools_lang';
+let currentLang = 'tl';
+
+const translations = {
+  tl:{
+    tab1:'Calculator',tab2:'Talahanayan',tab3:'Board Tips',tab4:'CalTech',
+    nav1:'Kalkulahin',nav2:'Talahanayan',nav3:'Tips',nav4:'CalTech',
+    hpkw:'HP ↔ kW Converter',
+    hpInput:'Horsepower (HP)',
+    calcHp:'I-convert',
+    flcTitle:'Full Load Current (FLC)',
+    calcFlc:'Kalkulahin ang FLC',
+    effTitle:'Motor Efficiency',
+    pout:'Output Power (kW)',pin:'Input Power (kW)',
+    calcEff:'Kalkulahin ang Efficiency',
+    slipTitle:'Slip Calculator',calcSlip:'Kalkulahin ang Slip',
+    torqueTitle:'Torque Calculator',calcTorque:'Kalkulahin ang Torque',
+    sfTitle:'Service Factor & Derating',
+    altitude:'Altitude Derating',
+    calcSF:'Kalkulahin ang Derated HP',
+    flcTableTitle:'NEC/PEC FLC Talaan — 3-Phase (460V)',
+    voltStdTitle:'Philippine Industrial Voltage Standards',
+    motorTypeTitle:'Paghahambing ng Uri ng Motor',
+    syncTitle:'Synchronous Speeds (f=60Hz)',
+    mnemonicTitle:'Board Exam Mnemonics',
+    sampleProb:'Sample Board Problems',
+    trapTitle:'Mga Karaniwang Bitag sa Board Exam!',
+    bepzTitle:'BEPZ/PEZA Factory Motor Sizing Context',
+    langDisplay:'🇵🇭 Tagalog'
+  },
+  en:{
+    tab1:'Calculator',tab2:'Table',tab3:'Board Tips',tab4:'CalTech',
+    nav1:'Calc',nav2:'Table',nav3:'Tips',nav4:'CalTech',
+    hpkw:'HP ↔ kW Converter',
+    hpInput:'Horsepower (HP)',
+    calcHp:'Convert',
+    flcTitle:'Full Load Current (FLC)',
+    calcFlc:'Calculate FLC',
+    effTitle:'Motor Efficiency',
+    pout:'Output Power (kW)',pin:'Input Power (kW)',
+    calcEff:'Calculate Efficiency',
+    slipTitle:'Slip Calculator',calcSlip:'Calculate Slip',
+    torqueTitle:'Torque Calculator',calcTorque:'Calculate Torque',
+    sfTitle:'Service Factor & Derating',
+    altitude:'Altitude Derating',
+    calcSF:'Calculate Derated HP',
+    flcTableTitle:'NEC/PEC FLC Table — 3-Phase (460V)',
+    voltStdTitle:'Philippine Industrial Voltage Standards',
+    motorTypeTitle:'Motor Types Comparison',
+    syncTitle:'Synchronous Speeds (f=60Hz)',
+    mnemonicTitle:'Board Exam Mnemonics',
+    sampleProb:'Sample Board Problems',
+    trapTitle:'Common Board Exam Traps!',
+    bepzTitle:'BEPZ/PEZA Factory Motor Sizing Context',
+    langDisplay:'🇺🇸 English'
+  },
+  ceb:{
+    tab1:'Kalkula',tab2:'Lamesa',tab3:'Tips',tab4:'CalTech',
+    nav1:'Kalkula',nav2:'Lamesa',nav3:'Tips',nav4:'CalTech',
+    hpkw:'HP ↔ kW Pretensyon',
+    hpInput:'Horsepower (HP)',
+    calcHp:'Usbon',
+    flcTitle:'Full Load Current (FLC)',
+    calcFlc:'Kuwentaha ang FLC',
+    effTitle:'Motor Efficiency',
+    pout:'Output nga Gahom (kW)',pin:'Input nga Gahom (kW)',
+    calcEff:'Kuwentaha ang Efficiency',
+    slipTitle:'Slip Calculator',calcSlip:'Kuwentaha ang Slip',
+    torqueTitle:'Torque Calculator',calcTorque:'Kuwentaha ang Torque',
+    sfTitle:'Service Factor & Derating',
+    altitude:'Altitude Derating',
+    calcSF:'Kuwentaha ang Derated HP',
+    flcTableTitle:'NEC/PEC FLC Lamesa — 3-Phase (460V)',
+    voltStdTitle:'Philippine Industrial Voltage Standards',
+    motorTypeTitle:'Pagtandi sa Matang Motor',
+    syncTitle:'Synchronous Speeds (f=60Hz)',
+    mnemonicTitle:'Board Exam Mnemonics',
+    sampleProb:'Sample Board Problems',
+    trapTitle:'Mga Bitag sa Board Exam!',
+    bepzTitle:'BEPZ/PEZA Factory Motor Sizing',
+    langDisplay:'🇵🇭 Cebuano'
+  },
+  ilo:{
+    tab1:'Kalkulayen',tab2:'Tabel',tab3:'Tips',tab4:'CalTech',
+    nav1:'Kalkulayen',nav2:'Tabel',nav3:'Tips',nav4:'CalTech',
+    hpkw:'HP ↔ kW Pangbalin',
+    hpInput:'Horsepower (HP)',
+    calcHp:'Baliwen',
+    flcTitle:'Full Load Current (FLC)',
+    calcFlc:'Kalkulayen ti FLC',
+    effTitle:'Motor Efficiency',
+    pout:'Output Power (kW)',pin:'Input Power (kW)',
+    calcEff:'Kalkulayen ti Efficiency',
+    slipTitle:'Slip Calculator',calcSlip:'Kalkulayen ti Slip',
+    torqueTitle:'Torque Calculator',calcTorque:'Kalkulayen ti Torque',
+    sfTitle:'Service Factor & Derating',
+    altitude:'Altitude Derating',
+    calcSF:'Kalkulayen ti Derated HP',
+    flcTableTitle:'NEC/PEC FLC Tabel — 3-Phase (460V)',
+    voltStdTitle:'Philippine Industrial Voltage Standards',
+    motorTypeTitle:'Panagipada ti Matang Motor',
+    syncTitle:'Synchronous Speeds (f=60Hz)',
+    mnemonicTitle:'Board Exam Mnemonics',
+    sampleProb:'Sample Board Problems',
+    trapTitle:'Kasapulan nga Bitag iti Board!',
+    bepzTitle:'BEPZ/PEZA Factory Motor Sizing',
+    langDisplay:'🇵🇭 Ilocano'
+  }
+};
+
+function applyLang(lang){
+  const t = translations[lang] || translations.tl;
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val};
+  set('tab1Lbl',t.tab1);set('tab2Lbl',t.tab2);set('tab3Lbl',t.tab3);set('tab4Lbl',t.tab4);
+  set('nav1',t.nav1);set('nav2',t.nav2);set('nav3',t.nav3);set('nav4',t.nav4);
+  set('l-hpkw',t.hpkw);set('l-hpInput',t.hpInput);set('l-calcHp',t.calcHp);
+  set('l-flcTitle',t.flcTitle);set('l-calcFlc',t.calcFlc);
+  set('l-effTitle',t.effTitle);set('l-pout',t.pout);set('l-pin',t.pin);
+  set('l-calcEff',t.calcEff);set('l-slipTitle',t.slipTitle);set('l-calcSlip',t.calcSlip);
+  set('l-torqueTitle',t.torqueTitle);set('l-calcTorque',t.calcTorque);
+  set('l-sfTitle',t.sfTitle);set('l-altitude',t.altitude);set('l-calcSF',t.calcSF);
+  set('l-flcTableTitle',t.flcTableTitle);set('l-voltStdTitle',t.voltStdTitle);
+  set('l-motorTypeTitle',t.motorTypeTitle);set('l-syncTitle',t.syncTitle);
+  set('l-mnemonicTitle',t.mnemonicTitle);set('l-sampleProb',t.sampleProb);
+  set('l-trapTitle',t.trapTitle);set('l-bepzTitle',t.bepzTitle);
+  set('langDisplay',t.langDisplay);
+}
+
+let selectedLang = 'tl';
+function setLang(lang){
+  selectedLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  event && event.target && event.target.classList.add('active');
+}
+function confirmLang(){
+  currentLang = selectedLang;
+  localStorage.setItem(LANG_KEY, currentLang);
+  applyLang(currentLang);
+  document.getElementById('langModal').classList.add('hidden');
+}
+function showLangModal(){
+  document.getElementById('langModal').classList.remove('hidden');
+}
+
+// ======= TABS =======
+function showTab(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  window.scrollTo(0,0);
+}
+
+// ======= HP CONVERTER =======
+let hpDir = 'hp';
+function setHpDir(dir){
+  hpDir = dir;
+  const l = document.getElementById('l-hpInput');
+  document.getElementById('btnHPtoKW').classList.toggle('active', dir==='hp');
+  document.getElementById('btnKWtoHP').classList.toggle('active', dir==='kw');
+  l.textContent = dir==='hp' ? 'Horsepower (HP)' : 'Kilowatts (kW)';
+  document.getElementById('hpInput').placeholder = dir==='hp' ? 'e.g. 5' : 'e.g. 3.73';
+  hideResult('hpResult');
+}
+function calcHP(){
+  const v = parseFloat(document.getElementById('hpInput').value);
+  if(isNaN(v)||v<0){showError('hpResult');return}
+  let res, formula;
+  if(hpDir==='hp'){
+    res = v * 0.746;
+    formula = `${v} HP × 0.746 = ${res.toFixed(4)} kW`;
+    showResult('hpResult', res.toFixed(4), 'kW', formula);
+  } else {
+    res = v / 0.746;
+    formula = `${v} kW ÷ 0.746 = ${res.toFixed(4)} HP`;
+    showResult('hpResult', res.toFixed(4), 'HP', formula);
+  }
+}
+
+// ======= FLC =======
+let phaseMode = 1;
+function setPhase(p){
+  phaseMode = p;
+  document.getElementById('btn1ph').classList.toggle('active', p===1);
+  document.getElementById('btn3ph').classList.toggle('active', p===3);
+  hideResult('flcResult');
+}
+function calcFLC(){
+  const P = parseFloat(document.getElementById('flcPower').value)*1000;
+  const V = parseFloat(document.getElementById('flcVoltage').value);
+  const PF = parseFloat(document.getElementById('flcPF').value);
+  const eff = parseFloat(document.getElementById('flcEff').value);
+  if([P,V,PF,eff].some(isNaN)||V<=0||PF<=0||eff<=0){showError('flcResult');return}
+  let I, formula;
+  if(phaseMode===1){
+    I = P/(V*PF*eff);
+    formula = `I = P/(V×PF×η)\nI = ${(P/1000).toFixed(3)}kW×1000 / (${V}×${PF}×${eff})\nI = ${P.toFixed(1)} / ${(V*PF*eff).toFixed(2)} = ${I.toFixed(3)} A`;
+  } else {
+    I = P/(Math.sqrt(3)*V*PF*eff);
+    formula = `I = P/(√3×V×PF×η)\nI = ${(P/1000).toFixed(3)}kW×1000 / (1.732×${V}×${PF}×${eff})\nI = ${P.toFixed(1)} / ${(Math.sqrt(3)*V*PF*eff).toFixed(2)} = ${I.toFixed(3)} A`;
+  }
+  showResult('flcResult', I.toFixed(3), 'Amperes', formula);
+}
+
+// ======= EFFICIENCY =======
+function calcEff(){
+  const Pout = parseFloat(document.getElementById('effPout').value);
+  const Pin = parseFloat(document.getElementById('effPin').value);
+  if(isNaN(Pout)||isNaN(Pin)||Pin<=0){showError('effResult');return}
+  const eta = (Pout/Pin)*100;
+  const formula = `η = Pout/Pin × 100%\nη = ${Pout}/${Pin} × 100% = ${eta.toFixed(2)}%`;
+  showResult('effResult', eta.toFixed(2)+'%', 'Efficiency', formula);
+}
+
+// ======= SLIP =======
+function calcSlip(){
+  const f = parseFloat(document.getElementById('slipFreq').value);
+  const P = parseFloat(document.getElementById('slipPoles').value);
+  const Nr = parseFloat(document.getElementById('slipNr').value);
+  if([f,P,Nr].some(isNaN)||P<=0||f<=0){showError('slipResult');return}
+  const Ns = (120*f)/P;
+  const slip = ((Ns-Nr)/Ns)*100;
+  const el = document.getElementById('slipResult');
+  el.classList.add('show');
+  document.getElementById('slipResultMulti').innerHTML =
+    `<div class="result-item"><div class="val">${Ns.toFixed(0)}</div><div class="lbl">Ns (sync RPM)</div></div>
+     <div class="result-item"><div class="val">${slip.toFixed(2)}%</div><div class="lbl">Slip %</div></div>`;
+  document.getElementById('slipResultFormula').innerHTML =
+    `Ns = 120×${f}/${P} = ${Ns.toFixed(0)} RPM\ns = (${Ns.toFixed(0)}−${Nr})/${Ns.toFixed(0)} × 100% = ${slip.toFixed(2)}%`;
+}
+
+// ======= TORQUE =======
+function calcTorque(){
+  const P = parseFloat(document.getElementById('torquePower').value)*1000;
+  const N = parseFloat(document.getElementById('torqueSpeed').value);
+  if([P,N].some(isNaN)||N<=0){showError('torqueResult');return}
+  const omega = 2*Math.PI*N/60;
+  const T = P/omega;
+  const formula = `T = P / (2π × N/60)\nω = 2π×${N}/60 = ${omega.toFixed(3)} rad/s\nT = ${P.toFixed(1)} / ${omega.toFixed(3)} = ${T.toFixed(3)} N·m`;
+  showResult('torqueResult', T.toFixed(3), 'Newton-meters (N·m)', formula);
+}
+
+// ======= SERVICE FACTOR =======
+function calcSF(){
+  const hp = parseFloat(document.getElementById('sfHP').value);
+  const sf = parseFloat(document.getElementById('sfFactor').value);
+  const alt = parseFloat(document.getElementById('sfAlt').value);
+  if(isNaN(hp)||hp<=0){showError('sfResult');return}
+  const sfHP = hp*sf;
+  const deratedHP = sfHP*alt;
+  const el = document.getElementById('sfResult');
+  el.classList.add('show');
+  document.getElementById('sfResultMulti').innerHTML =
+    `<div class="result-item"><div class="val">${sfHP.toFixed(2)} HP</div><div class="lbl">With SF (${sf})</div></div>
+     <div class="result-item"><div class="val">${deratedHP.toFixed(2)} HP</div><div class="lbl">Derated (alt)</div></div>`;
+  document.getElementById('sfResultFormula').innerHTML =
+    `SF HP = ${hp} × ${sf} = ${sfHP.toFixed(2)} HP\nAltitude factor: ${alt}\nDerated = ${sfHP.toFixed(2)} × ${alt} = ${deratedHP.toFixed(2)} HP`;
+}
+
+// ======= HELPERS =======
+function showResult(id, val, lbl, formula){
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  const vEl = document.getElementById(id+'Val');
+  const lEl = document.getElementById(id+'Lbl');
+  const fEl = document.getElementById(id+'Formula');
+  if(vEl) vEl.textContent = val;
+  if(lEl) lEl.textContent = lbl;
+  if(fEl) fEl.textContent = formula||'';
+}
+function showError(id){
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  const vEl = document.getElementById(id+'Val');
+  if(vEl) vEl.textContent='⚠️ Check inputs';
+}
+function hideResult(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+// ======= FLC TABLE DATA =======
+const flcData = [
+  {hp:0.5,kw:0.373,a230:4.4,a460:2.2,a2300:0.44},
+  {hp:0.75,kw:0.559,a230:6.4,a460:3.2,a2300:0.64},
+  {hp:1,kw:0.746,a230:8.4,a460:4.2,a2300:0.84},
+  {hp:1.5,kw:1.119,a230:12.0,a460:6.0,a2300:1.20},
+  {hp:2,kw:1.492,a230:13.6,a460:6.8,a2300:1.36},
+  {hp:3,kw:2.238,a230:19.6,a460:9.8,a2300:1.96},
+  {hp:5,kw:3.730,a230:30.8,a460:15.4,a2300:3.08},
+  {hp:7.5,kw:5.595,a230:46.2,a460:23.1,a2300:4.62},
+  {hp:10,kw:7.460,a230:59.4,a460:29.7,a2300:5.94},
+  {hp:15,kw:11.190,a230:90.0,a460:45.0,a2300:9.00},
+  {hp:20,kw:14.920,a230:120.0,a460:60.0,a2300:12.00},
+  {hp:25,kw:18.650,a230:150.0,a460:75.0,a2300:15.00},
+  {hp:30,kw:22.380,a230:180.0,a460:90.0,a2300:18.00},
+  {hp:40,kw:29.840,a230:240.0,a460:120.0,a2300:24.00},
+  {hp:50,kw:37.300,a230:302.0,a460:151.0,a2300:30.20},
+];
+function buildFLCTable(){
+  const tbody = document.getElementById('flcTableBody');
+  tbody.innerHTML = flcData.map(r=>
+    `<tr>
+      <td><strong>${r.hp} HP</strong></td>
+      <td>${r.kw.toFixed(3)}</td>
+      <td>${r.a230} A</td>
+      <td>${r.a460} A</td>
+      <td>${r.a2300} A</td>
+    </tr>`
+  ).join('');
+}
+
+// ======= KEYBOARD SHORTCUTS =======
+document.addEventListener('keydown',function(e){
+  // Don't trigger when typing in inputs
+  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabs = ['calc','table','tips','caltech'];
+  if(e.key==='1'){showTab(tabs[0],tabBtns[0])}
+  else if(e.key==='2'){showTab(tabs[1],tabBtns[1])}
+  else if(e.key==='3'){showTab(tabs[2],tabBtns[2])}
+  else if(e.key==='4'){showTab(tabs[3],tabBtns[3])}
+});
+
+// ======= INIT =======
+(function init(){
+  const saved = localStorage.getItem(LANG_KEY);
+  if(saved){
+    currentLang = saved;
+    selectedLang = saved;
+    applyLang(saved);
+    document.getElementById('langModal').classList.add('hidden');
+  }
+  buildFLCTable();
+})();
+</script>
+</body>
+</html>

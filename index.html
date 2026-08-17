@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="description" content="PinasTools - Libre na engineering tools para sa Filipino ECE, EE, CpE, ME students. Board exam ready, offline capable.">
+<meta name="theme-color" content="#111318">
+<title>PinasTools · Engineering Tools PH</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+:root{
+  --bg:#111318;--surf:#1a1d28;--surf2:#22263a;--border:#2a3050;
+  --gold:#f59e0b;--blue:#3b82f6;--green:#22c55e;--purple:#a855f7;
+  --orange:#f97316;--teal:#14b8a6;--red:#ef4444;
+  --text:#e8eaf0;--muted:#7a8499;--r:16px;
+  --font:'Outfit','Segoe UI',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+
+/* HEADER */
+.site-header{
+  background:var(--surf);border-bottom:2px solid var(--gold);
+  padding:18px 16px 14px;text-align:center;
+}
+.logo{font-size:2rem;font-weight:800;color:var(--gold);letter-spacing:-.5px}
+.tagline{font-size:.82rem;color:var(--muted);margin-top:3px}
+.badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase}
+.badge-green{background:#14532d;color:#86efac}
+.badge-gold{background:rgba(245,158,11,.15);color:var(--gold)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+
+/* SEARCH (future) */
+.search-wrap{padding:12px 14px 0}
+.search-box{
+  width:100%;padding:11px 14px;
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:12px;color:var(--text);
+  font-family:var(--font);font-size:.9rem;
+}
+.search-box:focus{outline:none;border-color:var(--gold)}
+
+/* MAIN */
+main{padding:14px 14px 30px;max-width:640px;margin:0 auto}
+
+/* SECTION */
+.section-header{
+  display:flex;align-items:center;gap:10px;
+  margin:20px 0 10px;
+  padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.section-icon{font-size:1.2rem}
+.section-title{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.section-count{font-size:.65rem;color:var(--border);font-weight:600;margin-left:auto}
+.section-pill{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.3px}
+
+/* TOOL CARDS */
+.tool-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;margin-bottom:8px;
+  text-decoration:none;color:var(--text);
+  transition:border-color .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tool-card:active{transform:scale(.98)}
+.tool-card:hover{border-color:var(--gold)}
+.tool-card.coming-soon{opacity:.5;pointer-events:none}
+
+.tool-icon{
+  font-size:1.5rem;width:42px;height:42px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:12px;flex-shrink:0;
+}
+.tool-info{flex:1;min-width:0}
+.tool-name{font-size:.95rem;font-weight:700;color:var(--text)}
+.tool-desc{font-size:.73rem;color:var(--muted);margin-top:2px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tool-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.tag{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:.3px}
+.tag-new{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-hot{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-board{background:rgba(59,130,246,.15);color:var(--blue)}
+.tag-soon{background:rgba(122,132,153,.1);color:var(--muted)}
+.tool-arrow{color:var(--border);font-size:1.1rem;flex-shrink:0}
+
+/* FOOTER */
+footer{
+  text-align:center;padding:24px 16px;
+  font-size:.75rem;color:var(--muted);
+  border-top:1px solid var(--border);
+  margin-top:10px;
+}
+footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🛠 PinasTools</div>
+  <div class="tagline">Libre na engineering tools para sa Filipino students</div>
+  <div class="badges">
+    <span class="badge badge-green">✓ Offline Ready</span>
+    <span class="badge badge-gold">Board Exam Focused</span>
+    <span class="badge badge-blue">🇵🇭 Taglish</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ ECE / CpE ══ -->
+  <div class="section-header">
+    <span class="section-icon">📡</span>
+    <span class="section-title">ECE / CpE — Electronics & Communications</span>
+  </div>
+
+  <a class="tool-card" href="/ece/resistor/">
+    <div class="tool-icon" style="background:rgba(245,158,11,.1)">🔢</div>
+    <div class="tool-info">
+      <div class="tool-name">Resistor Color Code</div>
+      <div class="tool-desc">Decode/encode 3–6 band resistors + SMD EIA-96</div>
+      <div class="tool-tags"><span class="tag tag-hot">Hot</span><span class="tag tag-board">Board Exam</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ece/db-converter/">
+    <div class="tool-icon" style="background:rgba(59,130,246,.1)">📡</div>
+    <div class="tool-info">
+      <div class="tool-name">dB / Decibel Converter</div>
+      <div class="tool-desc">dBm, dBW, FSPL, Link Budget, antenna gain</div>
+      <div class="tool-tags"><span class="tag tag-hot">Hot</span><span class="tag tag-board">EST Board</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ece/kmap/">
+    <div class="tool-icon" style="background:rgba(168,85,247,.1)">🗺</div>
+    <div class="tool-info">
+      <div class="tool-name">K-Map Simplifier</div>
+      <div class="tool-desc">SOP, POS, don't cares, 2–5 variables, gate diagram</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Digital Systems</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ece/number-system/">
+    <div class="tool-icon" style="background:rgba(20,184,166,.1)">🔄</div>
+    <div class="tool-info">
+      <div class="tool-name">Number System Converter</div>
+      <div class="tool-desc">Bin/Oct/Dec/Hex, 1s/2s complement, BCD, BASE-N caltech</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Digital Systems</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ece/op-amp/">
+    <div class="tool-icon" style="background:rgba(168,85,247,.1)">📻</div>
+    <div class="tool-info">
+      <div class="tool-name">Op-Amp Calculator</div>
+      <div class="tool-desc">7 configs, inverting/non-inv/summing, GBW, slew rate</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Electronics</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <!-- ══ EE ══ -->
+  <div class="section-header" style="margin-top:24px">
+    <span class="section-icon">⚡</span>
+    <span class="section-title">EE — Electrical Engineering</span>
+  </div>
+
+  <a class="tool-card" href="/ee/ohms-law/">
+    <div class="tool-icon" style="background:rgba(245,158,11,.1)">⚡</div>
+    <div class="tool-info">
+      <div class="tool-name">Ohm's Law & Power Calculator</div>
+      <div class="tool-desc">V=IR, P=VI, series & parallel circuits</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Board Exam</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ee/pec-wire-size/">
+    <div class="tool-icon" style="background:rgba(34,197,94,.1)">🔌</div>
+    <div class="tool-info">
+      <div class="tool-name">PEC Wire Size Calculator</div>
+      <div class="tool-desc">Ampacity, voltage drop, AWG table — PEC 2017</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">PEC 2017</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ee/three-phase-power/">
+    <div class="tool-icon" style="background:rgba(249,115,22,.1)">🔋</div>
+    <div class="tool-info">
+      <div class="tool-name">Three-Phase Power Calculator</div>
+      <div class="tool-desc">Star/Delta, real/reactive/apparent power, Y-Δ conversion</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Power Systems</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ee/unit-converter/">
+    <div class="tool-icon" style="background:rgba(20,184,166,.1)">📐</div>
+    <div class="tool-info">
+      <div class="tool-name">Engineering Unit Converter</div>
+      <div class="tool-desc">Length, temperature, pressure, energy, power, frequency</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">All Boards</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ee/transformer/">
+    <div class="tool-icon" style="background:rgba(245,158,11,.1)">🔄</div>
+    <div class="tool-info">
+      <div class="tool-name">Transformer Calculator</div>
+      <div class="tool-desc">Turns ratio, efficiency, voltage regulation, NIVI mnemonic</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Power Systems</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ee/motor-calculator/">
+    <div class="tool-icon" style="background:rgba(239,68,68,.1)">⚙️</div>
+    <div class="tool-info">
+      <div class="tool-name">Motor HP/kW Calculator</div>
+      <div class="tool-desc">HP↔kW, FLC, slip, torque, synchronous speed</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Machines</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <!-- ══ CE ══ -->
+  <div class="section-header" style="margin-top:24px">
+    <span class="section-icon">🏗️</span>
+    <span class="section-title">CE — Civil Engineering</span>
+  </div>
+
+  <a class="tool-card" href="/ce/beam-calculator/">
+    <div class="tool-icon" style="background:rgba(245,158,11,.1)">🏗️</div>
+    <div class="tool-info">
+      <div class="tool-name">Beam & Moment Calculator</div>
+      <div class="tool-desc">Simply supported, cantilever, fixed — shear, moment, deflection</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Structural</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ce/fluid-mechanics/">
+    <div class="tool-icon" style="background:rgba(59,130,246,.1)">💧</div>
+    <div class="tool-info">
+      <div class="tool-name">Fluid Mechanics & Hydraulics</div>
+      <div class="tool-desc">Pipe flow, Manning's open channel, Bernoulli, hydrostatic</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Hydraulics</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ce/surveying/">
+    <div class="tool-icon" style="background:rgba(34,197,94,.1)">🗺️</div>
+    <div class="tool-info">
+      <div class="tool-name">Surveying & Traverse Calculator</div>
+      <div class="tool-desc">Traverse, simple curve, differential leveling, DMD area</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Surveying</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ce/concrete-mix/">
+    <div class="tool-icon" style="background:rgba(168,85,247,.1)">🧱</div>
+    <div class="tool-info">
+      <div class="tool-name">Concrete Mix Design</div>
+      <div class="tool-desc">ACI 211, DPWH Class A/B/C, cement bags/m³, w/c ratio</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Materials</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ce/soil-mechanics/">
+    <div class="tool-icon" style="background:rgba(249,115,22,.1)">🌍</div>
+    <div class="tool-info">
+      <div class="tool-name">Soil Mechanics Calculator</div>
+      <div class="tool-desc">Index properties, USCS classification, bearing capacity, settlement</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-board">Geotechnical</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <!-- ══ PH EVERYDAY ══ -->
+  <div class="section-header" style="margin-top:24px">
+    <span class="section-icon">🇵🇭</span>
+    <span class="section-title">Pang-araw-araw — Everyday PH Tools</span>
+  </div>
+
+  <a class="tool-card" href="/ph/sahod-calculator/">
+    <div class="tool-icon" style="background:rgba(34,197,94,.1)">💰</div>
+    <div class="tool-info">
+      <div class="tool-name">Sahod Calculator 2026</div>
+      <div class="tool-desc">Kinsi/katapusan, SSS, PhilHealth, Pag-IBIG, loans, late</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-hot">Hot</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card" href="/ph/id-maker/">
+    <div class="tool-icon" style="background:rgba(59,130,246,.1)">🪪</div>
+    <div class="tool-info">
+      <div class="tool-name">2x2 ID Photo Maker</div>
+      <div class="tool-desc">Upload, zoom, drag, white BG, download — walang watermark</div>
+      <div class="tool-tags"><span class="tag tag-new">New</span><span class="tag tag-hot">Hot</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+  <a class="tool-card coming-soon" href="#">
+    <div class="tool-icon" style="background:rgba(122,132,153,.08)">📄</div>
+    <div class="tool-info">
+      <div class="tool-name">SSS Contribution Calculator</div>
+      <div class="tool-desc">Monthly contribution lookup, loan eligibility</div>
+      <div class="tool-tags"><span class="tag tag-soon">Coming Soon</span></div>
+    </div>
+    <div class="tool-arrow">›</div>
+  </a>
+
+</main>
+
+<footer>
+  🇵🇭 Gawa para sa mga Filipino students &amp; workers<br>
+  <a href="mailto:nivredg@gmail.com">Mag-suggest ng tool</a> ·
+  <a href="/ece/strategy/">Strategy Report</a>
+</footer>
+
+</body>
+</html>

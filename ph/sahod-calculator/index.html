@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="description" content="Sahod Calculator 2026 - Kinsi at katapusan ng buwan. SSS, PhilHealth, Pag-IBIG, loans, late deductions. Libre, offline.">
+<meta name="theme-color" content="#111318">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>PinasTools · Sahod Calculator 2026</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+:root{
+  --bg:#111318;--surf:#1a1d28;--surf2:#22263a;--border:#2a3050;
+  --gold:#f59e0b;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;
+  --text:#e8eaf0;--muted:#7a8499;--r:16px;
+  --font:'Outfit','Segoe UI',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:28px 22px;width:100%;max-width:360px}
+.modal-logo{font-size:1.4rem;font-weight:800;color:var(--gold);text-align:center;margin-bottom:4px}
+.modal-sub{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:20px}
+.modal-title{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.lang-btn{padding:12px 8px;border-radius:12px;border:2px solid var(--border);background:var(--surf2);color:var(--text);font-family:var(--font);font-size:.88rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.lang-btn:hover,.lang-btn.sel{border-color:var(--gold);background:rgba(245,158,11,.1);color:var(--gold)}
+.modal-confirm{width:100%;padding:13px;border:none;border-radius:12px;background:var(--gold);color:#000;font-family:var(--font);font-size:1rem;font-weight:700;cursor:pointer}
+
+/* HEADER */
+.site-header{position:sticky;top:0;z-index:100;background:var(--surf);border-bottom:2px solid var(--gold);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-size:1.05rem;font-weight:800;color:var(--gold)}
+.logo span{color:var(--muted);font-weight:400;font-size:.8rem}
+.offline-pill{margin-left:auto;background:#14532d;color:#86efac;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--surf);border-top:1px solid var(--border);display:flex}
+.nav-btn{flex:1;padding:12px 4px 10px;font-family:var(--font);font-size:.7rem;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s}
+.nav-btn .nav-icon{font-size:1.2rem}
+.nav-btn.on{color:var(--gold)}
+
+/* PAGES */
+.page{display:none;padding:14px 14px 80px}
+.page.on{display:block}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-title{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+
+/* FIELDS */
+.field{margin-bottom:10px}
+.field label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:5px}
+.field input[type=number],.field select{width:100%;padding:11px 13px;background:var(--surf2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font);font-size:.95rem;transition:border-color .15s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* PESO INPUT */
+.peso-wrap{position:relative}
+.peso-wrap::before{content:'₱';position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;font-size:.9rem;pointer-events:none}
+.peso-wrap input{padding-left:28px}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:.85rem;color:var(--text)}
+.toggle-sub{font-size:.72rem;color:var(--muted)}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surf2);border:1px solid var(--border);border-radius:24px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:rgba(245,158,11,.2);border-color:var(--gold)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--gold)}
+
+/* EXTRA DEDUCTION ROW */
+.deduct-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.deduct-row input{flex:1;padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:.85rem}
+.deduct-row input:focus{outline:none;border-color:var(--gold)}
+.deduct-row .peso-wrap{flex:1}
+.deduct-rm{background:none;border:none;color:var(--red);font-size:1.2rem;cursor:pointer;padding:4px;flex-shrink:0}
+.add-deduct-btn{width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:12px;background:none;color:var(--muted);font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;margin-top:4px;transition:all .15s}
+.add-deduct-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* COMPUTE BTN */
+.compute-btn{width:100%;padding:14px;border:none;border-radius:var(--r);background:var(--gold);color:#000;font-family:var(--font);font-size:1rem;font-weight:800;cursor:pointer;margin-top:4px;transition:opacity .15s}
+.compute-btn:active{opacity:.8}
+
+/* RESULTS */
+.result-section{display:none}
+.result-header{text-align:center;padding:16px;background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px}
+.result-name{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.result-amount{font-size:2.2rem;font-weight:800;color:var(--gold)}
+.result-sub{font-size:.8rem;color:var(--muted);margin-top:4px}
+
+.breakdown-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.breakdown-table td{padding:9px 10px;border-bottom:.5px solid var(--border)}
+.breakdown-table tr:last-child td{border-bottom:none}
+.breakdown-table .label{color:var(--muted)}
+.breakdown-table .amount{text-align:right;font-family:monospace;font-weight:700}
+.breakdown-table .deduct .amount{color:var(--red)}
+.breakdown-table .earn .amount{color:var(--green)}
+.breakdown-table .total-row td{font-weight:800;font-size:.9rem;border-top:2px solid var(--border)}
+.breakdown-table .total-row .amount{color:var(--gold);font-size:1rem}
+
+.split-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.split-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
+.split-label{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.split-amount{font-size:1.4rem;font-weight:800;color:var(--gold)}
+.split-date{font-size:.72rem;color:var(--muted);margin-top:3px}
+
+.copy-btn{width:100%;padding:12px;border:1.5px solid var(--gold);border-radius:12px;background:none;color:var(--gold);font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
+.copy-btn:hover{background:rgba(245,158,11,.1)}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--green);color:#000;padding:9px 22px;border-radius:24px;font-family:var(--font);font-size:.82rem;font-weight:700;transition:transform .25s;z-index:998;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* TIP */
+.tip{background:#1a2040;border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:10px 12px;font-size:.8rem;color:#fde68a;line-height:1.6;margin-bottom:10px}
+.tip strong{color:#fef3c7}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE MODAL -->
+<div class="modal-overlay" id="langModal">
+  <div class="modal-box">
+    <div class="modal-logo">🛠 PinasTools Installer</div>
+    <div class="modal-sub">Sahod Calculator 2026</div>
+    <div class="modal-title">Select Language / Piliin ang Wika</div>
+    <div class="lang-grid">
+      <button class="lang-btn sel" data-lang="tl" onclick="selLang(this)">🇵🇭 Tagalog<br><small style="font-weight:400;font-size:.7rem">Default</small></button>
+      <button class="lang-btn" data-lang="en" onclick="selLang(this)">🇺🇸 English</button>
+      <button class="lang-btn" data-lang="ceb" onclick="selLang(this)">🌊 Cebuano</button>
+      <button class="lang-btn" data-lang="ilo" onclick="selLang(this)">🏔 Ilocano</button>
+    </div>
+    <button class="modal-confirm" onclick="confirmLang()">Simulan · Start →</button>
+  </div>
+</div>
+
+<header class="site-header">
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
+  <div class="logo">💰 PinasTools <span>· Sahod Calculator 2026</span></div>
+  <span class="offline-pill">✓ Offline</span>
+</header>
+
+<!-- PAGE: CALCULATOR -->
+<section id="pg-sahod" class="page on">
+
+  <div class="tip">
+    💡 <strong>2026 rates:</strong> SSS, PhilHealth, Pag-IBIG ay updated na. Lahat ng computation ay nasa device mo lang — walang data na nare-record.
+  </div>
+
+  <!-- BASIC PAY -->
+  <div class="card">
+    <div class="card-title">💵 Basic Salary</div>
+    <div class="field">
+      <label>Monthly Basic Pay</label>
+      <div class="peso-wrap"><input type="number" id="basic" placeholder="25000" value="25000" oninput="onInput()"></div>
+    </div>
+    <div class="field">
+      <label>Allowance (non-taxable)</label>
+      <div class="peso-wrap"><input type="number" id="allowance" placeholder="0" value="0" oninput="onInput()"></div>
+    </div>
+  </div>
+
+  <!-- SPLIT -->
+  <div class="card">
+    <div class="card-title">📅 Salary Split</div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Split Salary? (15th &amp; 30th)</div>
+        <div class="toggle-sub">I-on kung may kinsi at katapusan</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="doSplit" onchange="onInput()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="splitOptions" style="margin-top:12px;display:none">
+      <div class="field">
+        <label>Split Type</label>
+        <select id="splitType" onchange="onInput()">
+          <option value="5050">50/50 Equal (common)</option>
+          <option value="4060">40/60 (40% kinsi, 60% katapusan)</option>
+          <option value="fixed">Fixed Amount sa Kinsi</option>
+        </select>
+      </div>
+      <div id="fixedKinsiWrap" class="field" style="display:none">
+        <label>Fixed Kinsi Amount</label>
+        <div class="peso-wrap"><input type="number" id="fixedKinsi" placeholder="10000" oninput="onInput()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOVT DEDUCTIONS -->
+  <div class="card">
+    <div class="card-title">🏛 Government Deductions (2026 Rates)</div>
+    <div class="field">
+      <label>Deduct SSS/PhilHealth/Pag-IBIG sa</label>
+      <select id="govtOn" onchange="onInput()">
+        <option value="30th">30th Only (most companies)</option>
+        <option value="split">Both 15th &amp; 30th (split equally)</option>
+        <option value="15th">15th Only</option>
+      </select>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);line-height:1.8;padding:8px 0">
+      <div id="sss_display">SSS: computing...</div>
+      <div id="phi_display">PhilHealth: computing...</div>
+      <div>Pag-IBIG: <strong style="color:var(--text)">₱200.00</strong> (max)</div>
+    </div>
+  </div>
+
+  <!-- OTHER DEDUCTIONS -->
+  <div class="card">
+    <div class="card-title">➖ Other Deductions</div>
+
+    <div class="toggle-row">
+      <div><div class="toggle-label">SSS Loan</div></div>
+      <label class="toggle"><input type="checkbox" id="hasSSSLoan" onchange="toggleLoan('sss')"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="sssLoanWrap" class="field" style="display:none;margin-top:8px">
+      <div class="peso-wrap"><input type="number" id="sssLoan" placeholder="Monthly amortization" oninput="onInput()"></div>
+    </div>
+
+    <div class="toggle-row">
+      <div><div class="toggle-label">Pag-IBIG Loan</div></div>
+      <label class="toggle"><input type="checkbox" id="hasPILoan" onchange="toggleLoan('pi')"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="piLoanWrap" class="field" style="display:none;margin-top:8px">
+      <div class="peso-wrap"><input type="number" id="piLoan" placeholder="Monthly amortization" oninput="onInput()"></div>
+    </div>
+
+    <div class="toggle-row">
+      <div><div class="toggle-label">Cash Advance (CA)</div></div>
+      <label class="toggle"><input type="checkbox" id="hasCA" onchange="toggleLoan('ca')"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="caWrap" class="field" style="display:none;margin-top:8px">
+      <div class="peso-wrap"><input type="number" id="caAmount" placeholder="Amount" oninput="onInput()"></div>
+      <div style="margin-top:6px">
+        <select id="caOn" onchange="onInput()" style="width:100%;padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:.85rem">
+          <option value="30th">Deduct sa 30th</option>
+          <option value="15th">Deduct sa 15th</option>
+          <option value="split">Split sa both</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <div><div class="toggle-label">Late / Undertime</div></div>
+      <label class="toggle"><input type="checkbox" id="hasLate" onchange="toggleLoan('late')"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="lateWrap" style="display:none;margin-top:8px;margin-bottom:8px">
+      <div class="row2">
+        <div class="field">
+          <label>Minutes Late</label>
+          <input type="number" id="lateMin" placeholder="e.g. 30" oninput="onInput()" style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:.85rem;width:100%">
+        </div>
+        <div class="field">
+          <label>Working days/month</label>
+          <input type="number" id="workDays" placeholder="22" value="22" oninput="onInput()" style="padding:9px 12px;background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:.85rem;width:100%">
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom deductions -->
+    <div id="customDeducts"></div>
+    <button class="add-deduct-btn" onclick="addCustomDeduct()">+ Add Deduction</button>
+  </div>
+
+  <button class="compute-btn" onclick="compute()">Compute Sahod →</button>
+
+  <!-- RESULTS -->
+  <div class="result-section" id="resultSection">
+    <div style="height:16px"></div>
+
+    <!-- Split cards -->
+    <div class="split-grid" id="splitGrid" style="display:none">
+      <div class="split-card">
+        <div class="split-label">💸 15th (Kinsi)</div>
+        <div class="split-amount" id="kinsi_amt">₱0</div>
+        <div class="split-date">Sweldo ng ika-15</div>
+      </div>
+      <div class="split-card">
+        <div class="split-label">💸 30th (Katapusan)</div>
+        <div class="split-amount" id="katas_amt">₱0</div>
+        <div class="split-date">Sweldo ng ika-30</div>
+      </div>
+    </div>
+
+    <!-- Monthly total -->
+    <div class="result-header">
+      <div class="result-name">💰 Monthly Net Pay</div>
+      <div class="result-amount" id="net_pay">₱0</div>
+      <div class="result-sub" id="net_sub"></div>
+    </div>
+
+    <!-- Full breakdown -->
+    <div class="card">
+      <div class="card-title">📊 Full Breakdown</div>
+      <table class="breakdown-table" id="breakdownTable"></table>
+      <button class="copy-btn" onclick="copyBreakdown()">📋 I-copy ang Breakdown</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- PAGE: INFO -->
+<section id="pg-info" class="page">
+  <div class="card">
+    <div class="card-title">📋 2026 Government Contribution Rates</div>
+    <div style="font-size:.82rem;line-height:1.9;color:var(--muted)">
+      <strong style="color:var(--text)">SSS (2025–2026)</strong><br>
+      Rate: 14% of MSC · Employee share: 4.5%<br>
+      Min: ₱135 (₱3,000 MSC) · Max: ₱900 (₱20,000 MSC)<br><br>
+
+      <strong style="color:var(--text)">PhilHealth (2025)</strong><br>
+      Rate: 5% of basic · Employee share: 2.5%<br>
+      Min: ₱250/month · Max: ₱2,500/month<br><br>
+
+      <strong style="color:var(--text)">Pag-IBIG (HDMF)</strong><br>
+      Employee: 2% of basic (max ₱200/month)<br>
+      Employer: 2% of basic (max ₱200/month)<br><br>
+
+      <strong style="color:var(--text)">Withholding Tax</strong><br>
+      This calculator shows gross-to-net excluding income tax.<br>
+      Tax computation depends on exemptions — consult your HR.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💡 Paano Gamitin</div>
+    <div style="font-size:.82rem;line-height:1.9;color:var(--muted)">
+      1. I-enter ang iyong monthly basic pay<br>
+      2. I-on ang Split kung may 15th at 30th<br>
+      3. Piliin kung saan idededuct ang govt contributions<br>
+      4. I-toggle ang SSS Loan, CA, Late kung meron<br>
+      5. I-click ang <strong style="color:var(--gold)">Compute Sahod</strong><br><br>
+      <strong style="color:var(--text)">Note:</strong> Ang lahat ng data ay nananatili sa iyong device lang. Walang na-upload, walang nire-record.
+    </div>
+  </div>
+</section>
+
+<!-- PAGE: MNEMONICS / BOARD TIPS -->
+<section id="pg-mnemonics" class="page">
+
+  <div class="card">
+    <div class="card-title">GEAS &amp; Laws — Board Exam Mnemonics</div>
+    <div class="tip">Para sa ECE, CE, at ME board exam reviewees. Taglish mnemonics para sa Laws, Obligations, at GEAS subjects.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Modes of Extinguishing Obligations</div>
+    <div class="tip">
+      <strong style="color:#f59e0b;font-size:1.05rem">"PA-LO-RE-ME-CON-NO"</strong><br>
+      <strong>PA</strong>yment · <strong>LO</strong>ss (of the thing due) · <strong>RE</strong>mission · <strong>ME</strong>rger (confusion) · <strong>CON</strong>donation · <strong>NO</strong>vation<br><br>
+      Ang 6 na paraan ng pagpapatigil ng obligasyon ayon sa Civil Code ng Pilipinas. Laging may tanong tungkol dito sa ECE Laws at Regulations exam (RA 9292 context).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ECE Executive Orders — Bottom to Top Reading</div>
+    <div class="tip">
+      <strong style="color:#f59e0b;font-size:1.05rem">"NeNE, IPaCO C PiLaTo"</strong><br>
+      Read <strong>bottom to top</strong> (pinakabago = nasa ibaba):<br><br>
+      <strong>Ne</strong>NE → EO 546 (NTC created) · EO 469 (NITC)<br>
+      <strong>IP</strong>a → EO 468 (E-commerce) · EO 467 (International Satellite)<br>
+      <strong>C</strong>O → EO 436 (CATV policy)<br>
+      <strong>C</strong> → EO 266 (CPE)<br>
+      <strong>Pi</strong> → EO 255 (OPM/DOTC)<br>
+      <strong>La</strong> → EO 205 (CATV operations)<br>
+      <strong>To</strong> → EO 196 (Philippine Satellite) · EO 109 (Local exchange) · EO 59 (Telecom policy)<br><br>
+      Ang NTC (National Telecommunications Commission) ay nilikha ng EO 546 — ang pinaka-importanteng EO para sa ECE board exam.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SMART Objectives</div>
+    <div class="tip">
+      <strong style="color:#f59e0b;font-size:1.05rem">S·M·A·R·T</strong><br>
+      <strong>S</strong>pecific · <strong>M</strong>easurable · <strong>A</strong>chievable · <strong>R</strong>elevant · <strong>T</strong>ime-framed<br><br>
+      Ginagamit sa Engineering Management at Industrial Engineering subjects. Sa board exam context: pag tinanong ang "characteristics of a good objective" — SMART ang sagot.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">7 Functions of Marketing</div>
+    <div class="tip">
+      <strong style="color:#f59e0b;font-size:1.05rem">"Did Fred Make Purple Pecan Pie Saturday"</strong><br>
+      <strong>D</strong>istribution · <strong>F</strong>inancing · <strong>M</strong>arketing Information · <strong>P</strong>roduct/Service Management · <strong>P</strong>ricing · <strong>P</strong>romotion · <strong>S</strong>elling<br><br>
+      Para sa Engineering Management at GEAS subjects. Ang 7 functions ng marketing ay laging lumalabas sa board exam kasama ang mga tanong tungkol sa marketing mix (4Ps).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Extinguishing Obligations — Detailed</div>
+    <div class="tip">
+      <strong>Payment</strong> — ang pagtupad ng obligasyon (pagbabayad, pagbibigay, paggawa)<br>
+      <strong>Loss</strong> — kung ang bagay ay nawala o nasira nang walang kasalanan ang may-utang<br>
+      <strong>Remission</strong> — ang pagpapatawad ng nagpapautang (condonation)<br>
+      <strong>Merger/Confusion</strong> — kung ang nagpapautang at may-utang ay naging iisa<br>
+      <strong>Compensation</strong> — offsetting ng mutual debts (hindi kasama sa PA-LO-RE-ME-CON-NO pero importanteng alam)<br>
+      <strong>Novation</strong> — pagpapalit ng lumang obligasyon ng bago
+    </div>
+  </div>
+
+</section>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn on" onclick="goPage('sahod')">
+    <span class="nav-icon">💰</span>Sahod
+  </button>
+  <button class="nav-btn" onclick="goPage('info')">
+    <span class="nav-icon">📋</span>Info
+  </button>
+  <button class="nav-btn" onclick="goPage('mnemonics')">
+    <span class="nav-icon">📚</span>Tips
+  </button>
+  <a href="/" style="flex:1;text-decoration:none">
+    <button class="nav-btn" style="width:100%">
+      <span class="nav-icon">🏠</span>Home
+    </button>
+  </a>
+</nav>
+
+<div class="toast" id="toast">📋 Kinopya!</div>
+
+<script>
+'use strict';
+
+// LANG
+let LANG = 'tl';
+function selLang(b){ document.querySelectorAll('.lang-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); LANG=b.dataset.lang; }
+function confirmLang(){ localStorage.setItem('pinastools_lang',LANG); document.getElementById('langModal').classList.add('hidden'); }
+(function(){ const s=localStorage.getItem('pinastools_lang'); if(s){LANG=s;document.getElementById('langModal').classList.add('hidden');} })();
+
+// NAV
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+
+// TOGGLE LOANS
+function toggleLoan(type){
+  const map={sss:'sssLoanWrap',pi:'piLoanWrap',ca:'caWrap',late:'lateWrap'};
+  const chk={sss:'hasSSSLoan',pi:'hasPILoan',ca:'hasCA',late:'hasLate'};
+  const el = document.getElementById(map[type]);
+  el.style.display = document.getElementById(chk[type]).checked ? 'block' : 'none';
+  onInput();
+}
+
+// SPLIT TOGGLE
+document.getElementById('doSplit').addEventListener('change', function(){
+  document.getElementById('splitOptions').style.display = this.checked ? 'block' : 'none';
+  onInput();
+});
+document.getElementById('splitType').addEventListener('change', function(){
+  document.getElementById('fixedKinsiWrap').style.display = this.value==='fixed' ? 'block' : 'none';
+});
+
+// CUSTOM DEDUCTIONS
+let customCount = 0;
+function addCustomDeduct(){
+  customCount++;
+  const id = 'custom_'+customCount;
+  const wrap = document.createElement('div');
+  wrap.className='deduct-row';
+  wrap.id='row_'+id;
+  wrap.innerHTML=`
+    <input type="text" placeholder="Label (e.g. Uniform)" id="lbl_${id}">
+    <div class="peso-wrap"><input type="number" placeholder="Amount" id="amt_${id}" oninput="onInput()"></div>
+    <button class="deduct-rm" onclick="document.getElementById('row_${id}').remove();onInput()">✕</button>`;
+  document.getElementById('customDeducts').appendChild(wrap);
+}
+
+// SSS TABLE (2025 MSC-based, employee share 4.5%)
+function calcSSS(basic){
+  const msc = Math.min(Math.max(Math.ceil(basic/500)*500, 4000), 30000);
+  return Math.round(msc * 0.045);
+}
+// PhilHealth (2025: 5%, employee 2.5%, min 250, max 2500)
+function calcPhilHealth(basic){
+  return Math.min(Math.max(basic * 0.025, 250), 2500);
+}
+
+function onInput(){
+  const basic = parseFloat(document.getElementById('basic').value)||0;
+  const sss = calcSSS(basic);
+  const phi = calcPhilHealth(basic);
+  document.getElementById('sss_display').innerHTML = `SSS: <strong style="color:var(--text)">₱${fmt(sss)}</strong> <span style="color:var(--muted);font-size:.7rem">(employee share 4.5%)</span>`;
+  document.getElementById('phi_display').innerHTML = `PhilHealth: <strong style="color:var(--text)">₱${fmt(phi)}</strong> <span style="color:var(--muted);font-size:.7rem">(2.5% of basic)</span>`;
+}
+
+function fmt(n){ return n.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function peso(n){ return '₱'+fmt(n); }
+
+function compute(){
+  const basic    = parseFloat(document.getElementById('basic').value)||0;
+  const allow    = parseFloat(document.getElementById('allowance').value)||0;
+  const doSplit  = document.getElementById('doSplit').checked;
+  const govtOn   = document.getElementById('govtOn').value;
+  const splitType= document.getElementById('splitType').value;
+
+  const sss  = calcSSS(basic);
+  const phi  = calcPhilHealth(basic);
+  const pagibig = 200;
+  const govtTotal = sss + phi + pagibig;
+
+  // loans & other deductions
+  const sssLoan = document.getElementById('hasSSSLoan').checked ? (parseFloat(document.getElementById('sssLoan').value)||0) : 0;
+  const piLoan  = document.getElementById('hasPILoan').checked  ? (parseFloat(document.getElementById('piLoan').value)||0)  : 0;
+  const ca      = document.getElementById('hasCA').checked      ? (parseFloat(document.getElementById('caAmount').value)||0) : 0;
+  const caOn    = document.getElementById('caOn').value;
+
+  // late deduction
+  let lateDeduct = 0;
+  if(document.getElementById('hasLate').checked){
+    const mins     = parseFloat(document.getElementById('lateMin').value)||0;
+    const workDays = parseFloat(document.getElementById('workDays').value)||22;
+    const hourlyRate = basic / workDays / 8;
+    lateDeduct = (mins/60) * hourlyRate;
+  }
+
+  // custom deductions
+  let customTotal = 0;
+  const customRows = [];
+  document.querySelectorAll('#customDeducts .deduct-row').forEach(row=>{
+    const id = row.id.replace('row_','');
+    const lbl = document.getElementById('lbl_'+id)?.value || 'Deduction';
+    const amt = parseFloat(document.getElementById('amt_'+id)?.value)||0;
+    customTotal += amt;
+    if(amt>0) customRows.push({lbl,amt});
+  });
+
+  const grossMonthly = basic + allow;
+  const netMonthly   = grossMonthly - govtTotal - sssLoan - piLoan - ca - lateDeduct - customTotal;
+
+  // Build breakdown
+  const rows = [];
+  rows.push({label:'Basic Pay', amount:basic, cls:'earn'});
+  if(allow>0) rows.push({label:'Allowance (non-taxable)', amount:allow, cls:'earn'});
+  rows.push({label:'Gross Pay', amount:grossMonthly, cls:'earn total-row'});
+  rows.push({label:'SSS (employee 4.5%)', amount:-sss, cls:'deduct'});
+  rows.push({label:'PhilHealth (2.5%)', amount:-phi, cls:'deduct'});
+  rows.push({label:'Pag-IBIG', amount:-pagibig, cls:'deduct'});
+  if(sssLoan>0) rows.push({label:'SSS Loan', amount:-sssLoan, cls:'deduct'});
+  if(piLoan>0)  rows.push({label:'Pag-IBIG Loan', amount:-piLoan, cls:'deduct'});
+  if(ca>0)      rows.push({label:'Cash Advance', amount:-ca, cls:'deduct'});
+  if(lateDeduct>0) rows.push({label:'Late/Undertime', amount:-lateDeduct, cls:'deduct'});
+  customRows.forEach(r=> rows.push({label:r.lbl, amount:-r.amt, cls:'deduct'}));
+  rows.push({label:'NET PAY', amount:netMonthly, cls:'total-row'});
+
+  const tbl = document.getElementById('breakdownTable');
+  tbl.innerHTML = rows.map(r=>`
+    <tr class="${r.cls||''}">
+      <td class="label">${r.label}</td>
+      <td class="amount" style="${r.amount<0?'color:var(--red)':r.label==='NET PAY'?'color:var(--gold)':'color:var(--green)'}">${peso(Math.abs(r.amount))}</td>
+    </tr>`).join('');
+
+  document.getElementById('net_pay').textContent = peso(netMonthly);
+  document.getElementById('net_sub').textContent = `Gross: ${peso(grossMonthly)} · Total Deductions: ${peso(grossMonthly - netMonthly)}`;
+
+  // Split
+  const splitGrid = document.getElementById('splitGrid');
+  if(doSplit){
+    let kinsi = 0, katas = 0;
+    if(splitType==='5050'){ kinsi=netMonthly/2; katas=netMonthly/2; }
+    else if(splitType==='4060'){ kinsi=netMonthly*0.4; katas=netMonthly*0.6; }
+    else { kinsi=parseFloat(document.getElementById('fixedKinsi').value)||0; katas=netMonthly-kinsi; }
+
+    // Govt deductions timing
+    let kinsiDeduct=0, katasDeduct=0;
+    if(govtOn==='30th') katasDeduct=govtTotal;
+    else if(govtOn==='15th') kinsiDeduct=govtTotal;
+    else { kinsiDeduct=govtTotal/2; katasDeduct=govtTotal/2; }
+
+    // CA timing
+    let kinsiCA=0, katasCA=0;
+    if(ca>0){ if(caOn==='15th') kinsiCA=ca; else if(caOn==='30th') katasCA=ca; else{kinsiCA=ca/2;katasCA=ca/2;} }
+
+    document.getElementById('kinsi_amt').textContent = peso(kinsi);
+    document.getElementById('katas_amt').textContent = peso(katas);
+    splitGrid.style.display='grid';
+  } else {
+    splitGrid.style.display='none';
+  }
+
+  document.getElementById('resultSection').style.display='block';
+  document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
+}
+
+// COPY
+let copyText = '';
+function copyBreakdown(){
+  const basic = parseFloat(document.getElementById('basic').value)||0;
+  const net   = document.getElementById('net_pay').textContent;
+  const rows  = [...document.querySelectorAll('#breakdownTable tr')];
+  const txt   = '💰 SAHOD BREAKDOWN\n' +
+    rows.map(r=>{ const cells=[...r.querySelectorAll('td')]; return cells.map(c=>c.textContent.trim()).join('\t'); }).join('\n') +
+    '\n\nComputed via PinasTools.com';
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(showToast); }
+  else { const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast(); }
+}
+function showToast(){ const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000); }
+
+// INIT
+document.addEventListener('DOMContentLoaded', onInput);
+</script>
+</body>
+</html>
