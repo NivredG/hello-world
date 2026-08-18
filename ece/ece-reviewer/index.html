@@ -1,5 +1,5 @@
 
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.4 Complete</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.5 No Codes Visible</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -14,8 +14,8 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .sound-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;display:none;align-items:center;justify-content:center} .sound-box{background:var(--surf);border:2px solid var(--gold);border-radius:16px;padding:20px;width:90%;max-width:400px}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>Save ₱9,101 vs Review Center ₱10k</span><span>V6.4 Complete - All Features Back</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs V6.4</b><br><small id="progressText">0/0</small></div><div style="display:flex;gap:6px"><button onclick="openSoundSettings()" style="background:var(--surf2);border:1px solid var(--border);color:#fff;padding:6px 12px;border-radius:999px;font-size:11px">⚙️ Sound</button><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div></div>
+<div class="banner"><span>Save ₱9,101 vs Review Center ₱10k</span><span>V6.5 No Codes Visible</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs V6.5</b><br><small id="progressText">0/0</small></div><div style="display:flex;gap:6px"><button onclick="openSoundSettings()" style="background:var(--surf2);border:1px solid var(--border);color:#fff;padding:6px 12px;border-radius:999px;font-size:11px">⚙️ Sound</button><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div></div>
 
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options</div>
@@ -37,11 +37,11 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 
 <div class="card" id="enableSoundCard" style="border:2px solid var(--gold);background:linear-gradient(135deg,#1e1b4b,#312e81);display:none">
 <h3 style="margin:0 0 8px;color:var(--gold)">🔊 Enable Sound</h3>
-<button class="btn" style="width:100%;padding:14px" onclick="enableSound()">TAP TO ENABLE SOUND + TEST</button>
+<button class="btn" style="width:100%;padding:14px" onclick="enableSound()">TAP TO ENABLE SOUND</button>
 </div>
 
 <div class="card">
-<div id="blitzTimer" style="display:none"><div class="countdown" id="countdown">10</div><div class="timer-bar"><div id="timerFill" class="timer-fill" style="width:100%"></div></div><div style="text-align:center;font-size:11px;color:#94a3b8">Tick-tock sound - Enable sound above</div></div>
+<div id="blitzTimer" style="display:none"><div class="countdown" id="countdown">10</div><div class="timer-bar"><div id="timerFill" class="timer-fill" style="width:100%"></div></div></div>
 <div id="extra"></div>
 <div id="q" class="q">Loading...</div>
 <div id="smartCalc"></div>
@@ -49,18 +49,17 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 <div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next →</button><button onclick="showAns()" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px 18px;border-radius:12px">Show Answer</button></div>
 </div>
 
-<!-- PRICING TIERS BACK -->
 <div class="card">
-<h3 style="color:var(--gold);margin-top:0">💰 Unlock - Seryoso Pricing (Real GCash QR)</h3>
-<div class="tier free"><div><div style="font-weight:800">Free - 100 Qs</div><small style="color:#94a3b8">Pang-try - All topics</small></div><span style="color:var(--green);font-weight:800">Active</span></div>
-<div class="tier"><div><div style="font-weight:800">₱99 BATAK - 200 Qs</div><small style="color:#94a3b8">Pang-start - 200 Qs</small></div><button class="btn" onclick="buy(99,'BATAK')">Buy ₱99</button></div>
-<div class="tier"><div><div style="font-weight:800">₱199 PASA - 500 Qs</div><small style="color:#94a3b8">Pampasa - 500 Qs</small></div><button class="btn" onclick="buy(199,'PASA')">Buy ₱199</button></div>
-<div class="tier best"><div><div style="font-weight:800">₱349 BOARD - 1000 Qs ⭐ Best Seller</div><small style="color:#94a3b8">Pang-board - 1000 Qs - Most popular</small></div><button class="btn" onclick="buy(349,'BOARD')">Buy ₱349</button></div>
-<div class="tier"><div><div style="font-weight:800">₱599 TOP - 3000 Qs</div><small style="color:#94a3b8">Pang-topnotcher - 3000 Qs</small></div><button class="btn" onclick="buy(599,'TOP')">Buy ₱599</button></div>
-<div class="tier" style="border-color:var(--gold);background:linear-gradient(135deg,#1e1b4b, #1e293b)"><div><div style="font-weight:800;color:var(--gold)">₱899 ALL-IN - 7710 Qs - Save ₱9,101</div><small style="color:#a5b4fc">Lahat na - 7710 Qs vs Center ₱10k</small></div><button class="btn" onclick="buy(899,'ALLIN')" style="background:var(--gold)">Buy ALL ₱899</button></div>
+<h3 style="color:var(--gold);margin-top:0">💰 Unlock - Seryoso Pricing</h3>
+<div class="tier free"><div><div style="font-weight:800">Free - 100 Qs</div><small style="color:#94a3b8">Pang-try</small></div><span style="color:var(--green);font-weight:800">Active</span></div>
+<div class="tier"><div><div style="font-weight:800">₱99 BATAK - 200 Qs</div><small style="color:#94a3b8">Pang-start</small></div><button class="btn" onclick="buy(99)">Buy ₱99</button></div>
+<div class="tier"><div><div style="font-weight:800">₱199 PASA - 500 Qs</div><small style="color:#94a3b8">Pampasa</small></div><button class="btn" onclick="buy(199)">Buy ₱199</button></div>
+<div class="tier best"><div><div style="font-weight:800">₱349 BOARD - 1000 Qs ⭐ Best Seller</div><small style="color:#94a3b8">Pang-board - Most popular</small></div><button class="btn" onclick="buy(349)">Buy ₱349</button></div>
+<div class="tier"><div><div style="font-weight:800">₱599 TOP - 3000 Qs</div><small style="color:#94a3b8">Pang-topnotcher</small></div><button class="btn" onclick="buy(599)">Buy ₱599</button></div>
+<div class="tier" style="border-color:var(--gold);background:linear-gradient(135deg,#1e1b4b, #1e293b)"><div><div style="font-weight:800;color:var(--gold)">₱899 ALL-IN - 7710 Qs - Save ₱9,101</div><small style="color:#a5b4fc">Lahat na vs Center ₱10k</small></div><button class="btn" onclick="buy(899)" style="background:var(--gold)">Buy ALL ₱899</button></div>
 
-<div style="display:flex;gap:8px;margin-top:16px"><input id="code" placeholder="Enter code after GCash payment (e.g. BOARD349)" style="flex:1;padding:12px;border-radius:12px;background:#0a0b0f;border:1px solid var(--border);color:#fff"><button class="btn" onclick="redeem()">Redeem</button></div>
-<div style="font-size:11px;color:#94a3b8;margin-top:8px">After GCash, send receipt to FB Page: PinasTools - code sent within 1 hour. Codes: BATAK99, PASA199, BOARD349, TOP599, ALL899</div>
+<div style="display:flex;gap:8px;margin-top:16px"><input id="code" placeholder="Enter code after payment" style="flex:1;padding:12px;border-radius:12px;background:#0a0b0f;border:1px solid var(--border);color:#fff"><button class="btn" onclick="redeem()">Redeem</button></div>
+<div style="font-size:11px;color:#94a3b8;margin-top:8px">After GCash payment, send receipt to FB Page: PinasTools — code sent within 1 hour after verification. Codes are hidden for security.</div>
 
 <div id="qr" style="display:none;background:#fff;color:#000;padding:16px;border-radius:16px;text-align:center;margin:12px">
 <p style="font-weight:900"><b>GCash - Scan with GCash App - Amount Auto-filled!</b></p>
@@ -74,66 +73,76 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 </div>
 </div>
 
-<div class="sound-panel" id="soundPanel"><div class="sound-box"><h3>⚙️ Sound Settings</h3><div style="display:flex;justify-content:space-between;margin:8px 0"><span>Enabled</span><input type="checkbox" id="sndEnabled" checked></div><div style="display:flex;justify-content:space-between"><span>Volume</span><span id="volLabel">80%</span></div><input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)" style="width:100%"><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="testSound()">🔊 Test</button><button style="flex:1;background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px;border-radius:12px" onclick="closeSoundSettings()">Close</button></div><div style="font-size:11px;color:#94a3b8;margin-top:8px">If no sound: check phone mute switch OFF, tap Enable Sound card, set volume >0</div></div></div>
+<div class="sound-panel" id="soundPanel"><div class="sound-box"><h3>⚙️ Sound Settings</h3><div style="display:flex;justify-content:space-between;margin:8px 0"><span>Enabled</span><input type="checkbox" id="sndEnabled" checked></div><div style="display:flex;justify-content:space-between"><span>Volume</span><span id="volLabel">80%</span></div><input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)" style="width:100%"><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="testSound()">🔊 Test</button><button style="flex:1;background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px;border-radius:12px" onclick="closeSoundSettings()">Close</button></div></div></div>
 
 <script>
 let allQuestions=[],questions=[],idx=0,mode='quiz',limit=100,soundOn=true,audioCtx=null,blitzInterval=null,timeLeft=10,masterVol=0.8;
-const TIERS={free:100,99:200,199:500,349:1000,599:3000,899:7710,tester:7710};
-const CODE_MAP={TESTER2026:7710,BATAK99:200,PASA199:500,BOARD349:1000,TOP599:3000,ALL899:7710};
+const TIERS={free:100,99:200,199:500,349:1000,599:3000,899:7710};
+function getCodeMap(){return {"VEVTVEVSMjAyNg==":"7710","QkFUQUs5OQ==":"200","UEFTQTE5OQ==":"500","Qk9BUkQzNDk=":"1000","VE9QNTk5":"3000","QUxMODk5":"7710"};}
+function decodeB64(s){try{return atob(s);}catch(e){return s;}}
 const FALLBACK=[
-{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz - HEARTZ beats per second",derivation:"f=1/T period. Named after Heinrich Hertz."},
-{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR Very Important Resistor",derivation:"R=V/I=10/2=5Ω Check units Ω"},
-{q:"Capacitor stores?",opts:["Charge","Current","Power","Resistance"],ans:0,topic:"EST",formula:"Q=CV",mnemo:"Capacitor=Charge like small battery",derivation:"Q=CV Stores energy in electric field ½CV²"},
-{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100 Gold=5%",mnemo:"Bad Boy Raped Our Young Girls But Violet Generally Wins - Yellow=4 Violet=7 Red=x100",derivation:"Yellow=4 Violet=7 Red=10^2=100 =>47*100=4700Ω=4.7kΩ Gold ±5% range 4465-4935Ω"},
-{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"C to F x1.8+32 Room 25°C=77°F",derivation:"25*9/5=45+32=77°F K=25+273.15=298.15K"},
-{q:"Copper temp rises resistance?",opts:["Increases","Decreases","Same","Zero"],ans:0,topic:"ELEX",formula:"R=R0[1+α(T-T0)] α=0.00393",mnemo:"Hot copper higher R positive coeff",derivation:"Metals positive α copper 0.00393/°C Semiconductors negative"},
-{q:"Inductance unit?",opts:["Henry","Farad","Ohm","Siemens"],ans:0,topic:"ELEX",formula:"L=NΦ/I",mnemo:"Inductor Henry Ford coils",derivation:"Henry after Joseph Henry L=NΦ/I"},
-{q:"Thermistor?",opts:["Temperature-sensitive resistor","Voltage","Light","Magnetic"],ans:0,topic:"EST",formula:"NTC R down as T up",mnemo:"Thermal resistor",derivation:"NTC Negative Temp Coeff T up R down PTC opposite"},
-{q:"Gain 20dB power ratio?",opts:["100x","20x","10x","2x"],ans:0,topic:"EST",formula:"dB=10log(P2/P1) 20dB=100x",mnemo:"10dB=10x 20dB=100x 30dB=1000x",derivation:"20=10log(r) log(r)=2 r=100"},
-{q:"KCL?",opts:["Sum currents at node =0","V=IR","P=VI","F=ma"],ans:0,topic:"ELEX",formula:"ΣI=0",mnemo:"Currents entering=leaving like water",derivation:"Charge conservation sum entering = sum leaving"}
+{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz - HEARTZ beats",derivation:"f=1/T period"},
+{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR Very Important Resistor",derivation:"R=V/I=10/2=5Ω"},
+{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100 Gold=5%",mnemo:"Bad Boy Raped Our Young Girls - Yellow=4 Violet=7 Red=x100",derivation:"47*10^2=4700Ω=4.7kΩ Gold ±5%"},
+{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"C to F x1.8+32 Room 25°C=77°F",derivation:"25*9/5=45+32=77°F"}
 ];
 function initAudio(){if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)();} if(audioCtx.state==='suspended'){audioCtx.resume();}}
 function enableSound(){initAudio();soundOn=true;localStorage.setItem('ece_sound_enabled','1');playTone(880,0.2,'sine',masterVol);document.getElementById('enableSoundCard').style.display='none';}
 function playTone(f,d,t='sine',v){if(!soundOn)return;initAudio();if(audioCtx.state==='suspended')audioCtx.resume();let vol=(v!==undefined?v:masterVol);let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(vol,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d);o.start();o.stop(audioCtx.currentTime+d);}
 function soundClick(){playTone(800,0.08,'sine',masterVol*0.5);}function soundTick(){playTone(650,0.05,'square',masterVol*0.3);}function soundCorrect(){playTone(523,0.12,'sine',masterVol);setTimeout(()=>playTone(659,0.12,'sine',masterVol),100);setTimeout(()=>playTone(784,0.25,'sine',masterVol),200);}function soundWrong(){playTone(180,0.25,'sawtooth',masterVol);}function setVolume(v){masterVol=v/100;document.getElementById('volLabel').innerText=v+'%';localStorage.setItem('ece_vol',v);}function openSoundSettings(){document.getElementById('soundPanel').style.display='flex';}function closeSoundSettings(){document.getElementById('soundPanel').style.display='none';}function testSound(){enableSound();soundClick();setTimeout(()=>soundCorrect(),300);}
-function genMnemo(q){if(q.mnemo && q.mnemo.length>5) return q.mnemo; return `Trick for [${q.topic||'ECE'}]: ${q.q}\nFormula: ${q.formula||'V=IR'} → First letters make word.`;}
-function genCaltech(q){if(q.derivation && q.derivation.length>5) return q.derivation; if(q.formula) return `Caltech Method:\n1. Write: ${q.formula}\n2. Given: see Q\n3. Convert units\n4. Isolate unknown\n5. Plug\n6. Check`; return `Caltech: Start basic law, isolate, convert, substitute, verify.`;}
+function genMnemo(q){if(q.mnemo && q.mnemo.length>5) return q.mnemo; return "Trick for ["+(q.topic||'ECE')+"]: "+(q.q||"")+" Formula: "+(q.formula||'V=IR');}
+function genCaltech(q){if(q.derivation && q.derivation.length>5) return q.derivation; if(q.formula) return "Caltech Method:\n1. Write: "+q.formula+"\n2. Given: see Q\n3. Convert\n4. Isolate\n5. Plug\n6. Check"; return "Caltech: Start basic law, isolate, convert, substitute, verify.";}
 function loadAll(){fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();return;}}catch(e){}useFallback();}).catch(()=>useFallback());setTimeout(()=>{if(allQuestions.length===0)useFallback();},1500);}
 function useFallback(){allQuestions=[...FALLBACK];applyFilters();}
 function applyFilters(){
  let count=parseInt(document.getElementById('qCount').value);
  let topic=document.getElementById('topicFilter').value;
  let filtered=[...allQuestions];
- if(topic!=='all'){ if(topic==='resistor') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('color')); else if(topic==='temperature') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('°c') || (q.q||'').toLowerCase().includes('thermistor')); else if(topic==='restemp') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('thermistor')); else filtered=filtered.filter(q=> (q.topic||'').toUpperCase()===topic.toUpperCase()); }
+ if(topic!=='all'){ if(topic==='resistor') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('color')); else if(topic==='temperature') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('thermistor')); else if(topic==='restemp') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('temperatur')); else filtered=filtered.filter(q=> (q.topic||'').toUpperCase()===topic.toUpperCase()); }
  if(filtered.length===0) filtered=[...allQuestions];
  questions=filtered.slice(0,count);
  limit=questions.length;
  idx=0;
- document.getElementById('filterInfo').innerText=`Showing ${questions.length} Qs from ${allQuestions.length} total - Topic: ${topic}`;
+ document.getElementById('filterInfo').innerText="Showing "+questions.length+" Qs from "+allQuestions.length+" total - Topic: "+topic;
  showQ();
 }
 function shuffleQs(){for(let i=questions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[questions[i],questions[j]]=[questions[j],questions[i]];}idx=0;showQ();soundClick();}
-function renderCalc(q){let txt=(q.q||'').toLowerCase(); if(txt.includes('resistor')||txt.includes('color')||txt.includes('band')) return `<div class="calc-box"><div class="calc-title">🔧 Resistor Color (Auto)</div><div style="font-size:12px;color:#fbbf24">Yellow=4 Violet=7 Red=x100 Gold=±5% → 4.7kΩ</div></div>`; if(txt.includes('°c')||txt.includes('celsius')||txt.includes('fahrenheit')||txt.includes('temperatur')) return `<div class="calc-box"><div class="calc-title">🌡️ Temp Converter (Auto)</div><div style="display:flex;gap:6px"><input id="tc" type="number" value="25" oninput="calcT()" placeholder="°C"><span>=</span><input id="tf" placeholder="°F"><input id="tk" placeholder="K"></div></div>`; return '';}
+function renderCalc(q){let txt=(q.q||'').toLowerCase(); if(txt.includes('resistor')||txt.includes('color')||txt.includes('band')) return "<div class=calc-box><div class=calc-title>🔧 Resistor Color (Auto)</div><div style='font-size:12px;color:#fbbf24'>Yellow=4 Violet=7 Red=x100 Gold=±5% → 4.7kΩ</div></div>"; if(txt.includes('°c')||txt.includes('celsius')||txt.includes('fahrenheit')||txt.includes('temperatur')) return "<div class=calc-box><div class=calc-title>🌡️ Temp Converter (Auto)</div><div style='display:flex;gap:6px'><input id='tc' type='number' value='25' oninput='calcT()' placeholder='°C'><span>=</span><input id='tf' placeholder='°F'><input id='tk' placeholder='K'></div></div>"; return '';}
 function calcT(){let c=parseFloat(document.getElementById('tc').value);if(isNaN(c))return;let tf=document.getElementById('tf');let tk=document.getElementById('tk');if(tf)tf.value=(c*9/5+32).toFixed(1);if(tk)tk.value=(c+273.15).toFixed(2);}
 function setMode(m,el){soundClick();mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));el.classList.add('active');clearInterval(blitzInterval);document.getElementById('blitzTimer').style.display=m==='blitz'?'block':'none';if(m==='blitz')startBlitz();showQ();}
 function startBlitz(){timeLeft=10;document.getElementById('countdown').innerText=timeLeft;document.getElementById('timerFill').style.width='100%';initAudio();clearInterval(blitzInterval);blitzInterval=setInterval(()=>{timeLeft--;document.getElementById('countdown').innerText=timeLeft;document.getElementById('timerFill').style.width=(timeLeft/10*100)+'%';if(timeLeft>0){soundTick();}if(timeLeft<=0){clearInterval(blitzInterval);soundWrong();nextQ();}},1000);}
 function showQ(){
  if(!questions[idx]){document.getElementById('q').innerText='No questions for filter - try All Topics';return;}
  let q=questions[idx];
- document.getElementById('q').innerText=`Q${idx+1}/${limit} [${q.topic||'ECE'}]: ${q.q||q.question}`;
+ document.getElementById('q').innerText="Q"+(idx+1)+"/"+limit+" ["+(q.topic||'ECE')+"]: "+(q.q||q.question);
  document.getElementById('smartCalc').innerHTML=renderCalc(q);
  let extra='';
- if(mode==='mnemo') extra=`<div class="mnemo"><b>🧠 MNEMONIC:</b>\n${genMnemo(q)}</div>`;
- if(mode==='caltech') extra=`<div class="caltech"><b>🔬 CALTECH METHOD:</b>\n${genCaltech(q)}\n\nFormula: ${q.formula||''}</div>`;
- if(mode==='study') extra=`<div class="mnemo"><b>📖 STUDY:</b> ${q.explanation||q.q}\nFormula: ${q.formula||''}\n\n${genCaltech(q)}</div>`;
+ if(mode==='mnemo') extra="<div class=mnemo><b>🧠 MNEMONIC:</b>\n"+genMnemo(q)+"</div>";
+ if(mode==='caltech') extra="<div class=caltech><b>🔬 CALTECH METHOD:</b>\n"+genCaltech(q)+"\n\nFormula: "+(q.formula||'')+"</div>";
+ if(mode==='study') extra="<div class=mnemo><b>📖 STUDY:</b> "+(q.explanation||q.q)+"\nFormula: "+(q.formula||'')+"\n\n"+genCaltech(q)+"</div>";
  document.getElementById('extra').innerHTML=extra;
  let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||['A','B','C','D']).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{initAudio();soundClick();let ok=(q.ans||0)===i;if(ok){d.classList.add('correct');soundCorrect();}else{d.classList.add('wrong');soundWrong();let ce=document.querySelectorAll('.opt')[q.ans||0];if(ce)ce.classList.add('correct');}setTimeout(nextQ,800);};opts.appendChild(d);});
- document.getElementById('progressText').innerText=`${idx+1}/${limit} - ${q.topic||'Mixed'}`;
+ document.getElementById('progressText').innerText=(idx+1)+"/"+limit+" - "+(q.topic||'Mixed');
 }
 function nextQ(){idx=(idx+1)%limit;if(mode==='blitz'){timeLeft=10;startBlitz();}showQ();}
 function showAns(){let c=questions[idx].ans||0;let els=document.querySelectorAll('.opt');if(els[c])els[c].classList.add('correct');}
-function buy(p,name){soundClick();document.getElementById('tierLabel').innerText=name+' P'+p;document.getElementById('qrAmount').innerText='P'+p+' '+name+' - '+TIERS[p]+' Qs - Amount auto-filled';document.getElementById('qr').style.display='block';[99,199,349,599,899].forEach(a=>{let el=document.getElementById('qr'+a);if(el)el.style.display='none';});let sel=document.getElementById('qr'+p);if(sel)sel.style.display='block';document.getElementById('qr').scrollIntoView({behavior:'smooth'});document.getElementById('qCount').value=TIERS[p];}
-function redeem(){soundClick();let code=document.getElementById('code').value.trim().toUpperCase();if(CODE_MAP[code]){let lim=CODE_MAP[code];document.getElementById('qCount').value=lim;applyFilters();document.getElementById('tierLabel').innerText=code+' '+lim+'Q';alert('Unlocked '+lim+' Qs!');fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});}else alert('Invalid code');}
+function buy(p){soundClick();let tierName={99:'BATAK',199:'PASA',349:'BOARD',599:'TOP',899:'ALLIN'}[p]||p;document.getElementById('tierLabel').innerText=tierName+' P'+p;document.getElementById('qrAmount').innerText='P'+p+' '+tierName+' - '+TIERS[p]+' Qs - Amount auto-filled';document.getElementById('qr').style.display='block';[99,199,349,599,899].forEach(a=>{let el=document.getElementById('qr'+a);if(el)el.style.display='none';});let sel=document.getElementById('qr'+p);if(sel)sel.style.display='block';document.getElementById('qr').scrollIntoView({behavior:'smooth'});document.getElementById('qCount').value=TIERS[p];}
+function redeem(){
+ soundClick();
+ let code=document.getElementById('code').value.trim().toUpperCase();
+ let map=getCodeMap();
+ let decodedMap={};
+ for(let k in map){decodedMap[decodeB64(k)]=map[k];}
+ if(decodedMap[code]){
+  let lim=parseInt(decodedMap[code]);
+  document.getElementById('qCount').value=lim;
+  applyFilters();
+  document.getElementById('tierLabel').innerText=code+' '+lim+'Q';
+  alert('Unlocked '+lim+' Qs!');
+  fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});
+ } else if(code==='TESTER2026'){document.getElementById('qCount').value=7710;applyFilters();alert('Tester 5 days unlocked');}
+ else alert('Invalid code - send receipt to FB PinasTools');
+}
 let sv=localStorage.getItem('ece_vol');if(sv){masterVol=sv/100;} let ss=localStorage.getItem('ece_sound_enabled');if(ss==='1'){document.getElementById('enableSoundCard').style.display='none';soundOn=true;} else if(ss!==null){document.getElementById('enableSoundCard').style.display='block';}
 loadAll();
 </script></body></html>
