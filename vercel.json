@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": true,
   "rewrites": [
     { "source": "/ece/ece-reviewer", "destination": "/ece/ece-reviewer/index.html" },
     { "source": "/ece/resistor", "destination": "/ece/resistor/index.html" },
