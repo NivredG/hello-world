@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.12 With Official Links Stable</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.11 Final Stable</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -11,9 +11,9 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0} .ctrl{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:10px} .ctrl label{font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;font-weight:800}
 .tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}.tier.best{border-color:var(--gold)} .tier.free{border-color:var(--green)}
 </style></head><body>
-<a class="home" href="/">← PinasTools Home</a><div style="display:flex;gap:8px;padding:0 12px"><a href="https://pinastools.com" target="_blank" style="color:var(--gold);font-size:12px;text-decoration:none;border:1px solid var(--gold);padding:4px 10px;border-radius:999px">🌐 PinasTools.com</a><a href="https://facebook.com/PinasTools" target="_blank" style="color:#60a5fa;font-size:12px;text-decoration:none;border:1px solid #3b82f6;padding:4px 10px;border-radius:999px">📘 FB: PinasTools</a></div>
-<div class="banner"><span>V6.12 With Official Links Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.12 With Official Links</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<a class="home" href="/">← PinasTools Home</a>
+<div class="banner"><span>V6.11 Final Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.11 Final</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options - FIXED</div>
 <div class="controls">
@@ -149,15 +149,4 @@ function buy(p){document.getElementById('qr').style.display='block';[99,199,349,
 function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();let map=getCodeMap();let dec={};for(let k in map){dec[decodeB64(k)]=map[k];} if(dec[code]){let lim=parseInt(dec[code]);unlockedLimit=lim;localStorage.setItem('unlockedLimit',lim);updateQCountOptionsSafe();document.getElementById('qCount').value=lim;selectedCount=lim;applyFilters();alert('Unlocked '+lim); fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});} else alert('Invalid');}
 let savedLim=localStorage.getItem('unlockedLimit');if(savedLim){unlockedLimit=parseInt(savedLim);}
 loadAll();
-</script>
-<div class="card" style="text-align:center;background:linear-gradient(135deg,#0f172a,#1e1b4b);border:2px solid var(--gold)">
-<h3 style="color:var(--gold);margin:0 0 8px">🌐 PinasTools Official Links</h3>
-<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0">
-<a href="https://pinastools.com" target="_blank" style="background:var(--gold);color:#000;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">Visit PinasTools.com</a>
-<a href="https://facebook.com/PinasTools" target="_blank" style="background:#1877f2;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">📘 FB Page: PinasTools</a>
-<a href="https://m.me/PinasTools" target="_blank" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">💬 Messenger: Send Receipt</a>
-</div>
-<p style="font-size:11px;color:#94a3b8;margin-top:8px">After GCash payment, screenshot receipt and send to <a href='https://facebook.com/PinasTools' target='_blank' style='color:#60a5fa'>FB Page PinasTools</a> or <a href='https://m.me/PinasTools' target='_blank' style='color:#60a5fa'>Messenger</a>. Code sent within 1 hour. For support: PinasTools.com | FB: PinasTools</p>
-<div style="font-size:10px;color:#64748b;margin-top:8px">© 2026 PinasTools - Save ₱9,101 vs Review Center ₱10k | ECE Board Reviewer 7710 Qs</div>
-</div>
-</body></html>
+</script></body></html>
