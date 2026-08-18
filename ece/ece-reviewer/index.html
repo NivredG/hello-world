@@ -1,5 +1,5 @@
 
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.5 No Codes Visible</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.6 Smart Q Count</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -14,13 +14,13 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .sound-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;display:none;align-items:center;justify-content:center} .sound-box{background:var(--surf);border:2px solid var(--gold);border-radius:16px;padding:20px;width:90%;max-width:400px}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>Save ₱9,101 vs Review Center ₱10k</span><span>V6.5 No Codes Visible</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs V6.5</b><br><small id="progressText">0/0</small></div><div style="display:flex;gap:6px"><button onclick="openSoundSettings()" style="background:var(--surf2);border:1px solid var(--border);color:#fff;padding:6px 12px;border-radius:999px;font-size:11px">⚙️ Sound</button><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div></div>
+<div class="banner"><span>Save ₱9,101 vs Review Center ₱10k</span><span>V6.6 Smart Q Count</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs V6.6</b><br><small id="progressText">0/0</small></div><div style="display:flex;gap:6px"><button onclick="openSoundSettings()" style="background:var(--surf2);border:1px solid var(--border);color:#fff;padding:6px 12px;border-radius:999px;font-size:11px">⚙️ Sound</button><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div></div>
 
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options</div>
 <div class="controls">
-<div class="ctrl"><label>📊 Number of Questions</label><select id="qCount" onchange="applyFilters()"><option value="10">10 Questions</option><option value="20">20 Questions</option><option value="50">50 Questions</option><option value="100" selected>100 Free</option><option value="200">200 BATAK</option><option value="500">500 PASA</option><option value="1000">1000 BOARD</option><option value="3000">3000 TOP</option><option value="7710">7710 ALL-IN</option></select></div>
+<div class="ctrl"><label>📊 Number of Questions</label><select id="qCount" onchange="applyFilters()"></select></div>
 <div class="ctrl"><label>📚 Topic Filter</label><select id="topicFilter" onchange="applyFilters()"><option value="all">All Topics Mixed</option><option value="ELEX">ELEX - Electronics</option><option value="EST">EST - Systems</option><option value="GEAS">GEAS - Gen Eng</option><option value="Math">Math</option><option value="resistor">Resistor Only</option><option value="temperature">Temperature Only</option><option value="restemp">🔥 RES-TEMP High-Yield</option></select></div>
 </div>
 <div style="display:flex;gap:6px"><button class="btn" style="flex:1" onclick="applyFilters()">Apply →</button><button style="flex:1;background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px;border-radius:12px" onclick="shuffleQs()">🔀 Shuffle</button></div>
@@ -76,7 +76,7 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 <div class="sound-panel" id="soundPanel"><div class="sound-box"><h3>⚙️ Sound Settings</h3><div style="display:flex;justify-content:space-between;margin:8px 0"><span>Enabled</span><input type="checkbox" id="sndEnabled" checked></div><div style="display:flex;justify-content:space-between"><span>Volume</span><span id="volLabel">80%</span></div><input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)" style="width:100%"><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="testSound()">🔊 Test</button><button style="flex:1;background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px;border-radius:12px" onclick="closeSoundSettings()">Close</button></div></div></div>
 
 <script>
-let allQuestions=[],questions=[],idx=0,mode='quiz',limit=100,soundOn=true,audioCtx=null,blitzInterval=null,timeLeft=10,masterVol=0.8;
+let allQuestions=[],questions=[],idx=0,mode='quiz',limit=100,soundOn=true,unlockedLimit=100,audioCtx=null,blitzInterval=null,timeLeft=10,masterVol=0.8;
 const TIERS={free:100,99:200,199:500,349:1000,599:3000,899:7710};
 function getCodeMap(){return {"VEVTVEVSMjAyNg==":"7710","QkFUQUs5OQ==":"200","UEFTQTE5OQ==":"500","Qk9BUkQzNDk=":"1000","VE9QNTk5":"3000","QUxMODk5":"7710"};}
 function decodeB64(s){try{return atob(s);}catch(e){return s;}}
@@ -94,6 +94,34 @@ function genMnemo(q){if(q.mnemo && q.mnemo.length>5) return q.mnemo; return "Tri
 function genCaltech(q){if(q.derivation && q.derivation.length>5) return q.derivation; if(q.formula) return "Caltech Method:\n1. Write: "+q.formula+"\n2. Given: see Q\n3. Convert\n4. Isolate\n5. Plug\n6. Check"; return "Caltech: Start basic law, isolate, convert, substitute, verify.";}
 function loadAll(){fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();return;}}catch(e){}useFallback();}).catch(()=>useFallback());setTimeout(()=>{if(allQuestions.length===0)useFallback();},1500);}
 function useFallback(){allQuestions=[...FALLBACK];applyFilters();}
+
+let unlockedLimit=100;
+function updateQCountDropdown(){
+ let sel=document.getElementById('qCount');
+ let current=sel.value;
+ let options=[];
+ if(unlockedLimit>=10) options.push({v:10,t:'10 Questions'});
+ if(unlockedLimit>=20) options.push({v:20,t:'20 Questions'});
+ if(unlockedLimit>=50) options.push({v:50,t:'50 Questions'});
+ if(unlockedLimit>=100) options.push({v:100,t:'100 Free'});
+ if(unlockedLimit>=200) options.push({v:200,t:'200 BATAK'});
+ if(unlockedLimit>=500) options.push({v:500,t:'500 PASA'});
+ if(unlockedLimit>=1000) options.push({v:1000,t:'1000 BOARD'});
+ if(unlockedLimit>=3000) options.push({v:3000,t:'3000 TOP'});
+ if(unlockedLimit>=7710) options.push({v:7710,t:'7710 ALL-IN'});
+ // If no options, at least show what we have
+ if(options.length===0) options.push({v:unlockedLimit,t:unlockedLimit+' Qs (Unlocked)'});
+ sel.innerHTML='';
+ options.forEach(o=>{
+   let opt=document.createElement('option');
+   opt.value=o.v;
+   opt.innerText=o.t+(o.v>unlockedLimit?' 🔒':'');
+   if(o.v==limit || o.v==Math.min(unlockedLimit,100)) opt.selected=true;
+   sel.appendChild(opt);
+ });
+ if(current && parseInt(current)<=unlockedLimit){sel.value=current;}
+}
+
 function applyFilters(){
  let count=parseInt(document.getElementById('qCount').value);
  let topic=document.getElementById('topicFilter').value;
@@ -135,14 +163,19 @@ function redeem(){
  for(let k in map){decodedMap[decodeB64(k)]=map[k];}
  if(decodedMap[code]){
   let lim=parseInt(decodedMap[code]);
+  unlockedLimit=lim;
+  localStorage.setItem('unlockedLimit',lim);
+  updateQCountDropdown();
   document.getElementById('qCount').value=lim;
   applyFilters();
   document.getElementById('tierLabel').innerText=code+' '+lim+'Q';
   alert('Unlocked '+lim+' Qs!');
   fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});
- } else if(code==='TESTER2026'){document.getElementById('qCount').value=7710;applyFilters();alert('Tester 5 days unlocked');}
+ } else if(code==='TESTER2026'){unlockedLimit=7710;localStorage.setItem('unlockedLimit',7710);updateQCountDropdown();document.getElementById('qCount').value=7710;applyFilters();alert('Tester 5 days unlocked');}
  else alert('Invalid code - send receipt to FB PinasTools');
 }
 let sv=localStorage.getItem('ece_vol');if(sv){masterVol=sv/100;} let ss=localStorage.getItem('ece_sound_enabled');if(ss==='1'){document.getElementById('enableSoundCard').style.display='none';soundOn=true;} else if(ss!==null){document.getElementById('enableSoundCard').style.display='block';}
+let savedLim=localStorage.getItem('unlockedLimit');if(savedLim){unlockedLimit=parseInt(savedLim);}
+updateQCountDropdown();
 loadAll();
 </script></body></html>
