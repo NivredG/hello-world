@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.8 Stable</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.9 Count Locked</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -12,8 +12,8 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}.tier.best{border-color:var(--gold)} .tier.free{border-color:var(--green)}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>V6.8 Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.8</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<div class="banner"><span>V6.9 Count Locked - Dropdown + Loading Fixed</span><span>No Blank</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.9</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options - FIXED</div>
 <div class="controls">
@@ -51,32 +51,43 @@ let allQuestions=[],questions=[],idx=0,mode='quiz',limit=100,unlockedLimit=100;
 let TIERS={"99":200,"199":500,"349":1000,"599":3000,"899":7710};
 function getCodeMap(){return {"VEVTVEVSMjAyNg==":"7710","QkFUQUs5OQ==":"200","UEFTQTE5OQ==":"500","Qk9BUkQzNDk=":"1000","VE9QNTk5":"3000","QUxMODk5":"7710"};}
 function decodeB64(s){try{return atob(s);}catch(e){return s;}}
+let selectedCount=100;let selectedTopic='all';
 let FALLBACK=[{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz",derivation:"f=1/T"},{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR",derivation:"R=V/I=5Ω"},{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100",mnemo:"Yellow=4 Violet=7 Red=x100",derivation:"47*100=4700=4.7kΩ"},{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"x1.8+32",derivation:"25*9/5+32=77°F"}];
 function loadAll(){
  allQuestions=[...FALLBACK];
  applyFilters();
  showQ();
  document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' fallback - loading real file...';
- fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' real Qs';}}catch(e){}}).catch(e=>{document.getElementById('filterInfo').innerText='Using fallback - upload questions-free.js';});
+ fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;reapplyAfterLoad();document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' real Qs - Showing '+selectedCount;}}catch(e){}}).catch(e=>{document.getElementById('filterInfo').innerText='Using fallback - upload questions-free.js';});
 }
+let selectedCount=100;
+let selectedTopic='all';
 function applyFilters(){
  let count=parseInt(document.getElementById('qCount').value);
- if(count>unlockedLimit){alert('Locked! Need code for '+count+' Qs. Showing '+unlockedLimit); count=unlockedLimit; document.getElementById('qCount').value=unlockedLimit;}
- let topic=document.getElementById('topicFilter').value;
+ selectedCount=count;
+ selectedTopic=document.getElementById('topicFilter').value;
+ if(count>unlockedLimit){alert('Locked! Need code for '+count+' Qs. Max you have: '+unlockedLimit); count=unlockedLimit; selectedCount=unlockedLimit; document.getElementById('qCount').value=unlockedLimit;}
+ let topic=selectedTopic;
  let filtered=[...allQuestions];
  if(topic!=='all'){
-   if(topic==='resistor') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor'));
-   else if(topic==='temperature') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('temperatur'));
-   else if(topic==='restemp') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('temperatur'));
-   else filtered=filtered.filter(q=> (q.topic||'').toUpperCase()===topic.toUpperCase());
+   if(topic==='resistor') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.topic||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('color code'));
+   else if(topic==='temperature') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('thermistor') || (q.q||'').toLowerCase().includes('°c') || (q.q||'').toLowerCase().includes('celsius'));
+   else if(topic==='restemp') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('thermistor'));
+   else filtered=filtered.filter(q=> (q.topic||'').toUpperCase().includes(topic.toUpperCase()) || (q.topic||'').toLowerCase().includes(topic.toLowerCase()));
  }
- if(filtered.length===0) filtered=[...allQuestions];
+ if(filtered.length===0){filtered=[...allQuestions]; document.getElementById('filterInfo').innerText='No match for topic '+topic+' - showing all';}
+ // STRICT slice to selected count
  questions=filtered.slice(0,count);
  limit=questions.length;
  idx=0;
- document.getElementById('filterInfo').innerText='Showing '+questions.length+' from '+allQuestions.length+' - Topic: '+topic;
+ document.getElementById('filterInfo').innerText='Showing '+questions.length+' Qs (you asked for '+selectedCount+') from '+allQuestions.length+' total - Topic: '+topic+' - Unlocked: '+unlockedLimit;
  showQ();
 }
+function reapplyAfterLoad(){
+ // Called when real file loads - respects user's last selected count
+ applyFilters();
+}
+
 function shuffleQs(){for(let i=questions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[questions[i],questions[j]]=[questions[j],questions[i]];}idx=0;showQ();}
 function renderCalc(q){let txt=(q.q||'').toLowerCase(); if(txt.includes('resistor')) return '<div class=calc-box><div class=calc-title>🔧 Resistor</div><div>Yellow=4 Violet=7 Red=x100 → 4.7kΩ</div></div>'; if(txt.includes('temperatur')||txt.includes('°c')) return '<div class=calc-box><div class=calc-title>🌡️ Temp</div><div><input id=tc type=number value=25 oninput=calcT() placeholder=°C><span>=</span><input id=tf placeholder=°F></div></div>'; return '';}
 function calcT(){let c=parseFloat(document.getElementById('tc').value);if(isNaN(c))return;document.getElementById('tf').value=(c*9/5+32).toFixed(1);}
