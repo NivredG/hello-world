@@ -1,75 +1,87 @@
-<!doctype html><html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ECE Reviewer 7710 Qs - PinasTools</title>
+<!doctype html><html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ECE Reviewer 7710 - V4.2 Loading Fix</title>
 <style>
-:root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--gold2:#fbbf24;--green:#22c55e;--red:#ef4444}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{background:var(--bg);color:#e8eaf0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;margin:0;padding:0}
-a.home{color:var(--gold);text-decoration:none;display:flex;gap:6px;padding:12px 16px;font-size:14px}
-.banner{background:linear-gradient(90deg,#1e293b,#0f172a);border:1px solid #334155;margin:0 12px;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;font-size:12px}
-.modes{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;scrollbar-width:none}
-.mode{padding:10px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surf);white-space:nowrap;font-size:13px;cursor:pointer;flex-shrink:0;transition:.2s}
-.mode.active{background:var(--gold);color:#000;font-weight:800;border-color:var(--gold)}
+:root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
+*{box-sizing:border-box}body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;padding:0;max-width:900px;margin:auto}
+a.home{color:var(--gold);text-decoration:none;padding:12px 16px;display:block}
+.banner{background:#1e293b;border:1px solid #334155;margin:0 12px;border-radius:12px;padding:10px;font-size:12px;display:flex;justify-content:space-between}
+.modes{display:flex;gap:6px;padding:8px 12px;overflow-x:auto}
+.mode{padding:10px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surf);cursor:pointer;white-space:nowrap;font-size:13px}
+.mode.active{background:var(--gold);color:#000;font-weight:800}
 .card{background:var(--surf);border:1px solid var(--border);border-radius:16px;margin:12px;padding:16px}
-.q{font-size:17px;line-height:1.6;font-weight:600}
-.opt{padding:14px 16px;border:1.5px solid var(--border);border-radius:14px;margin:10px 0;font-size:15px;background:var(--surf2);cursor:pointer;min-height:56px;display:flex;align-items:center;transition:.15s}
-.opt:active{transform:scale(.98)}
-.opt.correct{border-color:var(--green);background:rgba(34,197,94,.15)}
-.opt.wrong{border-color:var(--red);background:rgba(239,68,68,.15)}
-.tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;transition:.2s}
-.tier.best{border-color:var(--gold);background:linear-gradient(135deg,#1e1b4b22,#1a1e28);box-shadow:0 0 20px rgba(245,158,11,.15)}
-.price{font-weight:900;color:var(--gold2);font-size:20px}
-.old{text-decoration:line-through;color:#6b7280;font-size:11px}
-.btn{background:var(--gold);color:#000;border:0;padding:12px 20px;border-radius:12px;font-weight:900;cursor:pointer;font-size:14px}
-.btn:active{transform:scale(.96)}
-#qr{display:none;text-align:center;padding:16px;background:#fff;border-radius:16px;margin:12px 0;color:#000}
-.mnemo{background:#1e1b4b;border:1px solid #3730a3;border-radius:12px;padding:12px;margin:12px 0;color:#a5b4fc;font-size:13px}
-.caltech{background:#052e16;border:1px solid #166534;border-radius:12px;padding:12px;margin:12px 0;color:#86efac;font-size:13px}
-.progress-bar{height:4px;background:var(--border);border-radius:999px;overflow:hidden;margin:8px 0}
-.progress-fill{height:100%;background:var(--gold);transition:width .3s}
+.q{font-size:17px;font-weight:600}.opt{padding:14px;border:1px solid var(--border);border-radius:14px;margin:10px 0;background:var(--surf2);cursor:pointer}
+.opt.correct{border-color:var(--green);background:rgba(34,197,94,.15)}.opt.wrong{border-color:var(--red);background:rgba(239,68,68,.15)}
+.tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
+.tier.best{border-color:var(--gold)} .price{font-weight:900;color:var(--gold);font-size:20px}.old{line-through;color:#6b7280}
+.btn{background:var(--gold);color:#000;border:0;padding:12px 20px;border-radius:12px;font-weight:800;cursor:pointer}
+#qr{display:none;background:#fff;color:#000;padding:16px;border-radius:16px;text-align:center;margin:12px}
+.mnemo{background:#1e1b4b;padding:12px;border-radius:10px;color:#a5b4fc;margin:12px 0}
+.caltech{background:#052e16;padding:12px;border-radius:10px;color:#86efac;margin:12px 0}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>💰 <b style="color:var(--green)">Save ₱9,101</b> vs Center ₱10k</span><span style="color:#94a3b8">All 7710 Qs = ₱899</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:18px">ECE Board - 7710 Qs</b><br><small id="progressText" style="color:#7a8499">0/100 Free</small><div class="progress-bar"><div id="progressFill" class="progress-fill" style="width:0%"></div></div></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
-
-<div class="modes">
-<div class="mode active" data-mode="quiz" onclick="setMode('quiz',this)">📝 QUIZ</div>
-<div class="mode" data-mode="blitz" onclick="setMode('blitz',this)">⚡ BLITZ</div>
-<div class="mode" data-mode="study" onclick="setMode('study',this)">📖 STUDY</div>
-<div class="mode" data-mode="mnemo" onclick="setMode('mnemo',this)">🧠 MNEMO</div>
-<div class="mode" data-mode="caltech" onclick="setMode('caltech',this)">🔬 CALTECH</div>
-</div>
-
+<div class="banner"><span>Save ₱9,101 vs Center ₱10k</span><span>All 7710 = ₱899</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<div class="modes"><div class="mode active" onclick="setMode('quiz',this)">📝 QUIZ</div><div class="mode" onclick="setMode('blitz',this)">⚡ BLITZ</div><div class="mode" onclick="setMode('study',this)">📖 STUDY</div><div class="mode" onclick="setMode('mnemo',this)">🧠 MNEMO</div><div class="mode" onclick="setMode('caltech',this)">🔬 CALTECH</div></div>
+<div class="card"><div id="extra"></div><div id="q" class="q">Loading questions... If stuck, check console. Fallback loading in 2 sec...</div><div id="opts"></div><button class="btn" style="width:100%;margin-top:12px" onclick="nextQ()">Next →</button></div>
 <div class="card">
-<div id="extra"></div>
-<div id="q" class="q">Loading...</div>
-<div id="opts"></div>
-<div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1" onclick="nextQ()">Next →</button><button onclick="showAns()" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px 18px;border-radius:12px">Show Ans</button></div>
+<h3>Unlock - Seryoso Pricing</h3>
+<div class="tier"><div><b>Free</b> 100 Qs</div><span style="color:var(--green)">Active</span></div>
+<div class="tier"><div><b>₱99 BATAK</b> 200 Qs</div><button class="btn" onclick="buy(99,'BATAK')">Buy</button></div>
+<div class="tier"><div><b>₱199 PASA</b> 500 Qs</div><button class="btn" onclick="buy(199,'PASA')">Buy</button></div>
+<div class="tier best"><div><b>₱349 BOARD</b> 1000 Qs ⭐</div><button class="btn" onclick="buy(349,'BOARD')">Buy</button></div>
+<div class="tier"><div><b>₱599 TOP</b> 3000 Qs</div><button class="btn" onclick="buy(599,'TOP')">Buy</button></div>
+<div class="tier"><div><b>₱899 ALL</b> 7710 Qs</div><button class="btn" onclick="buy(899,'ALLIN')">Buy ALL</button></div>
+<div style="display:flex;gap:8px;margin-top:12px"><input id="code" placeholder="Enter code" style="flex:1;padding:12px;border-radius:12px;background:#0a0b0f;border:1px solid var(--border);color:#fff"><button class="btn" onclick="redeem()">Redeem</button></div>
+<div id="qr"><p><b>GCash - Scan to Pay</b></p><div id="qrPlaceholder" style="padding:12px;border:2px dashed #ccc;border-radius:12px">📱 Send your GCash QR here on Meta mobile and I'll embed real QR. This placeholder does NOT send money yet.</div><p><span id="qrAmount">₱899 ALL-IN</span></p></div>
 </div>
-
-<div class="card">
-<h3 style="margin:0 0 4px">🔓 Unlock - Seryoso Pricing</h3><small style="color:#7a8499">Pay once, review until pumasa. Mas mura pa rin 10x vs center.</small>
-<div class="tier"><div><b>Free</b> - 100 Qs - Hook</div><span style="color:var(--green)">Active</span></div>
-<div class="tier"><div><div><b>₱99 BATAK</b> - 200 Qs</div><div><span class="old">₱499</span> <span class="price">₱99</span></div><small style="color:#94a3b8">Seryoso starter - pang 1 week</small></div><button class="btn" onclick="buy(99,'BATAK')">Buy</button></div>
-<div class="tier"><div><div><b>₱199 PASA</b> - 500 Qs</div><div><span class="old">₱799</span> <span class="price">₱199</span></div><small style="color:#94a3b8">500 Qs - pang 1 month</small></div><button class="btn" onclick="buy(199,'PASA')">Buy</button></div>
-<div class="tier best"><div><div><b>₱349 BOARD</b> - 1000 Qs ⭐ Sweet Spot</div><div><span class="old">₱1,499</span> <span class="price">₱349</span></div><small style="color:var(--gold2)">Pinaka sulit for board - 1000 Qs</small></div><button class="btn" style="background:var(--gold2)" onclick="buy(349,'BOARD')">Buy BEST</button></div>
-<div class="tier"><div><div><b>₱599 TOPNOTCHER</b> - 3000 Qs</div><div><span class="old">₱3,999</span> <span class="price">₱599</span></div><small style="color:#94a3b8">Pang topnotcher - 3000 Qs</small></div><button class="btn" onclick="buy(599,'TOPNOTCHER')">Buy</button></div>
-<div class="tier"><div><div><b>₱899 ALL-IN</b> - All 7710 Qs</div><div><span class="old">₱10,000</span> <span class="price">₱899</span></div><small style="color:var(--green)">Save ₱9,101 vs Review Center</small></div><button class="btn" onclick="buy(899,'ALLIN')">Buy ALL</button></div>
-
-<div style="margin-top:16px;display:flex;gap:8px"><input id="code" placeholder="Code: TESTER2026 etc" style="flex:1;padding:12px;border-radius:12px;background:#0a0b0f;border:1px solid var(--border);color:#fff"><button class="btn" onclick="redeem()">Redeem</button></div>
-<div id="qr"><p><b>GCash - Scan to Pay</b></p><img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=GCash-PinasTools-09123456789"><p style="font-size:13px"><span id="qrAmount">₱899 ALL-IN</span><br><small>Send screenshot to FB: PinasTools<br>Code will be sent within 1 hour</small></p></div>
-<div style="margin-top:8px;font-size:11px;color:#6b7280">Codes: TESTER2026=UNLI 5 days viral • BATAK99=200Q • PASA199=500Q • BOARD349=1000Q • TOP599=3000Q • ALL899=7710Q<br>Free 100Q forever. Tester auto-expire after 5 days.</div>
-</div>
-
 <script>
 let questions=[],idx=0,mode='quiz',limit=100,tier='free';
 const TIERS={free:100,99:200,199:500,349:1000,599:3000,899:7710,tester:7710};
-function loadQs(){fetch('./questions-free.js').then(r=>r.text()).then(t=>{try{eval(t);questions=(window.FREE_QS||[]).slice(0,limit);showQ();}catch(e){document.getElementById('q').innerText='Error loading questions';}});}
-function setMode(m,el){mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));if(el)el.classList.add('active');showQ();}
-function showQ(){if(!questions[idx])return;let q=questions[idx];document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+': '+(q.q||q.question);let extra='';if(mode==='mnemo')extra='<div class="mnemo">🧠 <b>Mnemonic:</b> '+(q.mnemo||'Acronym trick: first letters')+'</div>';if(mode==='caltech')extra='<div class="caltech">🔬 <b>Caltech:</b> '+(q.derivation||'Formula '+ (q.formula||'') +' → derive → solve')+'</div>';if(mode==='study')extra='<div style="background:#111827;padding:12px;border-radius:10px">📖 '+(q.explanation||'Study mode - review explanation')+'</div>';document.getElementById('extra').innerHTML=extra;let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||['A','B','C','D']).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{if((q.ans||0)===i){d.classList.add('correct');}else{d.classList.add('wrong');}setTimeout(nextQ,700);};opts.appendChild(d);});document.getElementById('progressText').innerText=(idx+1)+'/'+limit+' Qs - '+tier.toUpperCase();document.getElementById('progressFill').style.width=((idx+1)/limit*100)+'%';}
-function nextQ(){idx=(idx+1)%limit;showQ();window.scrollTo({top:0,behavior:'smooth'});}
-function showAns(){let q=questions[idx];let c=q.ans||0;let els=document.querySelectorAll('.opt');if(els[c])els[c].classList.add('correct');}
-function buy(p,name){limit=TIERS[p];tier=name||('P'+p);document.getElementById('tierLabel').innerText=name+' - '+limit+'Q P'+p;document.getElementById('qrAmount').innerText='P'+p+' '+name+' - '+limit+' Qs';document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=GCash-PinasTools-'+p+'-'+name;document.getElementById('qr').style.display='block';document.getElementById('qr').scrollIntoView({behavior:'smooth'});}
-function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();let map={TESTER2026:7710,BATAK99:200,PASA199:500,BOARD349:1000,TOP599:3000,ALL899:7710,BATAAN2026:200,BAGUIO99:500,CEBU1000:1000,DAVAO3K:3000,MANILAALL:7710};if(map[code]){limit=map[code];tier=code;if(code==='TESTER2026'){let exp=Date.now()+5*24*60*60*1000;localStorage.setItem('tester_expiry',exp);alert('Tester UNLI 5 days until '+new Date(exp).toLocaleDateString()+' - Viral sa GC!');}document.getElementById('tierLabel').innerText=code+' - '+limit+'Q';document.getElementById('qr').style.display='none';fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];questions=all.slice(0,limit);idx=0;showQ();}catch(e){}});}else alert('Invalid code');}
-let exp=localStorage.getItem('tester_expiry');if(exp&&Date.now()>parseInt(exp)){localStorage.removeItem('tester_expiry');alert('Tester 5-day expired');}
+const CODE_MAP={TESTER2026:7710,BATAK99:200,PASA199:500,BOARD349:1000,TOP599:3000,ALL899:7710};
+const FALLBACK_QS=[
+{q:"What is the unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,mnemo:"Frequency = Hertz - isipin 'FrequenZ = HertZ'",derivation:"f=1/T - frequency is inverse of period",formula:"f=1/T"},
+{q:"Ohm's Law?",opts:["V=IR","P=VI","F=ma","E=mc²"],ans:0,mnemo:"VIR - Very Important Resistor",derivation:"V=IR derived from resistance definition R=V/I",formula:"V=IR"},
+{q:"What is 2+2 in binary?",opts:["100","101","110","111"],ans:0,mnemo:"2+2=4, binary 100",derivation:"Decimal 4 = 1*2^2 +0*2^1+0*2^0 =100",formula:"Binary conversion"},
+{q:"Capacitor stores?",opts:["Charge","Current","Power","Resistance"],ans:0,mnemo:"CAP stores Charge - C=C",derivation:"Q=CV",formula:"Q=CV"},
+{q:"Unit of inductance?",opts:["Henry","Farad","Ohm","Siemens"],ans:0,mnemo:"Inductor Henry - L Henry",derivation:"L = NΦ/I",formula:"L=NΦ/I"}
+];
+
+function loadQs(){
+ // Try to load real file
+ fetch('./questions-free.js').then(r=>{
+   if(!r.ok) throw new Error('not found');
+   return r.text();
+ }).then(t=>{
+   try{eval(t);let real=window.FREE_QS||[];if(real.length>0){questions=real.slice(0,limit);console.log('Loaded real',real.length);showQ();return;}}
+   catch(e){console.log('eval fail',e);}
+   // fallback if eval fails
+   useFallback();
+ }).catch(e=>{
+   console.log('Fetch failed, using fallback',e);
+   useFallback();
+ });
+ // Safety timeout - if still loading after 2 sec, use fallback
+ setTimeout(()=>{if(questions.length===0) useFallback();},2000);
+}
+function useFallback(){
+ if(questions.length>0) return;
+ questions=FALLBACK_QS; // at least 5 so modes work
+ document.getElementById('q').innerText='';
+ console.log('Using fallback 5 sample Qs - real file missing');
+ showQ();
+}
+function setMode(m,el){mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));el.classList.add('active');showQ();}
+function showQ(){
+ if(!questions[idx]){document.getElementById('q').innerText='No questions loaded. Check if questions-free.js is in same folder as index.html on Vercel.';return;}
+ let q=questions[idx];
+ document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+': '+(q.q||q.question);
+ let extra='';if(mode==='mnemo')extra='<div class="mnemo">🧠 '+(q.mnemo||'Mnemonic')+'</div>';if(mode==='caltech')extra='<div class="caltech">🔬 '+(q.derivation||q.formula||'Derivation')+'</div>';if(mode==='study')extra='<div class="mnemo">📖 Study: '+(q.explanation||q.q)+'</div>';
+ document.getElementById('extra').innerHTML=extra;
+ let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||['A','B','C','D']).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{if((q.ans||0)===i)d.classList.add('correct');else d.classList.add('wrong');setTimeout(nextQ,600);};opts.appendChild(d);});
+ document.getElementById('progressText').innerText=(idx+1)+'/'+limit+' - '+tier;
+}
+function nextQ(){idx=(idx+1)%limit;showQ();}
+function buy(p,name){limit=TIERS[p];tier=name;document.getElementById('tierLabel').innerText=name+' P'+p;document.getElementById('qrAmount').innerText='P'+p+' '+name;document.getElementById('qr').style.display='block';}
+function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();if(CODE_MAP[code]){limit=CODE_MAP[code];tier=code;if(code==='TESTER2026'){let exp=Date.now()+5*24*60*60*1000;localStorage.setItem('tester_expiry',exp);alert('Tester 5 days until '+new Date(exp).toLocaleDateString());}document.getElementById('tierLabel').innerText=code+' '+limit+'Q';document.getElementById('qr').style.display='none';fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];questions=all.slice(0,limit);idx=0;showQ();}catch(e){}});}else alert('Invalid');}
 loadQs();
-let startX=0;document.addEventListener('touchstart',e=>startX=e.touches[0].clientX);document.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-startX;if(dx<-60)nextQ();if(dx>60&&idx>0){idx--;showQ();}});
 </script></body></html>
