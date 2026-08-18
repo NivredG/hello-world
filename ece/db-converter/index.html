@@ -1,6 +1,0 @@
-
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>dB Converter - PinasTools</title>
-<style>body{background:#111318;color:#e8eaf0;font-family:system-ui;padding:24px;max-width:800px;margin:auto} .card{background:#1a1e28;border:1px solid #2a3050;border-radius:16px;padding:20px;margin:12px 0} input{width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#22273a;color:#fff} button{background:#f59e0b;color:#000;border:0;padding:12px 20px;border-radius:8px;font-weight:700;cursor:pointer}</style></head>
-<body><a href="/" style="color:#f59e0b">← PinasTools</a><h1>dB Converter</h1>
-<div class="card"><label>dBm</label><input id="dbm" type="number" value="0" oninput="calc()"><p id="out"></p><button onclick="calc()">Convert</button></div>
-<script>function calc(){let dbm=parseFloat(document.getElementById('dbm').value)||0; let mw=Math.pow(10,dbm/10); let w=mw/1000; document.getElementById('out').innerHTML=mw.toFixed(4)+' mW<br>'+w.toFixed(6)+' W<br>'+(20*Math.log10(Math.sqrt(mw*0.05))).toFixed(2)+' dBuV (50Ω)'} calc()</script></body></html>
