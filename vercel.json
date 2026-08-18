@@ -1,10 +1,1 @@
-{
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "headers": [
-    {
-      "source": "/(.*)\\.js",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
-    }
-  ]
-}
+{"cleanUrls":true,"trailingSlash":false,"headers":[{"source":"/ece/ece-reviewer/questions-free.js","headers":[{"key":"Content-Type","value":"application/javascript"}]},{"source":"/ece/ece-reviewer/questions-premium.js","headers":[{"key":"Content-Type","value":"application/javascript"}]},{"source":"/ece/ece-reviewer/gcash-qr.jpg","headers":[{"key":"Content-Type","value":"image/jpeg"}]}]}
