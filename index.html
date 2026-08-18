@@ -1,20 +1,83 @@
+<!doctype html>
+<html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PinasTools.com - Libre na engineering tools para sa Filipino students</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111318;--surf:#1a1e28;--surf2:#1c1f26;--border:#2e3340;--gold:#f59e0b;--text:#e8eaf0;--muted:#7a8499;--green:#22c55e;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Outfit,system-ui;max-width:1120px;margin:auto;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:32px}
+.logo{display:flex;align-items:center;gap:12px}.logo-mark{width:40px;height:40px;background:var(--gold);border-radius:10px;display:grid;place-items:center;font-weight:800;color:#000}
+.badges{display:flex;gap:8px}.badge{border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--muted)}
+.hero h1{font-size:42px;line-height:1.1;max-width:600px}.hero h1 span{color:var(--gold)}
+.hero p{color:var(--muted);margin-top:12px;max-width:640px}
+.search{margin:24px 0;background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:4px 16px;display:flex;align-items:center;gap:12px}
+.search input{flex:1;background:transparent;border:0;color:#fff;padding:14px 0;font-size:16px;outline:0}
+.search small{color:var(--muted);background:var(--bg);padding:6px 10px;border-radius:8px;border:1px solid var(--border)}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}.tag{background:var(--surf);border:1px solid var(--border);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted);cursor:pointer}
+.section{display:flex;align-items:center;gap:12px;margin:40px 0 16px}.bar{width:6px;height:28px;border-radius:999px;background:var(--gold)}.section.ce .bar{background:#22c55e}.section.daily .bar{background:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:28px}}
+.card{background:linear-gradient(to bottom right,var(--surf2),#1a1d25);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;transition:.2s;cursor:pointer}.card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.card.flagship{border-color:rgba(245,158,11,.3);grid-column:1/-1}
+.card .top{display:flex;gap:12px;align-items:flex-start}.icon{width:44px;height:44px;border-radius:12px;background:#111318;border:1px solid var(--border);display:grid;place-items:center;font-size:22px}
+.card h3{font-size:16px}.card p{color:var(--muted);font-size:13px;margin-top:4px;line-height:1.4}
+.pills{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}.pill{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border)}.pill.gold{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}.pill.green{background:#052e16;color:var(--green);border-color:rgba(22,101,52,.4)}.pill.hot{background:#431407;color:#fb923c;border-color:rgba(154,52,18,.5)}.pill.blue{background:#1e1b4b;color:#93c5fd;border-color:rgba(49,46,129,.5)}
+.arrow{position:absolute;top:20px;right:16px;width:28px;height:28px;border-radius:50%;background:var(--surf);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted)}
+.live{color:var(--gold);font-size:12px;margin-top:12px;display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;background:var(--gold);border-radius:50%}
+a{color:inherit;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo"><div class="logo-mark">P</div><div><b>PinasTools<span style="color:#7a8499;font-weight:400">.com</span></b><div style="font-size:11px;color:var(--muted)">Libre na engineering tools para sa Filipino students</div></div></div>
+  <div class="badges"><div class="badge">✓ Offline Ready</div><div class="badge">✓ Board Exam Focused</div><div class="badge">🇵🇭 Taglish</div></div>
+</div>
 
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PinasTools.com</title>
-<style>body{background:#111318;color:#e8eaf0;font-family:system-ui;padding:20px;max-width:1100px;margin:auto}a{color:#f59e0b;text-decoration:none}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}.card{background:#1c1f26;border:1px solid #2e3340;border-radius:16px;padding:16px}</style></head>
-<body><h1>PinasTools.com - All Tools Restored</h1><div class="grid">
-<a class="card" href="/ece/ece-reviewer/"><b>ECE Board Reviewer</b><br>7710 Qs</a>
-<a class="card" href="/ece/resistor/"><b>Resistor</b></a>
-<a class="card" href="/ece/db-converter/"><b>dB Converter</b></a>
-<a class="card" href="/ece/number-system/"><b>Number System</b></a>
-<a class="card" href="/ece/ohms-law/"><b>Ohm's Law ECE</b></a>
-<a class="card" href="/ece/kmap/"><b>K-Map</b></a>
-<a class="card" href="/ee/ohms-law/"><b>Ohm's Law EE</b></a>
-<a class="card" href="/ee/pec-wire-size/"><b>PEC Wire Size</b></a>
-<a class="card" href="/ee/three-phase/"><b>Three-Phase</b></a>
-<a class="card" href="/ee/transformer/"><b>Transformer</b></a>
-<a class="card" href="/ee/motor-hp-kw/"><b>Motor HP/kW</b></a>
-<a class="card" href="/ce/beam-moment/"><b>Beam & Moment</b></a>
-<a class="card" href="/tools/sahod-calculator/"><b>Sahod Calculator 2026</b></a>
-<a class="card" href="/tools/sss-contribution/"><b>SSS Contribution</b></a>
-<a class="card" href="/tools/id-photo/"><b>2x2 ID Photo</b></a>
-</div></body></html>
+<div class="hero">
+  <h1>Lahat ng kailangan mo sa <span>board exam review</span> at engineering.</h1>
+  <p>Mabilis, offline-ready, Taglish explanations. Walang ads na istorbo. Ginawa ng Pinoy para sa Pinoy.</p>
+  <div class="search"><span style="color:var(--muted)">⌕</span><input id="q" placeholder="Maghanap ng tool... hal. resistor, kmap, sahod" oninput="filter()"><small><span id="count">15</span> / 15 tools</small></div>
+  <div class="tags"><div class="tag" onclick="go('ece-reviewer')">ECE Board Reviewer</div><div class="tag" onclick="go('resistor')">Resistor</div><div class="tag" onclick="go('db-converter')">dB Converter</div><div class="tag" onclick="location.href='/tools/sahod-calculator/'">Sahod 2026</div><div class="tag" onclick="location.href='/ce/beam-moment/'">Beam</div></div>
+</div>
+
+<div class="section"><div class="bar"></div><h2>ECE / CpE</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Electronics & Communications</span><span style="margin-left:auto;color:var(--muted);font-size:12px">6 tools</span></div>
+<div class="grid" id="grid-ece">
+  <a class="card flagship" href="/ece/ece-reviewer/"><div class="arrow">›</div><div class="top"><div class="icon" style="background:var(--gold);color:#000">🏆</div><div><h3>ECE Board Reviewer</h3><p>3000+ questions · Quiz, Blitz & Flashcard · Leaderboard · GCash prize</p><div class="pills"><span class="pill gold">Flagship</span><span class="pill">Freemium</span><span class="pill blue">Board Exam</span></div><div class="live"><span class="dot"></span> 2,847 students online ngayon · Libre magsimula</div></div></div></a>
+  <a class="card" href="/ece/resistor/"><div class="arrow">›</div><div class="top"><div class="icon">🎨</div><div><h3>Resistor Color Code</h3><p>4-band, 5-band, 6-band decoder · Auto-value to color</p><div class="pills"><span class="pill hot">Hot</span><span class="pill blue">Board Exam</span></div></div></div></a>
+  <a class="card" href="/ece/db-converter/"><div class="arrow">›</div><div class="top"><div class="icon">📶</div><div><h3>dB / Decibel Converter</h3><p>dBm, dBW, voltage ratio, power gain · EST essentials</p><div class="pills"><span class="pill hot">Hot</span><span class="pill blue">EST Board</span></div></div></div></a>
+  <a class="card" href="/ece/kmap/"><div class="arrow">›</div><div class="top"><div class="icon">🧩</div><div><h3>K-Map Simplifier</h3><p>2 to 4 variables · SOP & POS · Step-by-step grouping</p></div></div></a>
+  <a class="card" href="/ece/number-system/"><div class="arrow">›</div><div class="top"><div class="icon">🔢</div><div><h3>Number System Converter</h3><p>Binary, Octal, Decimal, Hex · With solution steps</p></div></div></a>
+  <a class="card" href="/ece/op-amp/"><div class="arrow">›</div><div class="top"><div class="icon">🔌</div><div><h3>Op-Amp Calculator</h3><p>Inverting & Non-inverting · Gain & bandwidth</p></div></div></a>
+</div>
+
+<div class="section"><div class="bar"></div><h2>EE — Electrical Engineering</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Power & Systems</span></div>
+<div class="grid" id="grid-ee">
+  <a class="card" href="/ee/ohms-law/"><div class="arrow">›</div><div class="top"><div class="icon">🔌</div><div><h3>Ohm's Law & Power</h3><p>V=IR, P=VI · Solve any variable · Power triangle</p><div class="pills"><span class="pill">Calculator</span><span class="pill blue">Board Exam</span></div></div></div></a>
+  <a class="card" href="/ee/pec-wire-size/"><div class="arrow">›</div><div class="top"><div class="icon">🔧</div><div><h3>PEC Wire Size</h3><p>Ampacity table · Voltage drop · PEC 2023 compliant</p><div class="pills"><span class="pill">PEC</span><span class="pill blue">Board Exam</span></div></div></div></a>
+  <a class="card" href="/ee/three-phase/"><div class="arrow">›</div><div class="top"><div class="icon">⚙️</div><div><h3>Three-Phase Power</h3><p>Wye & Delta · Line vs Phase · Power factor calc</p><div class="pills"><span class="pill">Power Systems</span><span class="pill hot">Hot</span></div></div></div></a>
+  <a class="card" href="/ee/transformer/"><div class="arrow">›</div><div class="top"><div class="icon">🏗️</div><div><h3>Transformer Calculator</h3><p>Turns ratio · Efficiency · kVA to current</p><div class="pills"><span class="pill">Power Systems</span><span class="pill blue">Board Exam</span></div></div></div></a>
+  <a class="card" href="/ee/motor-hp-kw/"><div class="arrow">›</div><div class="top"><div class="icon">🏭</div><div><h3>Motor HP/kW Calculator</h3><p>HP ↔ kW · FLA · Service factor · Single & 3-phase</p><div class="pills"><span class="pill">Calculator</span><span class="pill">PEC</span></div></div></div></a>
+  <a class="card" href="/ee/unit-converter/"><div class="arrow">›</div><div class="top"><div class="icon">🔄</div><div><h3>Engineering Unit Converter</h3><p>Electrical units · Fast prefix · SI to Imperial</p><div class="pills"><span class="pill green">New</span><span class="pill">Calculator</span></div></div></div></a>
+</div>
+
+<div class="section ce"><div class="bar"></div><h2>CE — Civil Engineering</h2><span style="margin-left:auto;color:var(--muted);font-size:12px">5 tools</span></div>
+<div class="grid" id="grid-ce">
+  <a class="card" href="/ce/beam-moment/"><div class="arrow">›</div><div class="top"><div class="icon">📐</div><div><h3>Beam & Moment Calculator</h3><p>Shear & moment diagram · Reactions · Point & UDL</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
+  <a class="card" href="/ce/fluid-mechanics/"><div class="arrow">›</div><div class="top"><div class="icon">💧</div><div><h3>Fluid Mechanics</h3><p>Bernoulli · Reynolds · Head loss · Flow rate tools</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
+  <a class="card" href="/ce/surveying/"><div class="arrow">›</div><div class="top"><div class="icon">🧭</div><div><h3>Surveying & Traverse</h3><p>Bearing & azimuth · Lat & Dep · Area computation</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill green">New</span></div></div></div></a>
+  <a class="card" href="/ce/concrete-mix/"><div class="arrow">›</div><div class="top"><div class="icon">🧱</div><div><h3>Concrete Mix Design</h3><p>ACI 211 method · Water-cement ratio · PH materials</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
+  <a class="card" href="/ce/soil-mechanics/"><div class="arrow">›</div><div class="top"><div class="icon">🌍</div><div><h3>Soil Mechanics</h3><p>Atterberg limits · Permeability · Consolidation</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill green">New</span></div></div></div></a>
+</div>
+
+<div class="section daily"><div class="bar"></div><h2>Pang-araw-araw</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Everyday PH Tools</span><span style="margin-left:auto;color:var(--muted);font-size:12px">3 tools</span></div>
+<div class="grid" id="grid-tools">
+  <a class="card" href="/tools/sahod-calculator/"><div class="arrow">›</div><div class="top"><div class="icon">💰</div><div><h3>Sahod Calculator 2026</h3><p>BIR tax table 2026 · SSS, PhilHealth, Pag-IBIG · Net pay</p><div class="pills"><span class="pill green">2026 Update</span><span class="pill hot">Hot</span></div></div></div></a>
+  <a class="card" href="/tools/id-photo/"><div class="arrow">›</div><div class="top"><div class="icon">🪪</div><div><h3>2x2 ID Photo Maker</h3><p>PH standard 2x2 & 1x1 · White background · Print ready</p><div class="pills"><span class="pill">ID Ready</span><span class="pill">Everyday</span></div></div></div></a>
+  <a class="card" href="/tools/sss-contribution/"><div class="arrow">›</div><div class="top"><div class="icon">🏦</div><div><h3>SSS Contribution</h3><p>2026 table · Employee & employer share · Auto compute</p><div class="pills"><span class="pill">PH Gov</span><span class="pill green">2026 Update</span></div></div></div></a>
+</div>
+
+<script>
+function go(q){const el=document.getElementById('grid-ece'); const cards=[...el.querySelectorAll('a')]; const found=cards.find(c=>c.href.includes(q)); if(found) found.scrollIntoView({behavior:'smooth'});}
+function filter(){const q=document.getElementById('q').value.toLowerCase(); const all=document.querySelectorAll('.card'); let cnt=0; all.forEach(c=>{const t=c.innerText.toLowerCase(); const show=t.includes(q); c.style.display=show?'':'none'; if(show)cnt++;}); document.getElementById('count').innerText=cnt;}
+</script>
+</body></html>
