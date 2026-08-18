@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/ece/ece-reviewer", "destination": "/ece/ece-reviewer/index.html" },
+    { "source": "/ece/resistor", "destination": "/ece/resistor/index.html" },
+    { "source": "/ece/db-converter", "destination": "/ece/db-converter/index.html" },
+    { "source": "/ece/kmap", "destination": "/ece/kmap/index.html" },
+    { "source": "/ece/number-system", "destination": "/ece/number-system/index.html" },
+    { "source": "/ece/op-amp", "destination": "/ece/op-amp/index.html" },
+    { "source": "/ece/strategy", "destination": "/ece/strategy/index.html" }
+  ]
+}
