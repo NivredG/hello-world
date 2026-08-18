@@ -1,87 +1,128 @@
-<!doctype html><html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ECE Reviewer 7710 - V4.2 Loading Fix</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ECE 7710 V4.5 Smart Calcs</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
-*{box-sizing:border-box}body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;padding:0;max-width:900px;margin:auto}
-a.home{color:var(--gold);text-decoration:none;padding:12px 16px;display:block}
-.banner{background:#1e293b;border:1px solid #334155;margin:0 12px;border-radius:12px;padding:10px;font-size:12px;display:flex;justify-content:space-between}
-.modes{display:flex;gap:6px;padding:8px 12px;overflow-x:auto}
+*{box-sizing:border-box}body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}
 .mode{padding:10px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surf);cursor:pointer;white-space:nowrap;font-size:13px}
 .mode.active{background:var(--gold);color:#000;font-weight:800}
-.card{background:var(--surf);border:1px solid var(--border);border-radius:16px;margin:12px;padding:16px}
-.q{font-size:17px;font-weight:600}.opt{padding:14px;border:1px solid var(--border);border-radius:14px;margin:10px 0;background:var(--surf2);cursor:pointer}
-.opt.correct{border-color:var(--green);background:rgba(34,197,94,.15)}.opt.wrong{border-color:var(--red);background:rgba(239,68,68,.15)}
-.tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
-.tier.best{border-color:var(--gold)} .price{font-weight:900;color:var(--gold);font-size:20px}.old{line-through;color:#6b7280}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:16px;margin:12px;padding:16px;position:relative}
+.q{font-size:17px;font-weight:600}.opt{padding:14px;border:1.5px solid var(--border);border-radius:14px;margin:10px 0;background:var(--surf2);cursor:pointer}
+.opt.correct{border-color:var(--green);background:rgba(34,197,94,.2)}.opt.wrong{border-color:var(--red);background:rgba(239,68,68,.2)}
+.calc-box{background:#0f172a;border:2px solid #f59e0b;border-radius:12px;padding:12px;margin:12px 0}
+.calc-title{color:var(--gold);font-weight:800;font-size:12px;margin-bottom:8px}
+input,select{background:var(--surf2);border:1px solid var(--border);color:#fff;padding:10px;border-radius:8px;width:100%;margin:4px 0}
 .btn{background:var(--gold);color:#000;border:0;padding:12px 20px;border-radius:12px;font-weight:800;cursor:pointer}
-#qr{display:none;background:#fff;color:#000;padding:16px;border-radius:16px;text-align:center;margin:12px}
-.mnemo{background:#1e1b4b;padding:12px;border-radius:10px;color:#a5b4fc;margin:12px 0}
-.caltech{background:#052e16;padding:12px;border-radius:10px;color:#86efac;margin:12px 0}
+.mnemo{background:#1e1b4b;border:1px solid #3730a3;border-radius:12px;padding:12px;margin:12px 0;color:#a5b4fc;font-size:13px}
+.caltech{background:#052e16;border:1px solid #166534;border-radius:12px;padding:12px;margin:12px 0;color:#86efac;font-size:13px}
+.timer-bar{height:6px;background:#252a3a;border-radius:999px;overflow:hidden;margin:8px 0}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--red));transition:width 1s linear}
+.countdown{font-size:32px;font-weight:900;color:var(--gold);text-align:center}
 </style></head><body>
-<a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>Save ₱9,101 vs Center ₱10k</span><span>All 7710 = ₱899</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
-<div class="modes"><div class="mode active" onclick="setMode('quiz',this)">📝 QUIZ</div><div class="mode" onclick="setMode('blitz',this)">⚡ BLITZ</div><div class="mode" onclick="setMode('study',this)">📖 STUDY</div><div class="mode" onclick="setMode('mnemo',this)">🧠 MNEMO</div><div class="mode" onclick="setMode('caltech',this)">🔬 CALTECH</div></div>
-<div class="card"><div id="extra"></div><div id="q" class="q">Loading questions... If stuck, check console. Fallback loading in 2 sec...</div><div id="opts"></div><button class="btn" style="width:100%;margin-top:12px" onclick="nextQ()">Next →</button></div>
+<a href="/" style="color:var(--gold);text-decoration:none;padding:12px;display:block">← PinasTools Home</a>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 Qs V4.5</b><br><small id="progressText">0/100</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE</div></div>
+<div style="display:flex;gap:6px;padding:8px 12px;overflow-x:auto">
+<div class="mode active" onclick="setMode('quiz',this)">📝 QUIZ</div><div class="mode" onclick="setMode('blitz',this)">⚡ BLITZ</div><div class="mode" onclick="setMode('study',this)">📖 STUDY</div><div class="mode" onclick="setMode('mnemo',this)">🧠 MNEMO</div><div class="mode" onclick="setMode('caltech',this)">🔬 CALTECH</div>
+</div>
 <div class="card">
-<h3>Unlock - Seryoso Pricing</h3>
-<div class="tier"><div><b>Free</b> 100 Qs</div><span style="color:var(--green)">Active</span></div>
-<div class="tier"><div><b>₱99 BATAK</b> 200 Qs</div><button class="btn" onclick="buy(99,'BATAK')">Buy</button></div>
-<div class="tier"><div><b>₱199 PASA</b> 500 Qs</div><button class="btn" onclick="buy(199,'PASA')">Buy</button></div>
-<div class="tier best"><div><b>₱349 BOARD</b> 1000 Qs ⭐</div><button class="btn" onclick="buy(349,'BOARD')">Buy</button></div>
-<div class="tier"><div><b>₱599 TOP</b> 3000 Qs</div><button class="btn" onclick="buy(599,'TOP')">Buy</button></div>
-<div class="tier"><div><b>₱899 ALL</b> 7710 Qs</div><button class="btn" onclick="buy(899,'ALLIN')">Buy ALL</button></div>
-<div style="display:flex;gap:8px;margin-top:12px"><input id="code" placeholder="Enter code" style="flex:1;padding:12px;border-radius:12px;background:#0a0b0f;border:1px solid var(--border);color:#fff"><button class="btn" onclick="redeem()">Redeem</button></div>
-<div id="qr"><p><b>GCash - Scan to Pay</b></p><div id="qrPlaceholder" style="padding:12px;border:2px dashed #ccc;border-radius:12px">📱 Send your GCash QR here on Meta mobile and I'll embed real QR. This placeholder does NOT send money yet.</div><p><span id="qrAmount">₱899 ALL-IN</span></p></div>
+<div id="blitzTimer" style="display:none"><div class="countdown" id="countdown">10</div><div class="timer-bar"><div id="timerFill" class="timer-fill" style="width:100%"></div></div></div>
+<div id="extra"></div>
+<div id="q" class="q">Loading...</div>
+<div id="smartCalc"></div>
+<div id="opts"></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next →</button><button onclick="showAns()" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px 18px;border-radius:12px">Show</button></div>
+</div>
+<div class="card"><h3>Unlock</h3>
+<div style="display:flex;gap:8px;margin-top:12px"><input id="code" placeholder="Enter code"><button class="btn" onclick="redeem()">Redeem</button></div>
 </div>
 <script>
-let questions=[],idx=0,mode='quiz',limit=100,tier='free';
+let questions=[],idx=0,mode='quiz',limit=100,blitzInterval=null,timeLeft=10,soundOn=true;
 const TIERS={free:100,99:200,199:500,349:1000,599:3000,899:7710,tester:7710};
 const CODE_MAP={TESTER2026:7710,BATAK99:200,PASA199:500,BOARD349:1000,TOP599:3000,ALL899:7710};
-const FALLBACK_QS=[
-{q:"What is the unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,mnemo:"Frequency = Hertz - isipin 'FrequenZ = HertZ'",derivation:"f=1/T - frequency is inverse of period",formula:"f=1/T"},
-{q:"Ohm's Law?",opts:["V=IR","P=VI","F=ma","E=mc²"],ans:0,mnemo:"VIR - Very Important Resistor",derivation:"V=IR derived from resistance definition R=V/I",formula:"V=IR"},
-{q:"What is 2+2 in binary?",opts:["100","101","110","111"],ans:0,mnemo:"2+2=4, binary 100",derivation:"Decimal 4 = 1*2^2 +0*2^1+0*2^0 =100",formula:"Binary conversion"},
-{q:"Capacitor stores?",opts:["Charge","Current","Power","Resistance"],ans:0,mnemo:"CAP stores Charge - C=C",derivation:"Q=CV",formula:"Q=CV"},
-{q:"Unit of inductance?",opts:["Henry","Farad","Ohm","Siemens"],ans:0,mnemo:"Inductor Henry - L Henry",derivation:"L = NΦ/I",formula:"L=NΦ/I"}
+const FALLBACK=[
+{q:"What is resistance of resistor with colors Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω ±5%","47kΩ ±5%","4.7Ω ±5%"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100",keywords:"resistor color code"},
+{q:"Convert 25°C to Fahrenheit?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",keywords:"temperature celsius fahrenheit"},
+{q:"Capacitor 100μF at 60Hz reactance?",opts:["26.5Ω","60Ω","100Ω","0Ω"],ans:0,topic:"EST",formula:"Xc=1/(2πfC)",keywords:"capacitor reactance"},
+{q:"Gain 20dB means power ratio?",opts:["100x","20x","10x","2x"],ans:0,topic:"EST",formula:"dB=10log(P2/P1)",keywords:"db gain"},
+{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",keywords:"resistor ohms law"}
 ];
+let audioCtx=null;
+function playTone(f,d,t='sine',v=0.3){if(!soundOn)return;if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(v,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+d);o.start();o.stop(audioCtx.currentTime+d);}
+function soundClick(){playTone(800,0.1)}function soundCorrect(){playTone(523,0.15);setTimeout(()=>playTone(659,0.15),120);setTimeout(()=>playTone(784,0.3),240)}function soundWrong(){playTone(200,0.3,'sawtooth');}
 
-function loadQs(){
- // Try to load real file
- fetch('./questions-free.js').then(r=>{
-   if(!r.ok) throw new Error('not found');
-   return r.text();
- }).then(t=>{
-   try{eval(t);let real=window.FREE_QS||[];if(real.length>0){questions=real.slice(0,limit);console.log('Loaded real',real.length);showQ();return;}}
-   catch(e){console.log('eval fail',e);}
-   // fallback if eval fails
-   useFallback();
- }).catch(e=>{
-   console.log('Fetch failed, using fallback',e);
-   useFallback();
- });
- // Safety timeout - if still loading after 2 sec, use fallback
- setTimeout(()=>{if(questions.length===0) useFallback();},2000);
+function loadQs(){fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>0){questions=real;showQ();return;}}catch(e){}useFallback();}).catch(()=>useFallback());setTimeout(()=>{if(questions.length===0)useFallback();},1500);}
+function useFallback(){questions=FALLBACK;showQ();}
+
+function detectSmartCalc(qText){
+ let txt=(qText||'').toLowerCase();
+ if(txt.includes('resistor')||txt.includes('color code')||txt.includes('band')||txt.includes('kω')||txt.includes('kΩ')||txt.includes('ohm')&&txt.includes('color')) return 'resistor';
+ if(txt.includes('°c')||txt.includes('celsius')||txt.includes('fahrenheit')||txt.includes('kelvin')||txt.includes('temperature')||txt.includes('convert')&&txt.includes('°')) return 'temp';
+ if(txt.includes('capacitor')&& (txt.includes('reactance')||txt.includes('xc')||txt.includes('μf')||txt.includes('uf'))) return 'capacitor';
+ if(txt.includes('inductor')&& (txt.includes('xl')||txt.includes('mh')||txt.includes('inductance'))) return 'inductor';
+ if(txt.includes('db')||txt.includes('decibel')||txt.includes('gain')&&txt.includes('ratio')) return 'db';
+ if(txt.includes('resistance')||txt.includes('v=ir')||txt.includes('ohms law')) return 'ohm';
+ return null;
 }
-function useFallback(){
- if(questions.length>0) return;
- questions=FALLBACK_QS; // at least 5 so modes work
- document.getElementById('q').innerText='';
- console.log('Using fallback 5 sample Qs - real file missing');
- showQ();
+
+function renderSmartCalc(type){
+ if(!type) return '';
+ if(type==='resistor'){
+   return `<div class="calc-box"><div class="calc-title">🔧 Resistor Color Code Calculator (Auto-detected)</div>
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
+   <select id="band1"><option value="0">Black 0</option><option value="1">Brown 1</option><option value="2">Red 2</option><option value="3">Orange 3</option><option value="4" selected>Yellow 4</option><option value="5">Green 5</option><option value="6">Blue 6</option><option value="7">Violet 7</option><option value="8">Gray 8</option><option value="9">White 9</option></select>
+   <select id="band2"><option value="0">Black 0</option><option value="1">Brown 1</option><option value="2">Red 2</option><option value="3">Orange 3</option><option value="4">Yellow 4</option><option value="5">Green 5</option><option value="6">Blue 6</option><option value="7" selected>Violet 7</option><option value="8">Gray 8</option><option value="9">White 9</option></select>
+   <select id="band3"><option value="0">Black x1</option><option value="1">Brown x10</option><option value="2" selected>Red x100</option><option value="3">Orange x1k</option><option value="4">Yellow x10k</option><option value="5">Green x100k</option></select>
+   <select id="band4"><option value="5">Gold ±5%</option><option value="10">Silver ±10%</option></select>
+   </div>
+   <div id="resResult" style="margin-top:8px;font-weight:800;color:var(--gold)">4.7kΩ ±5%</div>
+   <button class="btn" style="margin-top:6px;padding:8px 12px;font-size:12px" onclick="calcRes()">Calculate</button></div>`;
+ }
+ if(type==='temp'){
+   return `<div class="calc-box"><div class="calc-title">🌡️ Temperature Converter (Auto-detected)</div>
+   <div style="display:flex;gap:6px"><input id="tempC" type="number" placeholder="°C" value="25" oninput="calcTemp()"><span style="padding:10px">=</span><input id="tempF" type="number" placeholder="°F" value="77"><input id="tempK" type="number" placeholder="K" value="298"></div>
+   <div style="font-size:11px;color:#94a3b8;margin-top:4px">Formulas: °F=°C×9/5+32, K=°C+273.15</div></div>`;
+ }
+ if(type==='capacitor'){
+   return `<div class="calc-box"><div class="calc-title">⚡ Capacitive Reactance Calc</div>
+   <div style="display:flex;gap:6px"><input id="capF" placeholder="Freq Hz" value="60"><input id="capC" placeholder="Cap μF" value="100"><button class="btn" onclick="calcCap()">Calc Xc</button></div><div id="capResult" style="color:var(--gold);font-weight:800;margin-top:6px"></div></div>`;
+ }
+ if(type==='db'){
+   return `<div class="calc-box"><div class="calc-title">📡 dB Calculator</div>
+   <div style="display:flex;gap:6px"><input id="dbRatio" placeholder="Power ratio" value="100"><button class="btn" onclick="calcDb()">→ dB</button></div><div id="dbResult" style="color:var(--gold);margin-top:6px"></div></div>`;
+ }
+ if(type==='ohm'){
+   return `<div class="calc-box"><div class="calc-title">🔌 Ohm's Law Calc</div><div style="display:flex;gap:6px"><input id="ohmV" placeholder="V" value="10"><input id="ohmI" placeholder="I" value="2"><button class="btn" onclick="calcOhm()">Calc R</button></div><div id="ohmResult" style="color:var(--gold);margin-top:6px">R=5Ω</div></div>`;
+ }
+ return '';
 }
-function setMode(m,el){mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));el.classList.add('active');showQ();}
+
+function calcRes(){
+ let b1=parseInt(document.getElementById('band1').value),b2=parseInt(document.getElementById('band2').value),b3=parseInt(document.getElementById('band3').value);
+ let val=(b1*10+b2)*Math.pow(10,b3);let txt=val>=1000? (val/1000)+'kΩ' : val+'Ω';document.getElementById('resResult').innerText=txt+' ±5%';
+}
+function calcTemp(){
+ let c=parseFloat(document.getElementById('tempC').value);if(isNaN(c))return;document.getElementById('tempF').value=(c*9/5+32).toFixed(1);document.getElementById('tempK').value=(c+273.15).toFixed(2);
+}
+function calcCap(){
+ let f=parseFloat(document.getElementById('capF').value),cap=parseFloat(document.getElementById('capC').value)*1e-6;let xc=1/(2*Math.PI*f*cap);document.getElementById('capResult').innerText='Xc='+xc.toFixed(2)+'Ω';
+}
+function calcDb(){let r=parseFloat(document.getElementById('dbRatio').value);document.getElementById('dbResult').innerText=(10*Math.log10(r)).toFixed(2)+' dB';}
+function calcOhm(){let v=parseFloat(document.getElementById('ohmV').value),i=parseFloat(document.getElementById('ohmI').value);document.getElementById('ohmResult').innerText='R='+(v/i).toFixed(2)+'Ω';}
+
+function setMode(m,el){mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));el.classList.add('active');document.getElementById('blitzTimer').style.display=m==='blitz'?'block':'none';if(m==='blitz')startBlitz();showQ();}
+function startBlitz(){timeLeft=10;clearInterval(blitzInterval);blitzInterval=setInterval(()=>{timeLeft--;document.getElementById('countdown').innerText=timeLeft;document.getElementById('timerFill').style.width=(timeLeft/10*100)+'%';if(timeLeft<=0){clearInterval(blitzInterval);nextQ();}},1000);}
 function showQ(){
- if(!questions[idx]){document.getElementById('q').innerText='No questions loaded. Check if questions-free.js is in same folder as index.html on Vercel.';return;}
+ if(!questions[idx])return;
  let q=questions[idx];
- document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+': '+(q.q||q.question);
- let extra='';if(mode==='mnemo')extra='<div class="mnemo">🧠 '+(q.mnemo||'Mnemonic')+'</div>';if(mode==='caltech')extra='<div class="caltech">🔬 '+(q.derivation||q.formula||'Derivation')+'</div>';if(mode==='study')extra='<div class="mnemo">📖 Study: '+(q.explanation||q.q)+'</div>';
+ document.getElementById('q').innerText=`Q${idx+1}/${limit}: ${q.q||q.question}`;
+ let calcType=detectSmartCalc(q.q||q.question);
+ document.getElementById('smartCalc').innerHTML=renderSmartCalc(calcType);
+ let extra='';if(mode==='mnemo') extra=`<div class="mnemo">🧠 ${(q.mnemo||'Trick: '+q.formula)}</div>`;if(mode==='caltech') extra=`<div class="caltech">🔬 ${q.derivation||q.formula||'Derivation'}</div>`;
  document.getElementById('extra').innerHTML=extra;
- let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||['A','B','C','D']).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{if((q.ans||0)===i)d.classList.add('correct');else d.classList.add('wrong');setTimeout(nextQ,600);};opts.appendChild(d);});
- document.getElementById('progressText').innerText=(idx+1)+'/'+limit+' - '+tier;
+ let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||[]).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{soundClick();let ok=(q.ans||0)===i;if(ok){d.classList.add('correct');soundCorrect();}else{d.classList.add('wrong');soundWrong();}setTimeout(nextQ,900);};opts.appendChild(d);});
+ document.getElementById('progressText').innerText=`${idx+1}/${limit}`;
 }
-function nextQ(){idx=(idx+1)%limit;showQ();}
-function buy(p,name){limit=TIERS[p];tier=name;document.getElementById('tierLabel').innerText=name+' P'+p;document.getElementById('qrAmount').innerText='P'+p+' '+name;document.getElementById('qr').style.display='block';}
-function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();if(CODE_MAP[code]){limit=CODE_MAP[code];tier=code;if(code==='TESTER2026'){let exp=Date.now()+5*24*60*60*1000;localStorage.setItem('tester_expiry',exp);alert('Tester 5 days until '+new Date(exp).toLocaleDateString());}document.getElementById('tierLabel').innerText=code+' '+limit+'Q';document.getElementById('qr').style.display='none';fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];questions=all.slice(0,limit);idx=0;showQ();}catch(e){}});}else alert('Invalid');}
+function nextQ(){idx=(idx+1)%Math.min(limit,questions.length);showQ();}
+function showAns(){let c=questions[idx].ans||0;let els=document.querySelectorAll('.opt');if(els[c])els[c].classList.add('correct');}
+function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();if(CODE_MAP[code]){limit=CODE_MAP[code];fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];questions=all.slice(0,limit);idx=0;showQ();}catch(e){}});}else alert('Invalid');}
 loadQs();
 </script></body></html>
