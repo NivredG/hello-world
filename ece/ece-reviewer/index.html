@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.13 Blitz Fixed + Score Tracker Stable</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.14 No Repeat + Debug Blitz Fixed + Score Tracker Stable</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -12,8 +12,8 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}.tier.best{border-color:var(--gold)} .tier.free{border-color:var(--green)}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a><div style="display:flex;gap:8px;padding:0 12px"><a href="https://pinastools.com" target="_blank" style="color:var(--gold);font-size:12px;text-decoration:none;border:1px solid var(--gold);padding:4px 10px;border-radius:999px">🌐 PinasTools.com</a><a href="https://facebook.com/PinasTools" target="_blank" style="color:#60a5fa;font-size:12px;text-decoration:none;border:1px solid #3b82f6;padding:4px 10px;border-radius:999px">📘 FB: PinasTools</a></div>
-<div class="banner"><span>V6.13 Blitz Fixed + Score Tracker Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.13 Blitz Fixed + Score Tracker</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<div class="banner"><span>V6.14 No Repeat + Debug Blitz Fixed + Score Tracker Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.14 No Repeat + Debug Blitz Fixed + Score Tracker</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options - FIXED</div>
 <div class="controls">
@@ -96,38 +96,60 @@ let selectedCount=100;
 let selectedTopic='all';
 
 let answered=0, correct=0;
-let FALLBACK=[{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz",derivation:"f=1/T"},{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR",derivation:"R=V/I=5Ω"},{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100",mnemo:"Yellow=4 Violet=7 Red=x100",derivation:"47*100=4700=4.7kΩ"},{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"x1.8+32",derivation:"25*9/5+32=77°F"}];
+
+let FALLBACK=[
+{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz",derivation:"f=1/T"},
+{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR",derivation:"R=10/2=5Ω"},
+{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100",mnemo:"Bad Boy",derivation:"47*100=4.7k"},
+{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"x1.8+32",derivation:"25*9/5+32=77"},
+{q:"Copper temp rises resistance?",opts:["Increases","Decreases","Same","Zero"],ans:0,topic:"ELEX",formula:"R=R0[1+αΔT]",mnemo:"Hot higher",derivation:"α=0.00393"},
+{q:"Thermistor is?",opts:["Temp-sensitive resistor","Voltage","Light","Magnetic"],ans:0,topic:"EST",formula:"NTC",mnemo:"Thermal resistor",derivation:"NTC T up R down"},
+{q:"Capacitor unit?",opts:["Farad","Henry","Ohm","Watt"],ans:0,topic:"ELEX",formula:"C=Q/V",mnemo:"Farad",derivation:"Q=CV"},
+{q:"Inductor unit?",opts:["Henry","Farad","Ohm","Volt"],ans:0,topic:"ELEX",formula:"V=L di/dt",mnemo:"Henry",derivation:"L"},
+{q:"Power formula?",opts:["P=VI","P=V/I","P=I/V","P=V+I"],ans:0,topic:"GEAS",formula:"P=VI",mnemo:"VI",derivation:"P=VI"},
+{q:"Series resistors total?",opts:["Sum","Product","Average","Difference"],ans:0,topic:"ELEX",formula:"Rt=R1+R2",mnemo:"Add",derivation:"Rtotal=R1+R2"},
+{q:"Parallel resistors?",opts:["1/Rt=1/R1+1/R2","Rt=R1+R2","Rt=R1*R2","Rt=R1-R2"],ans:0,topic:"ELEX",formula:"1/Rt",mnemo:"Reciprocal",derivation:"1/Rt=sum"},
+{q:"Diode allows current?",opts:["One way","Both","None","AC only"],ans:0,topic:"ELEX",formula:"Forward bias",mnemo:"One way",derivation:"PN junction"},
+{q:"Transistor has how many terminals?",opts:["3","2","4","5"],ans:0,topic:"ELEX",formula:"B C E",mnemo:"BCE",derivation:"Base Collector Emitter"},
+{q:"Ohm's law for power?",opts:["P=I²R","P=IR","P=R/I","P=I/R"],ans:0,topic:"ELEX",formula:"P=I2R",mnemo:"I squared R",derivation:"P=VI=I2R"},
+{q:"What is 1kΩ?",opts:["1000Ω","100Ω","10Ω","10000Ω"],ans:0,topic:"ELEX",formula:"k=1000",mnemo:"kilo",derivation:"1k=1000"},
+{q:"Kirchhoff current law?",opts:["Sum in = Sum out","V=IR","P=VI","F=ma"],ans:0,topic:"GEAS",formula:"ΣI=0",mnemo:"In=Out",derivation:"KCL"},
+{q:"Kirchhoff voltage law?",opts:["Sum V loop=0","Sum I=0","P=VI","V=IR"],ans:0,topic:"GEAS",formula:"ΣV=0",mnemo:"Loop zero",derivation:"KVL"},
+{q:"What is ground?",opts:["0V reference","High voltage","Current","Power"],ans:0,topic:"GEAS",formula:"0V",mnemo:"Reference",derivation:"0V"},
+{q:"AC frequency PH?",opts:["60Hz","50Hz","100Hz","0Hz"],ans:0,topic:"GEAS",formula:"60Hz",mnemo:"60 PH",derivation:"Philippines 60Hz"},
+{q:"Resistor color Black?",opts:["0","1","2","3"],ans:0,topic:"ELEX",formula:"Black=0",mnemo:"0 black",derivation:"0"}
+];
+
+
 function loadAll(){
  updateQCountOptionsSafe();
  allQuestions=[...FALLBACK];
  applyFilters();
  showQ();
- document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' fallback - loading real file...';
- fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' real Qs';}}catch(e){}}).catch(e=>{document.getElementById('filterInfo').innerText='Using fallback - upload questions-free.js';});
+ document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' fallback (20) - trying real file...';
+ // Try with cache bust
+ fetch('./questions-free.js?v='+Date.now()).then(r=>{
+   if(!r.ok) throw new Error('HTTP '+r.status+' - file not found on server. Did you git add ece/ece-reviewer/?');
+   return r.text();
+ }).then(t=>{
+   try{
+     eval(t);
+     let real=window.FREE_QS||[];
+     if(real.length>=10){
+       allQuestions=real;
+       reapplyAfterLoad();
+       document.getElementById('filterInfo').innerText='✅ Loaded '+allQuestions.length+' REAL Qs from questions-free.js - No repeat!';
+     } else {
+       document.getElementById('filterInfo').innerText='⚠️ Real file too small ('+real.length+') - using fallback 20 Qs. File may be empty';
+     }
+   }catch(e){
+     document.getElementById('filterInfo').innerText='❌ Parse error in questions-free.js: '+e.message+' - using fallback 20';
+   }
+ }).catch(e=>{
+   document.getElementById('filterInfo').innerHTML='❌ FAILED to load questions-free.js: '+e.message+'<br>→ Fix: Run <code>git add ece/ece-reviewer/</code> then <code>git push</code>. Check Vercel has the file at /ece/ece-reviewer/questions-free.js';
+ });
 }
-function applyFilters(){
- try{
-  let count=parseInt(document.getElementById('qCount').value);
-  selectedCount=count;
-  selectedTopic=document.getElementById('topicFilter').value;
-  if(count>unlockedLimit){alert('Locked! Need code for '+count+' Max: '+unlockedLimit); count=unlockedLimit; selectedCount=unlockedLimit; document.getElementById('qCount').value=unlockedLimit;}
-  let topic=selectedTopic;
-  let filtered=[...allQuestions];
-  if(topic!=='all'){
-    if(topic==='resistor') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('color'));
-    else if(topic==='temperature') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('temperatur') || (q.q||'').toLowerCase().includes('thermistor'));
-    else if(topic==='restemp') filtered=filtered.filter(q=> (q.q||'').toLowerCase().includes('resistor') || (q.q||'').toLowerCase().includes('temperatur'));
-    else filtered=filtered.filter(q=> (q.topic||'').toUpperCase().includes(topic.toUpperCase()));
-  }
-  if(filtered.length===0) filtered=[...allQuestions];
-  questions=filtered.slice(0,count);
-  limit=questions.length;
-  idx=0;
-  answered=0; correct=0;
-  document.getElementById('filterInfo').innerText='Showing '+questions.length+' Qs (you asked '+selectedCount+') from '+allQuestions.length+' - Topic: '+topic+' - Unlocked: '+unlockedLimit;
-  showQ();
- }catch(e){console.log('applyFilters error',e); questions=allQuestions.slice(0,100); limit=questions.length; showQ();}
-}
+
 
 function shuffleQs(){for(let i=questions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[questions[i],questions[j]]=[questions[j],questions[i]];}idx=0;showQ();}
 function renderCalc(q){let txt=(q.q||'').toLowerCase(); if(txt.includes('resistor')) return '<div class=calc-box><div class=calc-title>🔧 Resistor</div><div>Yellow=4 Violet=7 Red=x100 → 4.7kΩ</div></div>'; if(txt.includes('temperatur')||txt.includes('°c')) return '<div class=calc-box><div class=calc-title>🌡️ Temp</div><div><input id=tc type=number value=25 oninput=calcT() placeholder=°C><span>=</span><input id=tf placeholder=°F></div></div>'; return '';}
