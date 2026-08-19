@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.11 Final Stable</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.13 Blitz Fixed + Score Tracker Stable</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -11,9 +11,9 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0} .ctrl{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:10px} .ctrl label{font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;font-weight:800}
 .tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}.tier.best{border-color:var(--gold)} .tier.free{border-color:var(--green)}
 </style></head><body>
-<a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>V6.11 Final Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.11 Final</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<a class="home" href="/">← PinasTools Home</a><div style="display:flex;gap:8px;padding:0 12px"><a href="https://pinastools.com" target="_blank" style="color:var(--gold);font-size:12px;text-decoration:none;border:1px solid var(--gold);padding:4px 10px;border-radius:999px">🌐 PinasTools.com</a><a href="https://facebook.com/PinasTools" target="_blank" style="color:#60a5fa;font-size:12px;text-decoration:none;border:1px solid #3b82f6;padding:4px 10px;border-radius:999px">📘 FB: PinasTools</a></div>
+<div class="banner"><span>V6.13 Blitz Fixed + Score Tracker Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.13 Blitz Fixed + Score Tracker</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options - FIXED</div>
 <div class="controls">
@@ -30,7 +30,7 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 <div class="mode" onclick="setMode('mnemo',this)">🧠 MNEMO</div>
 <div class="mode" onclick="setMode('caltech',this)">🔬 CALTECH</div>
 </div>
-<div class="card"><div id="extra"></div><div id="q" class="q">Loading questions...</div><div id="smartCalc"></div><div id="opts"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next</button><button onclick="showAns()" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px 18px;border-radius:12px">Show</button></div></div>
+<div class="card"><div id="blitzTimer" style="display:none"><div class="countdown" id="countdown" style="font-size:36px;font-weight:900;color:var(--gold);text-align:center">10</div><div class="timer-bar" style="height:8px;background:#252a3a;border-radius:999px;overflow:hidden;margin:8px 0"><div id="timerFill" class="timer-fill" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--red));width:100%"></div></div></div><div id="extra"></div><div id="q" class="q">Loading questions...</div><div id="smartCalc"></div><div id="opts"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next</button><button onclick="showAns()" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:12px 18px;border-radius:12px">Show</button></div></div>
 <div class="card"><h3 style="color:var(--gold);margin-top:0">💰 Unlock - Pricing Tiers (No Codes Visible)</h3>
 <div class="tier free"><div><b>Free - 100 Qs</b></div><span style="color:var(--green)">Active</span></div>
 <div class="tier"><div><b>₱99 BATAK - 200 Qs</b></div><button class="btn" onclick="buy(99)">Buy ₱99</button></div>
@@ -95,6 +95,7 @@ function updateQCountOptionsSafe(){
 let selectedCount=100;
 let selectedTopic='all';
 
+let answered=0, correct=0;
 let FALLBACK=[{q:"Unit of frequency?",opts:["Hertz","Watt","Volt","Ampere"],ans:0,topic:"GEAS",formula:"f=1/T",mnemo:"Hertz",derivation:"f=1/T"},{q:"Ohm's Law V=10V I=2A R=?",opts:["5Ω","20Ω","0.2Ω","12Ω"],ans:0,topic:"ELEX",formula:"R=V/I",mnemo:"V=IR",derivation:"R=V/I=5Ω"},{q:"Resistor Yellow Violet Red Gold?",opts:["4.7kΩ ±5%","470Ω","47kΩ","4.7Ω"],ans:0,topic:"ELEX",formula:"Yellow=4 Violet=7 Red=x100",mnemo:"Yellow=4 Violet=7 Red=x100",derivation:"47*100=4700=4.7kΩ"},{q:"Convert 25°C to °F?",opts:["77°F","32°F","100°F","-77°F"],ans:0,topic:"GEAS",formula:"F=C*9/5+32",mnemo:"x1.8+32",derivation:"25*9/5+32=77°F"}];
 function loadAll(){
  updateQCountOptionsSafe();
@@ -122,6 +123,7 @@ function applyFilters(){
   questions=filtered.slice(0,count);
   limit=questions.length;
   idx=0;
+  answered=0; correct=0;
   document.getElementById('filterInfo').innerText='Showing '+questions.length+' Qs (you asked '+selectedCount+') from '+allQuestions.length+' - Topic: '+topic+' - Unlocked: '+unlockedLimit;
   showQ();
  }catch(e){console.log('applyFilters error',e); questions=allQuestions.slice(0,100); limit=questions.length; showQ();}
@@ -130,8 +132,55 @@ function applyFilters(){
 function shuffleQs(){for(let i=questions.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[questions[i],questions[j]]=[questions[j],questions[i]];}idx=0;showQ();}
 function renderCalc(q){let txt=(q.q||'').toLowerCase(); if(txt.includes('resistor')) return '<div class=calc-box><div class=calc-title>🔧 Resistor</div><div>Yellow=4 Violet=7 Red=x100 → 4.7kΩ</div></div>'; if(txt.includes('temperatur')||txt.includes('°c')) return '<div class=calc-box><div class=calc-title>🌡️ Temp</div><div><input id=tc type=number value=25 oninput=calcT() placeholder=°C><span>=</span><input id=tf placeholder=°F></div></div>'; return '';}
 function calcT(){let c=parseFloat(document.getElementById('tc').value);if(isNaN(c))return;document.getElementById('tf').value=(c*9/5+32).toFixed(1);}
-function setMode(m,el){mode=m;document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));el.classList.add('active');showQ();}
+
+let blitzInterval=null, timeLeft=10;
+function setMode(m,el){
+ mode=m;
+ document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active'));
+ el.classList.add('active');
+ let timerDiv=document.getElementById('blitzTimer');
+ if(timerDiv){
+   if(m==='blitz'){
+     timerDiv.style.display='block';
+     startBlitz();
+   } else {
+     timerDiv.style.display='none';
+     clearInterval(blitzInterval);
+   }
+ }
+ showQ();
+}
+function startBlitz(){
+ clearInterval(blitzInterval);
+ timeLeft=10;
+ let cd=document.getElementById('countdown');
+ let tf=document.getElementById('timerFill');
+ if(cd) cd.innerText=timeLeft;
+ if(tf) tf.style.width='100%';
+ blitzInterval=setInterval(()=>{
+   timeLeft--;
+   if(cd) cd.innerText=timeLeft;
+   if(tf) tf.style.width=(timeLeft/10*100)+'%';
+   if(timeLeft<=0){
+     clearInterval(blitzInterval);
+     // auto next if not answered
+     nextQ();
+     if(mode==='blitz') startBlitz();
+   }
+ },1000);
+}
+
+function updateScore(){
+  let total=limit||1;
+  let pct = answered>0 ? Math.round(correct/answered*100) : 0;
+  let el=document.getElementById('scoreText');
+  if(el) el.innerText='Answered: '+answered+' | Correct: '+correct+' | Score: '+pct+'% ('+correct+'/'+answered+') - Q '+(idx+1)+'/'+total;
+  let prog=document.getElementById('progressText');
+  if(prog) prog.innerText='Q '+(idx+1)+'/'+total+' - '+(questions[idx]?.topic||'Mixed');
+}
 function showQ(){
+ updateScore();
+
  if(!questions[idx]){document.getElementById('q').innerText='No Qs - try All Topics';return;}
  let q=questions[idx];
  document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+' ['+(q.topic||'ECE')+']: '+(q.q||'');
@@ -140,7 +189,7 @@ function showQ(){
  if(mode==='mnemo') extra='<div class=mnemo><b>🧠 MNEMONIC:</b><br>'+(q.mnemo||'No mnemo')+'</div>';
  if(mode==='caltech') extra='<div class=caltech><b>🔬 CALTECH:</b><br>'+(q.derivation||q.formula||'No derivation')+'</div>';
  document.getElementById('extra').innerHTML=extra;
- let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||[]).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{let ok=(q.ans||0)===i;if(ok){d.classList.add('correct');}else{d.classList.add('wrong');document.querySelectorAll('.opt')[q.ans||0].classList.add('correct');}setTimeout(nextQ,700);};opts.appendChild(d);});
+ let opts=document.getElementById('opts');opts.innerHTML='';(q.opts||[]).forEach((o,i)=>{let d=document.createElement('div');d.className='opt';d.innerText=o;d.onclick=()=>{if(d.classList.contains('correct')||d.classList.contains('wrong')) return; let ok=(q.ans||0)===i; answered++; if(ok){d.classList.add('correct'); correct++;}else{d.classList.add('wrong'); let ce=document.querySelectorAll('.opt')[q.ans||0]; if(ce) ce.classList.add('correct');} updateScore(); if(mode==='blitz'){clearInterval(blitzInterval);} setTimeout(()=>{nextQ(); if(mode==='blitz') startBlitz();},800);};opts.appendChild(d);});
  document.getElementById('progressText').innerText=(idx+1)+'/'+limit;
 }
 function nextQ(){idx=(idx+1)%limit;showQ();}
@@ -149,4 +198,15 @@ function buy(p){document.getElementById('qr').style.display='block';[99,199,349,
 function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();let map=getCodeMap();let dec={};for(let k in map){dec[decodeB64(k)]=map[k];} if(dec[code]){let lim=parseInt(dec[code]);unlockedLimit=lim;localStorage.setItem('unlockedLimit',lim);updateQCountOptionsSafe();document.getElementById('qCount').value=lim;selectedCount=lim;applyFilters();alert('Unlocked '+lim); fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});} else alert('Invalid');}
 let savedLim=localStorage.getItem('unlockedLimit');if(savedLim){unlockedLimit=parseInt(savedLim);}
 loadAll();
-</script></body></html>
+</script>
+<div class="card" style="text-align:center;background:linear-gradient(135deg,#0f172a,#1e1b4b);border:2px solid var(--gold)">
+<h3 style="color:var(--gold);margin:0 0 8px">🌐 PinasTools Official Links</h3>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0">
+<a href="https://pinastools.com" target="_blank" style="background:var(--gold);color:#000;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">Visit PinasTools.com</a>
+<a href="https://facebook.com/PinasTools" target="_blank" style="background:#1877f2;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">📘 FB Page: PinasTools</a>
+<a href="https://m.me/PinasTools" target="_blank" style="background:var(--surf2);color:#fff;border:1px solid var(--border);padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800">💬 Messenger: Send Receipt</a>
+</div>
+<p style="font-size:11px;color:#94a3b8;margin-top:8px">After GCash payment, screenshot receipt and send to <a href='https://facebook.com/PinasTools' target='_blank' style='color:#60a5fa'>FB Page PinasTools</a> or <a href='https://m.me/PinasTools' target='_blank' style='color:#60a5fa'>Messenger</a>. Code sent within 1 hour. For support: PinasTools.com | FB: PinasTools</p>
+<div style="font-size:10px;color:#64748b;margin-top:8px">© 2026 PinasTools - Save ₱9,101 vs Review Center ₱10k | ECE Board Reviewer 7710 Qs</div>
+</div>
+</body></html>
