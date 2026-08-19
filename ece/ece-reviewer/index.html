@@ -1,13 +1,13 @@
 
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.17 Real FB Link</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V6.18 QA Format Fixed</title>
 <style>body{background:#0a0b0f;color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto} a.home{color:#f59e0b;padding:12px;display:block} .banner{background:linear-gradient(90deg,#7c3aed,#f59e0b);color:#fff;margin:0 12px;border-radius:12px;padding:10px;font-size:12px;display:flex;justify-content:space-between;font-weight:800} .modes{display:flex;gap:6px;padding:8px 12px;overflow-x:auto}.mode{padding:10px 14px;border-radius:999px;border:1px solid #252a3a;background:#151821;cursor:pointer;white-space:nowrap;font-size:12px}.mode.active{background:#f59e0b;color:#000;font-weight:900} .card{background:#151821;border:1px solid #252a3a;border-radius:16px;margin:12px;padding:16px}.q{font-size:17px;font-weight:600}.opt{padding:14px;border:1.5px solid #252a3a;border-radius:14px;margin:10px 0;background:#1e2333;cursor:pointer}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,.2)} .btn{background:#f59e0b;color:#000;border:0;padding:12px 20px;border-radius:12px;font-weight:800;cursor:pointer} .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.ctrl{background:#1e2333;border:1px solid #252a3a;border-radius:12px;padding:10px} .timer-bar{height:8px;background:#252a3a;border-radius:999px;overflow:hidden;margin:8px 0}.timer-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#ef4444);width:100%}.countdown{font-size:36px;font-weight:900;color:#f59e0b;text-align:center} select,input{background:#1e2333;border:1px solid #252a3a;color:#fff;padding:10px;border-radius:8px;width:100%;margin:4px 0} .tier{background:#1e2333;border:1px solid #252a3a;border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}</style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
 <div style="display:flex;gap:8px;padding:0 12px"><a href="https://pinastools.com" target="_blank" style="color:#f59e0b;font-size:12px;text-decoration:none;border:1px solid #f59e0b;padding:4px 10px;border-radius:999px">🌐 PinasTools.com</a><a href="https://www.facebook.com/profile.php?id=61593302194808" target="_blank" style="color:#60a5fa;font-size:12px;text-decoration:none;border:1px solid #3b82f6;padding:4px 10px;border-radius:999px">📘 FB: PinasTools Page</a></div>
-<div class="banner"><span>V6.17 Real FB Link FIXED 100 Qs Pool OK</span><span>STABLE</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.17 Real FB Link</b><br><small id="progressText">Init...</small><div id="scoreText" style="font-size:11px;color:#22c55e;font-weight:800">Answered: 0 | Correct: 0 | Score: 0%</div></div><div style="background:#f59e0b;color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<div class="banner"><span>V6.18 QA Format Fixed FIXED 100 Qs Pool OK</span><span>STABLE</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V6.18 QA Format Fixed</b><br><small id="progressText">Init...</small><div id="scoreText" style="font-size:11px;color:#22c55e;font-weight:800">Answered: 0 | Correct: 0 | Score: 0%</div></div><div style="background:#f59e0b;color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card"><div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#f59e0b">⚙️ Quiz Options</div><div class="controls"><div class="ctrl"><label>📊 Number of Questions</label><select id="qCount" onchange="applyFilters()"></select></div><div class="ctrl"><label>📚 Topic Filter</label><select id="topicFilter" onchange="applyFilters()"><option value="all">All Topics</option><option value="ELEX">ELEX</option><option value="EST">EST</option><option value="GEAS">GEAS</option><option value="resistor">Resistor</option><option value="temperature">Temperature</option></select></div></div><div style="display:flex;gap:6px"><button class="btn" style="flex:1" onclick="applyFilters()">Apply</button><button style="flex:1;background:#1e2333;color:#fff;border:1px solid #252a3a;padding:12px;border-radius:12px" onclick="shuffleQs()">🔀 Shuffle</button></div><div id="filterInfo" style="font-size:11px;color:#94a3b8;margin-top:8px">Loading...</div></div>
 <div class="modes"><div class="mode active" onclick="setMode('quiz',this)">📝 QUIZ</div><div class="mode" onclick="setMode('blitz',this)">⚡ BLITZ</div><div class="mode" onclick="setMode('study',this)">📖 STUDY</div><div class="mode" onclick="setMode('mnemo',this)">🧠 MNEMO</div><div class="mode" onclick="setMode('caltech',this)">🔬 CALTECH</div></div>
-<div class="card"><div id="blitzTimer" style="display:none"><div class="countdown" id="countdown">10</div><div class="timer-bar"><div id="timerFill" class="timer-fill"></div></div></div><div id="q" class="q">Loading...</div><div id="opts"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next →</button><button onclick="showAns()" style="background:#1e2333;color:#fff;border:1px solid #252a3a;padding:12px 18px;border-radius:12px">Show</button></div></div>
+<div class="card"><div id="blitzTimer" style="display:none"><div class="countdown" id="countdown">10</div><div class="timer-bar"><div id="timerFill" class="timer-fill"></div></div></div><div id="q" class="q" data-showAns="0">Loading...</div><div id="opts"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="nextQ()">Next →</button><button onclick="showAns()" style="background:#1e2333;color:#fff;border:1px solid #252a3a;padding:12px 18px;border-radius:12px">Show</button></div></div>
 <script>
 let FALLBACK=[{q:"Sample fallback resistor?",opts:["4.7k","1k","10k","100"],ans:0,topic:"ELEX"}];
 </script>
@@ -24,8 +24,64 @@ function shuffleQs(){for(let i=questions.length-1;i>0;i--){let j=Math.floor(Math
 function updateScore(){let pct=answered>0?Math.round(correct/answered*100):0; document.getElementById('scoreText').innerText='Answered: '+answered+' | Correct: '+correct+' | Score: '+pct+'% - Q '+(idx+1)+'/'+limit; document.getElementById('progressText').innerText='Q '+(idx+1)+'/'+limit+' - Pool: '+allQuestions.length+' - '+(questions[idx]?.topic||'');}
 function setMode(m,el){mode=m; document.querySelectorAll('.mode').forEach(e=>e.classList.remove('active')); el.classList.add('active'); let td=document.getElementById('blitzTimer'); if(m==='blitz'){td.style.display='block'; startBlitz();} else {td.style.display='none'; clearInterval(blitzInterval);} showQ();}
 function startBlitz(){clearInterval(blitzInterval); timeLeft=10; let cd=document.getElementById('countdown'); let tf=document.getElementById('timerFill'); if(cd) cd.innerText=timeLeft; if(tf) tf.style.width='100%'; blitzInterval=setInterval(()=>{timeLeft--; if(cd) cd.innerText=timeLeft; if(tf) tf.style.width=(timeLeft/10*100)+'%'; if(timeLeft<=0){clearInterval(blitzInterval); nextQ(); if(mode==='blitz') startBlitz();}},1000);}
-function showQ(){updateScore(); if(!questions[idx]){document.getElementById('q').innerText='No Qs - pool '+allQuestions.length; return;} let q=questions[idx]; document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+' ['+(q.topic||'ECE')+']: '+(q.q||''); let opts=document.getElementById('opts'); opts.innerHTML=''; (q.opts||[]).forEach((o,i)=>{let d=document.createElement('div'); d.className='opt'; d.innerText=o; d.onclick=()=>{if(d.classList.contains('correct')||d.classList.contains('wrong')) return; let ok=(q.ans||0)===i; answered++; if(ok){d.classList.add('correct'); correct++;} else {d.classList.add('wrong'); let ce=document.querySelectorAll('.opt')[q.ans||0]; if(ce) ce.classList.add('correct');} updateScore(); if(mode==='blitz') clearInterval(blitzInterval); setTimeout(()=>{nextQ(); if(mode==='blitz') startBlitz();},800);}; opts.appendChild(d);});}
-function nextQ(){idx=(idx+1)%limit; showQ();}
-function showAns(){let c=questions[idx].ans||0; let els=document.querySelectorAll('.opt'); if(els[c]) els[c].classList.add('correct');}
+
+
+function showQ(){
+ updateScore();
+ if(!questions[idx]){document.getElementById('q').innerText='No Qs - pool '+allQuestions.length; return;}
+ let q=questions[idx];
+ document.getElementById('q').innerText='Q'+(idx+1)+'/'+limit+' ['+(q.topic||q.cat||'ECE')+']: '+(q.q||'');
+ let opts=document.getElementById('opts'); opts.innerHTML='';
+ let extra=document.getElementById('extra');
+ // Q&A mode (has 'a' field, no opts)
+ if(!q.opts || q.opts.length===0){
+   // Show answer area hidden initially
+   let isBlitz = mode==='blitz';
+   let ansText = q.a||q.answer||'No answer';
+   let exp = q.exp||q.explanation||'';
+   if(mode==='study' || document.getElementById('q').dataset.showAns==='1'){
+     extra.innerHTML='<div style="background:#052e16;border:1px solid #166534;border-radius:12px;padding:12px;margin:12px 0;color:#86efac;font-size:14px;white-space:pre-wrap"><b>✅ Answer:</b> '+ansText+(exp?'<br><br><b>📖 Exp:</b> '+exp:'')+'</div>';
+     opts.innerHTML='<div style="display:flex;gap:8px"><button class="btn" style="flex:1;background:#22c55e;color:#000" onclick="markCorrect(true)">✅ I Got It</button><button class="btn" style="flex:1;background:#ef4444;color:#fff" onclick="markCorrect(false)">❌ Missed</button></div>';
+   } else {
+     extra.innerHTML='<div style="background:#1e1b4b;border:1px solid #3730a3;border-radius:12px;padding:12px;margin:12px 0;color:#a5b4fc;font-size:13px">👆 Tap Show to see answer</div>';
+     opts.innerHTML='';
+   }
+ } else {
+   // MCQ mode
+   extra.innerHTML='';
+   (q.opts||[]).forEach((o,i)=>{
+     let d=document.createElement('div'); d.className='opt'; d.innerText=o;
+     d.onclick=()=>{
+       if(d.classList.contains('correct')||d.classList.contains('wrong')) return;
+       let ok=(q.ans||0)===i; answered++;
+       if(ok){d.classList.add('correct'); correct++;} else {d.classList.add('wrong'); let ce=document.querySelectorAll('.opt')[q.ans||0]; if(ce) ce.classList.add('correct');}
+       updateScore(); if(mode==='blitz') clearInterval(blitzInterval);
+       setTimeout(()=>{nextQ(); if(mode==='blitz') startBlitz();},800);
+     };
+     opts.appendChild(d);
+   });
+ }
+}
+function markCorrect(ok){
+ answered++;
+ if(ok) correct++;
+ updateScore();
+ nextQ();
+ if(mode==='blitz') startBlitz();
+}
+function showAns(){
+ let q=questions[idx];
+ if(!q.opts || q.opts.length===0){
+   document.getElementById('q').dataset.showAns='1';
+   showQ();
+ } else {
+   let c=q.ans||0; let els=document.querySelectorAll('.opt'); if(els[c]) els[c].classList.add('correct');
+ }
+}
+function nextQ(){
+ document.getElementById('q').dataset.showAns='0';
+ idx=(idx+1)%limit; showQ();
+}
+
 updateQCountOptionsSafe(); applyFilters();
 </script></body></html>
