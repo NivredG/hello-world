@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V7.0 STABLE - V6.11 Base + Real FB ID Final Stable</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>V7.1 NO-REPEAT 1000 REAL Qs Inline Final Stable</title>
 <style>
 :root{--bg:#0a0b0f;--surf:#151821;--surf2:#1e2333;--border:#252a3a;--gold:#f59e0b;--green:#22c55e;--red:#ef4444}
 body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width:900px;margin:auto}a.home{color:var(--gold);text-decoration:none;padding:12px;display:block}
@@ -12,8 +12,8 @@ body{background:var(--bg);color:#e8eaf0;font-family:system-ui;margin:0;max-width
 .tier{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}.tier.best{border-color:var(--gold)} .tier.free{border-color:var(--green)}
 </style></head><body>
 <a class="home" href="/">← PinasTools Home</a>
-<div class="banner"><span>V7.0 STABLE - V6.11 Base + Real FB ID Final Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V7.0 STABLE - V6.11 Base + Real FB ID Final</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
+<div class="banner"><span>V7.1 NO-REPEAT 1000 REAL Qs Inline Final Stable - Dropdown + Loading Fixed</span><span>No Blank</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><div><b>ECE 7710 V7.1 NO-REPEAT 1000 REAL Qs Inline Final</b><br><small id="progressText">Loading...</small></div><div id="tierLabel" style="background:var(--gold);color:#000;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">FREE 100Q</div></div>
 <div class="card">
 <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--gold)">⚙️ Quiz Options - FIXED</div>
 <div class="controls">
@@ -102,7 +102,7 @@ function loadAll(){
  applyFilters();
  showQ();
  document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' fallback - loading real file...';
- fetch('./questions-free.js').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' real Qs';}}catch(e){}}).catch(e=>{document.getElementById('filterInfo').innerText='Using fallback - upload questions-free.js';});
+ fetch('./').then(r=>{if(!r.ok)throw new Error();return r.text()}).then(t=>{try{eval(t);let real=window.FREE_QS||[];if(real.length>10){allQuestions=real;applyFilters();document.getElementById('filterInfo').innerText='Loaded '+allQuestions.length+' real Qs';}}catch(e){}}).catch(e=>{document.getElementById('filterInfo').innerText='Using fallback - upload ';});
 }
 function applyFilters(){
  try{
@@ -149,4 +149,4 @@ function buy(p){document.getElementById('qr').style.display='block';[99,199,349,
 function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();let map=getCodeMap();let dec={};for(let k in map){dec[decodeB64(k)]=map[k];} if(dec[code]){let lim=parseInt(dec[code]);unlockedLimit=lim;localStorage.setItem('unlockedLimit',lim);updateQCountOptionsSafe();document.getElementById('qCount').value=lim;selectedCount=lim;applyFilters();alert('Unlocked '+lim); fetch('./questions-premium.js').then(r=>r.text()).then(t=>{try{eval(t);let all=[...(window.FREE_QS||[]),...(window.PREMIUM_QS||[])];allQuestions=all;applyFilters();}catch(e){}});} else alert('Invalid');}
 let savedLim=localStorage.getItem('unlockedLimit');if(savedLim){unlockedLimit=parseInt(savedLim);}
 loadAll();
-</script></body></html>
+</script><script>let allQuestions = typeof QA_FREE!=="undefined"?QA_FREE:[]; window.FREE_QS=allQuestions; console.log("Pool", allQuestions.length);</script></body></html>
