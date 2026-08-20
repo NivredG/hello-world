@@ -485,7 +485,14 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
         <div style="font-size:.85rem;font-weight:600" id="blitz-q-text-num">Tanong 1</div>
       </div>
       <div class="streak-display">🔥 Streak: <span id="blitz-streak">0</span></div>
-      <div class="blitz-timer" id="blitz-timer">20</div>
+      <div style="position:relative;width:64px;height:64px">
+        <svg width="64" height="64" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" stroke-width="5"/>
+          <circle id="blitz-ring" cx="32" cy="32" r="28" fill="none" stroke="var(--gold)" stroke-width="5"
+            stroke-dasharray="175.93" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear,stroke .3s"/>
+        </svg>
+        <div class="blitz-timer" id="blitz-timer" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem">20</div>
+      </div>
     </div>
     <div class="q-card">
       <div class="q-meta">
@@ -963,10 +970,79 @@ function incrementAttempts(n) {
 }
 
 // ── SHOW SCREEN ──
+// ══ SOUND ENGINE (Web Audio API — no files needed) ══
+let _ctx = null;
+function getCtx() {
+  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  return _ctx;
+}
+function playSound(type) {
+  try {
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    const g = ctx.createGain();
+    g.connect(ctx.destination);
+    const now = ctx.currentTime;
+    if (type === 'correct') {
+      // Ascending chime
+      [523,659,784,1047].forEach((f,i) => {
+        const o = ctx.createOscillator();
+        o.type = 'sine'; o.frequency.value = f;
+        const gn = ctx.createGain();
+        gn.gain.setValueAtTime(0.3, now + i*0.12);
+        gn.gain.exponentialRampToValueAtTime(0.001, now + i*0.12 + 0.3);
+        o.connect(gn); gn.connect(ctx.destination);
+        o.start(now + i*0.12); o.stop(now + i*0.12 + 0.3);
+      });
+    } else if (type === 'wrong') {
+      // Low buzz
+      [200,180].forEach((f,i) => {
+        const o = ctx.createOscillator();
+        o.type = 'sawtooth'; o.frequency.value = f;
+        const gn = ctx.createGain();
+        gn.gain.setValueAtTime(0.25, now + i*0.15);
+        gn.gain.exponentialRampToValueAtTime(0.001, now + i*0.15 + 0.25);
+        o.connect(gn); gn.connect(ctx.destination);
+        o.start(now + i*0.15); o.stop(now + i*0.15 + 0.25);
+      });
+    } else if (type === 'tick') {
+      // Short tick for blitz urgency
+      const o = ctx.createOscillator();
+      o.type = 'square'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.1, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      o.connect(g); o.start(now); o.stop(now + 0.06);
+    } else if (type === 'timeout') {
+      // Blitz timeout — descending
+      [400,300,200].forEach((f,i) => {
+        const o = ctx.createOscillator();
+        o.type = 'triangle'; o.frequency.value = f;
+        const gn = ctx.createGain();
+        gn.gain.setValueAtTime(0.2, now + i*0.18);
+        gn.gain.exponentialRampToValueAtTime(0.001, now + i*0.18 + 0.2);
+        o.connect(gn); gn.connect(ctx.destination);
+        o.start(now + i*0.18); o.stop(now + i*0.18 + 0.2);
+      });
+    } else if (type === 'fanfare') {
+      // Quiz complete fanfare
+      [[523,0],[659,0.1],[784,0.2],[1047,0.3],[784,0.5],[1047,0.65],[1319,0.8]].forEach(([f,t]) => {
+        const o = ctx.createOscillator();
+        o.type = 'sine'; o.frequency.value = f;
+        const gn = ctx.createGain();
+        gn.gain.setValueAtTime(0.3, now + t);
+        gn.gain.exponentialRampToValueAtTime(0.001, now + t + 0.4);
+        o.connect(gn); gn.connect(ctx.destination);
+        o.start(now + t); o.stop(now + t + 0.4);
+      });
+    }
+  } catch(e) {}
+}
+
 function showScreen(id) {
   document.getElementById('home-screen').classList.remove('active');
-  ['quiz-screen','blitz-screen','study-screen','end-screen'].forEach(s => {
-    document.getElementById(s).classList.remove('active');
+  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.remove('active');
   });
   document.getElementById(id).classList.add('active');
 }
@@ -1023,13 +1099,53 @@ function renderQuizQuestion() {
   const answersEl = document.getElementById('answers');
   answersEl.innerHTML = '';
   const letters = ['A','B','C','D'];
-  q.choices.forEach((c, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'ans-btn';
-    btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
-    btn.onclick = () => selectAnswer(i, btn);
-    answersEl.appendChild(btn);
-  });
+  if (q.choices && q.choices.length) {
+    // MCQ format
+    q.choices.forEach((c, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
+      btn.onclick = () => selectAnswer(i, btn);
+      answersEl.appendChild(btn);
+    });
+  } else {
+    // Open-ended format (premium questions: {q, a})
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'ans-btn';
+    revealBtn.innerHTML = `<span class="ans-letter">👁</span><span>Ipakita ang Sagot</span>`;
+    revealBtn.onclick = () => {
+      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
+      revealBtn.classList.add('correct');
+      revealBtn.disabled = true;
+      state.quizCorrect++;
+      playSound('correct');
+      document.getElementById('q-score-text').textContent = `Tama: ${state.quizCorrect}`;
+      if (q.exp) {
+        document.getElementById('exp-text').textContent = q.exp;
+        document.getElementById('explanation').classList.add('visible');
+      }
+      document.getElementById('next-btn').style.display = 'inline-flex';
+    };
+    answersEl.appendChild(revealBtn);
+    // "Hindi ko alam" button
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'ans-btn';
+    skipBtn.innerHTML = `<span class="ans-letter">❌</span><span>Hindi ko alam</span>`;
+    skipBtn.onclick = () => {
+      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
+      revealBtn.classList.add('correct');
+      revealBtn.disabled = true;
+      skipBtn.classList.add('wrong');
+      skipBtn.disabled = true;
+      playSound('wrong');
+      if (q.exp) {
+        document.getElementById('exp-text').textContent = q.exp;
+        document.getElementById('explanation').classList.add('visible');
+      }
+      document.getElementById('next-btn').style.display = 'inline-flex';
+    };
+    answersEl.appendChild(skipBtn);
+  }
 }
 
 function selectAnswer(idx, btn) {
@@ -1040,7 +1156,9 @@ function selectAnswer(idx, btn) {
   if (idx === q.answer) {
     btn.classList.add('correct');
     state.quizCorrect++;
+    playSound('correct');
   } else {
+    playSound('wrong');
     btn.classList.add('wrong');
     btns[q.answer].classList.add('correct');
   }
@@ -1140,13 +1258,44 @@ function renderBlitzQuestion() {
   const answersEl = document.getElementById('blitz-answers');
   answersEl.innerHTML = '';
   const letters = ['A','B','C','D'];
-  q.choices.forEach((c, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'ans-btn';
-    btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
-    btn.onclick = () => selectBlitzAnswer(i, btn);
-    answersEl.appendChild(btn);
-  });
+  if (q.choices && q.choices.length) {
+    q.choices.forEach((c, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
+      btn.onclick = () => selectBlitzAnswer(i, btn);
+      answersEl.appendChild(btn);
+    });
+  } else {
+    // Open-ended format
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'ans-btn';
+    revealBtn.innerHTML = `<span class="ans-letter">👁</span><span>Ipakita ang Sagot</span>`;
+    revealBtn.onclick = () => {
+      clearInterval(state.blitzTimer);
+      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
+      revealBtn.classList.add('correct');
+      revealBtn.disabled = true;
+      state.blitzCorrect++; state.blitzStreak++;
+      playSound('correct');
+      document.getElementById('blitz-streak').textContent = state.blitzStreak;
+      document.getElementById('blitz-next-btn').style.display = 'inline-flex';
+    };
+    answersEl.appendChild(revealBtn);
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'ans-btn';
+    skipBtn.innerHTML = `<span class="ans-letter">❌</span><span>Hindi ko alam</span>`;
+    skipBtn.onclick = () => {
+      clearInterval(state.blitzTimer);
+      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
+      revealBtn.classList.add('correct'); revealBtn.disabled = true;
+      skipBtn.classList.add('wrong'); skipBtn.disabled = true;
+      state.blitzStreak = 0; playSound('wrong');
+      document.getElementById('blitz-streak').textContent = state.blitzStreak;
+      document.getElementById('blitz-next-btn').style.display = 'inline-flex';
+    };
+    answersEl.appendChild(skipBtn);
+  }
 
   // Timer
   clearInterval(state.blitzTimer);
@@ -1164,8 +1313,16 @@ function renderBlitzQuestion() {
 
 function updateBlitzTimer() {
   const el = document.getElementById('blitz-timer');
-  el.textContent = state.blitzTimeLeft;
-  el.classList.toggle('urgent', state.blitzTimeLeft <= 5);
+  const ring = document.getElementById('blitz-ring');
+  const t = state.blitzTimeLeft;
+  el.textContent = t;
+  const urgent = t <= 5;
+  el.classList.toggle('urgent', urgent);
+  const circumference = 175.93;
+  const offset = circumference * (1 - t / 20);
+  ring.style.strokeDashoffset = offset;
+  ring.style.stroke = urgent ? 'var(--red)' : t <= 10 ? '#f59e0b' : 'var(--gold)';
+  if (urgent) playSound('tick');
 }
 
 function selectBlitzAnswer(idx, btn) {
@@ -1178,10 +1335,12 @@ function selectBlitzAnswer(idx, btn) {
     btn.classList.add('correct');
     state.blitzCorrect++;
     state.blitzStreak++;
+    playSound('correct');
   } else {
     btn.classList.add('wrong');
     btns[q.answer].classList.add('correct');
     state.blitzStreak = 0;
+    playSound('wrong');
   }
   document.getElementById('blitz-streak').textContent = state.blitzStreak;
 
@@ -1193,6 +1352,7 @@ function selectBlitzAnswer(idx, btn) {
 }
 
 function timeoutBlitz() {
+  playSound('timeout');
   const q = state.blitzQs[state.blitzIndex];
   const btns = document.querySelectorAll('#blitz-answers .ans-btn');
   btns.forEach(b => b.disabled = true);
@@ -1243,7 +1403,7 @@ function renderFlashcard() {
   document.getElementById('study-progress-text').textContent = `Card ${state.studyIndex + 1} ng ${total}`;
   document.getElementById('study-known-text').textContent = `✓ Alam: ${state.studyKnown}`;
   document.getElementById('fc-question').textContent = q.q;
-  document.getElementById('fc-answer').textContent = q.choices[q.answer];
+  document.getElementById('fc-answer').textContent = (q.choices && q.choices.length) ? q.choices[q.answer] : (q.a || q.answer || '—');
   document.getElementById('fc-topic-label').textContent = q.topic || '';
 
   // Reset flip
@@ -1316,6 +1476,7 @@ function showEndScreen(mode) {
   document.getElementById('end-save-msg').style.display = 'none';
 
   showScreen('end-screen');
+  if (!wasQuit) playSound('fanfare');
 }
 
 function saveScore() {
