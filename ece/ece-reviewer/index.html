@@ -47,10 +47,12 @@ input{font-family:'Outfit',sans-serif}
 .header-title{font-size:1.05rem;font-weight:700;color:var(--text);flex:1}
 .header-title span{color:var(--gold)}
 .tier-badge{font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
-.tier-free{background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3)}
-.tier-basic{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
-.tier-tester{background:rgba(168,85,247,.15);color:#a855f7;border:1px solid rgba(168,85,247,.3)}
-.tier-premium{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.tier-libre{background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3)}
+.tier-pasimula{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+.tier-seryoso{background:rgba(20,184,166,.15);color:#14b8a6;border:1px solid rgba(20,184,166,.3)}
+.tier-handa{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.tier-kampeon{background:rgba(168,85,247,.15);color:#a855f7;border:1px solid rgba(168,85,247,.3)}
+.tier-lisensyado{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
 .btn-upgrade{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#111;font-size:.78rem;font-weight:700;padding:7px 13px;border-radius:20px;transition:opacity .2s;white-space:nowrap}
 .btn-upgrade:hover{opacity:.85}
 
@@ -279,14 +281,14 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
 <header class="header">
   <a href="/" class="header-back">← PinasTools</a>
   <div class="header-title"><span>ECE</span> Board Reviewer</div>
-  <span id="tier-badge" class="tier-badge tier-free">Free</span>
+  <span id="tier-badge" class="tier-badge tier-libre">Libre</span>
   <button class="btn-upgrade" onclick="openUpgradeModal()">🔑 Enter Code / Upgrade</button>
 </header>
 
 <!-- Prize Banner -->
 <div id="prize-banner" class="prize-banner hidden">
   <span class="icon">🏆</span>
-  <div><strong>Weekly Prize!</strong> Top 1 sa leaderboard this week — manalo ng <strong>₱100 GCash</strong>! Basic, Tester, at Premium tiers lang ang karapat-dapat.</div>
+  <div><strong>Weekly Prize!</strong> Top 1 sa leaderboard this week — manalo ng <strong>₱100 GCash</strong>! Pasimula, Seryoso, Handa, Kampeon, at Lisensyado tiers lang ang karapat-dapat.</div>
 </div>
 
 <!-- Free Limit Bar -->
@@ -402,7 +404,7 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
     <div id="home-leaderboard" style="display:none">
       <div class="section-title">Leaderboard</div>
       <div id="lb-warn" class="lb-warn" style="display:none">
-        ⚠️ Free tier scores ay hindi karapat-dapat sa weekly prize. Mag-upgrade sa Basic, Tester, o Premium para maging eligible!
+        ⚠️ Libre tier scores ay hindi karapat-dapat sa weekly prize. Mag-upgrade sa Pasimula o mas mataas pa para maging eligible!
       </div>
       <div class="start-card" style="padding:0;overflow:hidden">
         <table class="lb-table" id="lb-table">
@@ -543,7 +545,7 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
     </div>
     <div class="end-more">
       <h4>📚 More to Come!</h4>
-      <p style="color:var(--muted)">Patuloy kaming nagdadagdag ng bagong tanong at features. Premium users makakakuha ng 6,710+ questions mula sa lahat ng ECE subjects. Watch out sa Weak Topics Tracker at Progress Analytics!</p>
+      <p style="color:var(--muted)">Patuloy kaming nagdadagdag ng bagong tanong at features. Kampeon at Lisensyado users makakakuha ng 6,710+ questions mula sa lahat ng ECE subjects. Watch out sa Weak Topics Tracker at Progress Analytics!</p>
     </div>
     <div class="feedback-row">
       <a href="https://www.facebook.com/profile.php?id=61593302194808" target="_blank" class="fb-btn">👍 I-like ang Page</a>
@@ -571,40 +573,56 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
       <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="tier-cards">
-        <div class="tier-card">
-          <div class="tier-card-label tier-free" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px">Free</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;text-align:center">I-click ang tier para makita ang GCash QR at mag-bayad. Libre magsimula!</p>
+      <div class="tier-cards" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="tier-card" onclick="showTierQR('libre')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3)">LIBRE</div>
           <div class="tier-card-price">₱0 <span>/ palagi</span></div>
           <ul>
-            <li>100 total attempts</li>
+            <li>100 attempts</li>
             <li>Top 5 leaderboard</li>
-            <li>Quiz &amp; Blitz mode</li>
             <li style="color:var(--red);">✗ Hindi prize-eligible</li>
           </ul>
         </div>
-        <div class="tier-card">
-          <div class="tier-card-label tier-basic" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px">Basic</div>
-          <div class="tier-card-price">₱49 <span>/ isang beses</span></div>
+        <div class="tier-card" onclick="showTierQR('pasimula')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)">PASIMULA</div>
+          <div class="tier-card-price">₱99 <span>/ one-time</span></div>
           <ul>
-            <li>1,000 questions</li>
-            <li>Top 10 leaderboard</li>
+            <li>300 questions</li>
+            <li>Top 8 leaderboard</li>
             <li>Prize eligible ✓</li>
-            <li>Lahat ng modes</li>
           </ul>
         </div>
-        <div class="tier-card">
-          <div class="tier-card-label tier-tester" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px">Tester</div>
-          <div class="tier-card-price">Libre <span>/ code required</span></div>
+        <div class="tier-card" onclick="showTierQR('seryoso')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(20,184,166,.15);color:#14b8a6;border:1px solid rgba(20,184,166,.3)">SERYOSO</div>
+          <div class="tier-card-price">₱199 <span>/ one-time</span></div>
           <ul>
-            <li>1,000 questions</li>
+            <li>500 questions</li>
             <li>Top 10 leaderboard</li>
             <li>Prize eligible ✓</li>
-            <li>Para sa testers</li>
           </ul>
         </div>
-        <div class="tier-card featured">
-          <div class="tier-card-label tier-premium" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px">Premium ⭐</div>
-          <div class="tier-card-price">₱99 <span>/ intro price</span></div>
+        <div class="tier-card" onclick="showTierQR('handa')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)">HANDA ⭐</div>
+          <div class="tier-card-price">₱349 <span>/ one-time</span></div>
+          <ul>
+            <li>1,000 questions</li>
+            <li>Top 12 leaderboard</li>
+            <li>Prize eligible ✓</li>
+          </ul>
+        </div>
+        <div class="tier-card" onclick="showTierQR('kampeon')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(168,85,247,.15);color:#a855f7;border:1px solid rgba(168,85,247,.3)">KAMPEON 🔥</div>
+          <div class="tier-card-price">₱599 <span>/ one-time</span></div>
+          <ul>
+            <li>3,000 questions</li>
+            <li>Top 15 leaderboard</li>
+            <li>Prize eligible ✓</li>
+          </ul>
+        </div>
+        <div class="tier-card featured" onclick="showTierQR('lisensyado')" style="cursor:pointer">
+          <div class="tier-card-label" style="display:inline-block;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)">LISENSYADO 👑</div>
+          <div class="tier-card-price">₱899 <span>/ one-time</span></div>
           <ul>
             <li>6,710 questions</li>
             <li>Top 20 leaderboard</li>
@@ -613,10 +631,10 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
           </ul>
         </div>
       </div>
-      <div class="gcash-wrap">
-        <img src="gcash-qr.jpg" alt="GCash QR Code" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <div style="display:none;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--radius);padding:20px;color:var(--muted);font-size:.82rem">📷 GCash QR — gcash-qr.jpg</div>
-        <div class="gcash-name">GCash · InstaPay · PinasTools · DE***N G.</div>
+      <div class="gcash-wrap" id="gcash-qr-wrap" style="display:none">
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px" id="gcash-tier-label">I-scan ang QR sa GCash app at bayaran ang tamang halaga:</p>
+        <img id="gcash-qr-img" src="" alt="GCash QR Code" style="max-width:200px;border-radius:12px;border:2px solid var(--green)">
+        <div class="gcash-name" style="margin-top:8px">InstaPay · PinasTools · DE***N G.</div>
       </div>
       <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;text-align:center">Pagkatapos mag-bayad, makikita mo ang code sa iyong receipt / inbox. I-enter dito:</p>
       <div class="code-input-wrap">
@@ -651,14 +669,19 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
 <script>
 // ── CONSTANTS ──
 const TIERS = {
-  free:    { qs:100,   blitz:10,  millionaire:5,   lb:5,  weakTopics:false, prize:false, label:'100 question attempts' },
-  basic:   { qs:99999, blitz:200, millionaire:50,  lb:10, weakTopics:false, prize:true,  label:'1,000 questions' },
-  tester:  { qs:99999, blitz:200, millionaire:50,  lb:10, weakTopics:false, prize:true,  label:'1,000 questions' },
-  premium: { qs:99999, blitz:999, millionaire:999, lb:20, weakTopics:true,  prize:true,  label:'6,710 questions' }
+  libre:      { qs:100,   blitz:10,  millionaire:5,   lb:5,  weakTopics:false, prize:false, label:'100 question attempts', price:0,   qrFile:null,              color:'#3b82f6' },
+  pasimula:   { qs:300,   blitz:50,  millionaire:10,  lb:8,  weakTopics:false, prize:true,  label:'300 questions',         price:99,  qrFile:'gcash-qr-99.jpeg',  color:'#22c55e' },
+  seryoso:    { qs:500,   blitz:100, millionaire:20,  lb:10, weakTopics:false, prize:true,  label:'500 questions',         price:199, qrFile:'gcash-qr-199.jpeg', color:'#14b8a6' },
+  handa:      { qs:1000,  blitz:200, millionaire:50,  lb:12, weakTopics:false, prize:true,  label:'1,000 questions',       price:349, qrFile:'gcash-qr-349.jpeg', color:'#f59e0b' },
+  kampeon:    { qs:3000,  blitz:500, millionaire:100, lb:15, weakTopics:false, prize:true,  label:'3,000 questions',       price:599, qrFile:'gcash-qr-599.jpeg', color:'#a855f7' },
+  lisensyado: { qs:99999, blitz:999, millionaire:999, lb:20, weakTopics:true,  prize:true,  label:'6,710 questions',       price:899, qrFile:'gcash-qr-899.jpeg', color:'#ef4444' }
 };
-const TESTER_CODES  = ['BATAAN2026','TESTER01','TESTER02','TESTER03','PINAS2026','ORANI2026','ECE2026','PINASTOOLS'];
-const BASIC_CODES   = ['BASIC01','BASIC02','BASIC03','BASIC04','BASIC05','BASIC06','BASIC07','BASIC08','BASIC09','BASIC10','BASIC11','BASIC12','BASIC13','BASIC14','BASIC15','BASIC16','BASIC17','BASIC18','BASIC19','BASIC20','BASIC21','BASIC22','BASIC23','BASIC24','BASIC25','BASIC26','BASIC27','BASIC28','BASIC29','BASIC30','BASIC31','BASIC32','BASIC33','BASIC34','BASIC35','BASIC36','BASIC37','BASIC38','BASIC39','BASIC40','BASIC41','BASIC42','BASIC43','BASIC44','BASIC45','BASIC46','BASIC47','BASIC48','BASIC49','BASIC50'];
-const PREMIUM_CODES = ['PREMIUM99','DERVIN2026','PINAS99','ECEPASS99'];
+const TESTER_CODES     = ['BATAAN2026','TESTER01','TESTER02','TESTER03','PINAS2026','ORANI2026','ECE2026','PINASTOOLS'];
+const PASIMULA_CODES   = ['BASIC01','BASIC02','BASIC03','BASIC04','BASIC05','BASIC06','BASIC07','BASIC08','BASIC09','BASIC10','BASIC11','BASIC12','BASIC13','BASIC14','BASIC15','BASIC16','BASIC17','BASIC18','BASIC19','BASIC20','BASIC21','BASIC22','BASIC23','BASIC24','BASIC25','BASIC26','BASIC27','BASIC28','BASIC29','BASIC30','BASIC31','BASIC32','BASIC33','BASIC34','BASIC35','BASIC36','BASIC37','BASIC38','BASIC39','BASIC40','BASIC41','BASIC42','BASIC43','BASIC44','BASIC45','BASIC46','BASIC47','BASIC48','BASIC49','BASIC50'];
+const SERYOSO_CODES    = ['SERYOSO01','SERYOSO02','SERYOSO03','SERYOSO04','SERYOSO05','SERYOSO06','SERYOSO07','SERYOSO08','SERYOSO09','SERYOSO10'];
+const HANDA_CODES      = ['HANDA01','HANDA02','HANDA03','HANDA04','HANDA05','HANDA06','HANDA07','HANDA08','HANDA09','HANDA10'];
+const KAMPEON_CODES    = ['KAMPEON01','KAMPEON02','KAMPEON03','KAMPEON04','KAMPEON05'];
+const LISENSYADO_CODES = ['PREMIUM99','DERVIN2026','PINAS99','ECEPASS99','LISENSYADO01','LISENSYADO02','LISENSYADO03'];
 const QUOTES = [
   "Ang tubig na paulit-ulit na tumatama sa bato ay nakakabutas din nito. Huwag sumuko!",
   "\"Success is 1% inspiration and 99% perspiration.\" — Thomas Edison ⚡",
@@ -713,7 +736,7 @@ const RES_TOLS         = { gold:'±5%', silver:'±10%', brown:'±1%', red:'±2%'
 
 // ── STATE ──
 let state = {
-  tier: 'free',
+  tier: 'libre',
   questions: [],
   allQuestions: [],
   currentMode: 'quiz',
@@ -732,7 +755,7 @@ let state = {
 // ── INIT ──
 function init() {
   // Load saved tier
-  const savedTier = localStorage.getItem('ece_tier') || 'free';
+  const savedTier = localStorage.getItem('ece_tier') || 'libre';
   state.tier = savedTier;
   const savedAttempts = parseInt(localStorage.getItem('ece_attempts') || '0');
   state.freeAttempts = savedAttempts;
@@ -759,7 +782,7 @@ async function loadQuestions() {
     qs = getFallbackQuestions();
   }
 
-  if (state.tier === 'premium') {
+  if (state.tier === 'kampeon' || state.tier === 'lisensyado') {
     // Dynamically load premium questions
     try {
       await new Promise((resolve, reject) => {
@@ -831,7 +854,7 @@ function updateUI() {
 
   // Free limit bar
   const limitWrap = document.getElementById('limit-bar-wrap');
-  if (tier === 'free') {
+  if (tier === 'libre') {
     limitWrap.classList.add('visible');
     updateLimitBar();
   } else {
@@ -882,7 +905,7 @@ function populateTopics() {
 // ── COUNT DROPDOWN ──
 function updateCountDropdown() {
   const sel = document.getElementById('count-select');
-  const paid = state.tier !== 'free';
+  const paid = state.tier !== 'libre';
   sel.querySelectorAll('.paid-only').forEach(opt => {
     opt.disabled = !paid;
     opt.textContent = paid ? opt.value + ' questions' : opt.value + ' questions (Paid)';
@@ -922,9 +945,9 @@ function shuffle(arr) {
 
 // ── CHECK FREE LIMIT ──
 function checkFreeLimit(count) {
-  if (state.tier !== 'free') return true;
+  if (state.tier !== 'libre') return true;
   if (state.freeAttempts + count > 100) {
-    alert('Naubos na ang iyong 100 free attempts! Mag-upgrade sa Basic, Tester, o Premium para sa unlimited access.');
+    alert('Naubos na ang iyong 100 libre attempts! Mag-upgrade sa Pasimula, Seryoso, o mas mataas pa para sa mas maraming access.');
     openUpgradeModal();
     return false;
   }
@@ -932,7 +955,7 @@ function checkFreeLimit(count) {
 }
 
 function incrementAttempts(n) {
-  if (state.tier === 'free') {
+  if (state.tier === 'libre') {
     state.freeAttempts += n;
     localStorage.setItem('ece_attempts', state.freeAttempts);
     updateLimitBar();
@@ -1346,7 +1369,7 @@ function renderLeaderboard() {
   if (!tbody) return;
 
   const warn = document.getElementById('lb-warn');
-  if (warn) warn.style.display = state.tier === 'free' ? 'block' : 'none';
+  if (warn) warn.style.display = state.tier === 'libre' ? 'block' : 'none';
 
   const max = TIERS[state.tier].lb;
   const rows = lb.slice(0, max);
@@ -1363,7 +1386,7 @@ function renderLeaderboard() {
       <td>${r.score}/${r.total}</td>
       <td><strong>${r.pct}%</strong></td>
       <td style="color:var(--muted);font-size:.75rem">${r.mode || 'quiz'}</td>
-      <td><span class="tier-badge tier-${r.tier || 'free'}" style="font-size:.6rem">${r.tier || 'free'}</span></td>
+      <td><span class="tier-badge tier-${r.tier || 'libre'}" style="font-size:.6rem">${r.tier || 'libre'}</span></td>
     </tr>
   `).join('');
 }
@@ -1386,9 +1409,19 @@ function openUpgradeModal() {
   const msg = document.getElementById('code-msg');
   msg.className = 'code-msg';
   msg.style.display = 'none';
+  document.getElementById('gcash-qr-wrap').style.display = 'none';
 }
 function closeUpgradeModal() {
   document.getElementById('upgrade-modal').classList.remove('open');
+}
+function showTierQR(tier) {
+  const t = TIERS[tier];
+  const wrap = document.getElementById('gcash-qr-wrap');
+  if (!t.qrFile) { wrap.style.display = 'none'; return; }
+  document.getElementById('gcash-qr-img').src = t.qrFile;
+  document.getElementById('gcash-tier-label').textContent = `${tier.toUpperCase()} — ₱${t.price} · I-scan sa GCash app at bayaran ang ₱${t.price}. Pagkatapos, i-enter ang code sa ibaba:`;
+  wrap.style.display = 'block';
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function applyCode() {
@@ -1396,9 +1429,12 @@ function applyCode() {
   const msg = document.getElementById('code-msg');
 
   let newTier = null;
-  if (PREMIUM_CODES.includes(code)) newTier = 'premium';
-  else if (TESTER_CODES.includes(code)) newTier = 'tester';
-  else if (BASIC_CODES.includes(code)) newTier = 'basic';
+  if (LISENSYADO_CODES.includes(code))  newTier = 'lisensyado';
+  else if (KAMPEON_CODES.includes(code))    newTier = 'kampeon';
+  else if (HANDA_CODES.includes(code))      newTier = 'handa';
+  else if (SERYOSO_CODES.includes(code))    newTier = 'seryoso';
+  else if (PASIMULA_CODES.includes(code))   newTier = 'pasimula';
+  else if (TESTER_CODES.includes(code))     newTier = 'lisensyado'; // testers get full access
 
   if (!newTier) {
     msg.className = 'code-msg error';
@@ -1407,8 +1443,8 @@ function applyCode() {
   }
 
   // Check if downgrade
-  const tierRank = { free:0, basic:1, tester:1, premium:2 };
-  if (tierRank[newTier] <= tierRank[state.tier] && state.tier !== 'free') {
+  const tierRank = { libre:0, pasimula:1, seryoso:2, handa:3, kampeon:4, lisensyado:5 };
+  if (tierRank[newTier] <= tierRank[state.tier] && state.tier !== 'libre') {
     msg.className = 'code-msg error';
     msg.textContent = '⚠️ Mayroon ka na pong mas mataas o katumbas na tier.';
     return;
