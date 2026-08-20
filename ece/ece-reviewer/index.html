@@ -941,6 +941,29 @@ function getFilteredQuestions(topicSelectId) {
   return qs;
 }
 
+// Generate MCQ choices for open-ended questions
+function generateMCQ(q) {
+  if (q.choices && q.choices.length) return { choices: q.choices, answer: q.answer };
+  const correct = q.a || String(q.answer);
+  // Get distractors from same topic first, then any topic
+  const pool = state.allQuestions
+    .filter(x => x !== q && (x.a || x.answer) && String(x.a || x.answer) !== correct)
+    .sort((a, b) => (a.topic === q.topic ? -1 : 1));
+  const distractors = [];
+  const seen = new Set([correct.toLowerCase()]);
+  for (const x of pool) {
+    const ans = String(x.a || x.answer).trim();
+    if (ans.length > 0 && ans.length < 80 && !seen.has(ans.toLowerCase())) {
+      seen.add(ans.toLowerCase());
+      distractors.push(ans);
+      if (distractors.length === 3) break;
+    }
+  }
+  while (distractors.length < 3) distractors.push('None of the above');
+  const choices = shuffle([correct, ...distractors]);
+  return { choices, answer: choices.indexOf(correct) };
+}
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -1095,72 +1118,36 @@ function renderQuizQuestion() {
   expEl.classList.remove('visible');
   document.getElementById('next-btn').style.display = 'none';
 
-  // Answers
+  // Answers — generate MCQ from open-ended if needed
+  const mcq = generateMCQ(q);
   const answersEl = document.getElementById('answers');
   answersEl.innerHTML = '';
   const letters = ['A','B','C','D'];
-  if (q.choices && q.choices.length) {
-    // MCQ format
-    q.choices.forEach((c, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'ans-btn';
-      btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
-      btn.onclick = () => selectAnswer(i, btn);
-      answersEl.appendChild(btn);
-    });
-  } else {
-    // Open-ended format (premium questions: {q, a})
-    const revealBtn = document.createElement('button');
-    revealBtn.className = 'ans-btn';
-    revealBtn.innerHTML = `<span class="ans-letter">👁</span><span>Ipakita ang Sagot</span>`;
-    revealBtn.onclick = () => {
-      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
-      revealBtn.classList.add('correct');
-      revealBtn.disabled = true;
-      state.quizCorrect++;
-      playSound('correct');
-      document.getElementById('q-score-text').textContent = `Tama: ${state.quizCorrect}`;
-      if (q.exp) {
-        document.getElementById('exp-text').textContent = q.exp;
-        document.getElementById('explanation').classList.add('visible');
-      }
-      document.getElementById('next-btn').style.display = 'inline-flex';
-    };
-    answersEl.appendChild(revealBtn);
-    // "Hindi ko alam" button
-    const skipBtn = document.createElement('button');
-    skipBtn.className = 'ans-btn';
-    skipBtn.innerHTML = `<span class="ans-letter">❌</span><span>Hindi ko alam</span>`;
-    skipBtn.onclick = () => {
-      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
-      revealBtn.classList.add('correct');
-      revealBtn.disabled = true;
-      skipBtn.classList.add('wrong');
-      skipBtn.disabled = true;
-      playSound('wrong');
-      if (q.exp) {
-        document.getElementById('exp-text').textContent = q.exp;
-        document.getElementById('explanation').classList.add('visible');
-      }
-      document.getElementById('next-btn').style.display = 'inline-flex';
-    };
-    answersEl.appendChild(skipBtn);
-  }
+  mcq.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
+    btn.onclick = () => selectAnswer(i, btn, mcq.answer);
+    answersEl.appendChild(btn);
+  });
+  // Store generated answer index for selectAnswer
+  state._quizMCQAnswer = mcq.answer;
 }
 
-function selectAnswer(idx, btn) {
+function selectAnswer(idx, btn, mcqAnswer) {
   const q = state.quizQs[state.quizIndex];
+  const correctIdx = mcqAnswer !== undefined ? mcqAnswer : state._quizMCQAnswer;
   const btns = document.querySelectorAll('#answers .ans-btn');
   btns.forEach(b => b.disabled = true);
 
-  if (idx === q.answer) {
+  if (idx === correctIdx) {
     btn.classList.add('correct');
     state.quizCorrect++;
     playSound('correct');
   } else {
     playSound('wrong');
     btn.classList.add('wrong');
-    btns[q.answer].classList.add('correct');
+    if (btns[correctIdx]) btns[correctIdx].classList.add('correct');
   }
 
   // Explanation
@@ -1255,47 +1242,18 @@ function renderBlitzQuestion() {
   expEl.classList.remove('visible');
   document.getElementById('blitz-next-btn').style.display = 'none';
 
+  const blitzMCQ = generateMCQ(q);
+  state._blitzMCQAnswer = blitzMCQ.answer;
   const answersEl = document.getElementById('blitz-answers');
   answersEl.innerHTML = '';
   const letters = ['A','B','C','D'];
-  if (q.choices && q.choices.length) {
-    q.choices.forEach((c, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'ans-btn';
-      btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
-      btn.onclick = () => selectBlitzAnswer(i, btn);
-      answersEl.appendChild(btn);
-    });
-  } else {
-    // Open-ended format
-    const revealBtn = document.createElement('button');
-    revealBtn.className = 'ans-btn';
-    revealBtn.innerHTML = `<span class="ans-letter">👁</span><span>Ipakita ang Sagot</span>`;
-    revealBtn.onclick = () => {
-      clearInterval(state.blitzTimer);
-      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
-      revealBtn.classList.add('correct');
-      revealBtn.disabled = true;
-      state.blitzCorrect++; state.blitzStreak++;
-      playSound('correct');
-      document.getElementById('blitz-streak').textContent = state.blitzStreak;
-      document.getElementById('blitz-next-btn').style.display = 'inline-flex';
-    };
-    answersEl.appendChild(revealBtn);
-    const skipBtn = document.createElement('button');
-    skipBtn.className = 'ans-btn';
-    skipBtn.innerHTML = `<span class="ans-letter">❌</span><span>Hindi ko alam</span>`;
-    skipBtn.onclick = () => {
-      clearInterval(state.blitzTimer);
-      revealBtn.innerHTML = `<span class="ans-letter">✅</span><span>${q.a || q.answer}</span>`;
-      revealBtn.classList.add('correct'); revealBtn.disabled = true;
-      skipBtn.classList.add('wrong'); skipBtn.disabled = true;
-      state.blitzStreak = 0; playSound('wrong');
-      document.getElementById('blitz-streak').textContent = state.blitzStreak;
-      document.getElementById('blitz-next-btn').style.display = 'inline-flex';
-    };
-    answersEl.appendChild(skipBtn);
-  }
+  blitzMCQ.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.innerHTML = `<span class="ans-letter">${letters[i]}</span><span>${c}</span>`;
+    btn.onclick = () => selectBlitzAnswer(i, btn, blitzMCQ.answer);
+    answersEl.appendChild(btn);
+  });
 
   // Timer
   clearInterval(state.blitzTimer);
@@ -1325,20 +1283,21 @@ function updateBlitzTimer() {
   if (urgent) playSound('tick');
 }
 
-function selectBlitzAnswer(idx, btn) {
+function selectBlitzAnswer(idx, btn, mcqAnswer) {
   clearInterval(state.blitzTimer);
   const q = state.blitzQs[state.blitzIndex];
+  const correctIdx = mcqAnswer !== undefined ? mcqAnswer : state._blitzMCQAnswer;
   const btns = document.querySelectorAll('#blitz-answers .ans-btn');
   btns.forEach(b => b.disabled = true);
 
-  if (idx === q.answer) {
+  if (idx === correctIdx) {
     btn.classList.add('correct');
     state.blitzCorrect++;
     state.blitzStreak++;
     playSound('correct');
   } else {
     btn.classList.add('wrong');
-    btns[q.answer].classList.add('correct');
+    if (btns[correctIdx]) btns[correctIdx].classList.add('correct');
     state.blitzStreak = 0;
     playSound('wrong');
   }
@@ -1356,7 +1315,8 @@ function timeoutBlitz() {
   const q = state.blitzQs[state.blitzIndex];
   const btns = document.querySelectorAll('#blitz-answers .ans-btn');
   btns.forEach(b => b.disabled = true);
-  btns[q.answer].classList.add('correct');
+  const correctIdx = state._blitzMCQAnswer;
+  if (btns[correctIdx]) btns[correctIdx].classList.add('correct');
   state.blitzStreak = 0;
   document.getElementById('blitz-streak').textContent = state.blitzStreak;
   document.getElementById('blitz-next-btn').style.display = 'inline-flex';
