@@ -1294,12 +1294,69 @@ function updateBlitzTimer() {
   const t = state.blitzTimeLeft;
   el.textContent = t;
   const urgent = t <= 5;
+  const warning = t <= 10;
   el.classList.toggle('urgent', urgent);
   const circumference = 175.93;
   const offset = circumference * (1 - t / 20);
   ring.style.strokeDashoffset = offset;
-  ring.style.stroke = urgent ? 'var(--red)' : t <= 10 ? '#f59e0b' : 'var(--gold)';
-  if (urgent) playSound('tick');
+  ring.style.stroke = urgent ? 'var(--red)' : warning ? '#f59e0b' : 'var(--gold)';
+  // Tik-tak tick every second, faster when urgent
+  playTick(urgent);
+}
+
+function playTick(urgent) {
+  try {
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    // Alternating high/low pitch — tik TAK tik TAK
+    const isEven = state.blitzTimeLeft % 2 === 0;
+    const freq = urgent ? (isEven ? 1200 : 900) : (isEven ? 900 : 700);
+    const vol = urgent ? 0.18 : 0.1;
+    const dur = urgent ? 0.04 : 0.055;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(now); o.stop(now + dur);
+    // If urgent, add a second faster tick 0.5s later
+    if (urgent) {
+      setTimeout(() => {
+        try {
+          const ctx2 = getCtx();
+          const now2 = ctx2.currentTime;
+          const o2 = ctx2.createOscillator();
+          const g2 = ctx2.createGain();
+          o2.type = 'square'; o2.frequency.value = isEven ? 900 : 1200;
+          g2.gain.setValueAtTime(0.15, now2);
+          g2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.035);
+          o2.connect(g2); g2.connect(ctx2.destination);
+          o2.start(now2); o2.stop(now2 + 0.035);
+        } catch(e) {}
+      }, 500);
+    }
+  } catch(e) {}
+}
+
+function playDing() {
+  try {
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    // DING — bell-like tone
+    [[1047,0,0.5],[1319,0.05,0.4],[1568,0.08,0.6],[2093,0.1,0.8]].forEach(([freq,delay,vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol * 0.25, now + delay);
+      g.gain.exponentialRampToValueAtTime(0.001, now + delay + 1.2);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now + delay); o.stop(now + delay + 1.2);
+    });
+  } catch(e) {}
 }
 
 function selectBlitzAnswer(idx, btn, mcqAnswer) {
@@ -1330,7 +1387,7 @@ function selectBlitzAnswer(idx, btn, mcqAnswer) {
 }
 
 function timeoutBlitz() {
-  playSound('timeout');
+  playDing();
   const q = state.blitzQs[state.blitzIndex];
   const btns = document.querySelectorAll('#blitz-answers .ans-btn');
   btns.forEach(b => b.disabled = true);
