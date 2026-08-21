@@ -3,50 +3,53 @@
 <head>
 <!--
   ================================================================
-  PinasTools — Resistor Color Code Calculator
-  Para sa mga ECE students ng Bataan Peninsula State University
+  PinasTools — Resistor Color Code Calculator (Flagship v2)
+  Para sa mga ECE / CpE / EE students ng Bataan at buong Pilipinas
 
-  Ginawa para sa:
-  - Mobile-first (mababang bandwidth, brownout-friendly)
-  - Offline use (i-save lang sa phone, buksan sa browser)
-  - Board Exam review (may tips at mnemonics)
-  - Walang external libraries — isa lang na HTML file!
+  Pinagsama ang dalawang tool:
+    - resistor-tool.html  (mas magandang SVG, E24 grid)
+    - index.html          (Board Exam Tips, Taglish, SMD EIA-96)
 
-  Ginawa ni: ECE Professor / PinasTools Team
-  Lisensya: Libre para sa lahat ng Pilipinong estudyante
+  Plus bago:
+    - Copy result sa clipboard
+    - Ohmmeter lead color guide
+    - PWA manifest (Add to Home Screen)
+    - Keyboard shortcut: 1-5 para sa tabs
+
+  Constraints:
+    - Walang external libraries
+    - < 100 KB
+    - Gumagana offline (i-save lang at buksan sa browser)
   ================================================================
 -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="Resistor Color Code Calculator — para sa ECE board exam review. Works offline!">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Resistor Color Code Calculator para sa PRC ECE board exam. Decode, Encode, SMD, at Board Tips. Offline. Libre.">
 <meta name="theme-color" content="#111318">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PinasTools Resistor">
 <title>PinasTools · Resistor Color Code</title>
-
 <style>
 /* ================================================================
-   CSS VARIABLES — Kulay at spacing ng buong app
+   DESIGN TOKENS — Pinagsamang kulay ng dalawang tool
    ================================================================ */
 :root {
-  --bg:        #111318;   /* Background ng page */
-  --surf:      #1a1e28;   /* Surface ng mga card */
-  --surf2:     #22273a;   /* Secondary surface */
-  --border:    #2a3050;   /* Border ng mga elemento */
-  --gold:      #f59e0b;   /* Accent color (parang gold na resistor) */
-  --blue:      #3b82f6;   /* Secondary accent */
-  --green:     #22c55e;   /* Success / online */
-  --red:       #ef4444;   /* Error / danger */
-  --text:      #e8eaf0;   /* Primary text */
-  --muted:     #7a8499;   /* Secondary / hint text */
-  --r:         8px;       /* Border radius */
+  --bg:      #111318;
+  --surf:    #1a1d28;
+  --surf2:   #22263a;
+  --border:  #2a3050;
+  --gold:    #f59e0b;   /* Primary accent */
+  --blue:    #3b82f6;   /* Secondary accent */
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --text:    #e8eaf0;
+  --muted:   #7a8499;
+  --r:       8px;
 }
 
-/* ================================================================
-   RESET AT BASE STYLES
-   ================================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { -webkit-tap-highlight-color: transparent; }
-
+html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--bg);
@@ -54,472 +57,380 @@ body {
   font-size: 15px;
   line-height: 1.5;
   min-height: 100vh;
-  /* Pigilan ang horizontal scroll sa mobile */
   overflow-x: hidden;
 }
 
 /* ================================================================
-   HEADER — Logo at offline badge
+   HEADER
    ================================================================ */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.site-header {
+  position: sticky; top: 0; z-index: 100;
   background: var(--surf);
   border-bottom: 2px solid var(--gold);
   padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
 }
-
-.logo {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: -0.5px;
-}
-
-.logo span { color: var(--text); font-weight: 400; font-size: 0.85rem; }
-
-/* Badge na nagpapakita na offline ang tool */
-.badge-offline {
+.logo { font-size: 1.1rem; font-weight: 800; color: var(--gold); letter-spacing: -.3px; }
+.logo span { color: var(--muted); font-weight: 400; font-size: .82rem; }
+.offline-badge {
   margin-left: auto;
-  background: #14532d;
-  color: #86efac;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  background: #14532d; color: #86efac;
+  font-size: .68rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  letter-spacing: .5px; text-transform: uppercase;
 }
 
 /* ================================================================
-   TAB NAVIGATION — Mga pangunahing seksyon
+   TABS
    ================================================================ */
 .tabs {
   display: flex;
   background: var(--surf);
   border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar { display: none; }
-
 .tab {
-  flex: 1;
-  min-width: 80px;
+  flex: 1; min-width: 72px;
   padding: 10px 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: .76rem; font-weight: 600;
   color: var(--muted);
-  background: none;
-  border: none;
+  background: none; border: none;
   border-bottom: 3px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
-  letter-spacing: 0.2px;
+  cursor: pointer; white-space: nowrap;
+  transition: color .15s, border-color .15s;
 }
-.tab.on {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
-}
+.tab.on { color: var(--gold); border-bottom-color: var(--gold); }
 
 /* ================================================================
-   PAGES — Bawat seksyon ng app
+   PAGES
    ================================================================ */
 .page { display: none; padding: 14px 14px 80px; }
 .page.on { display: block; }
 
 /* ================================================================
-   RESISTOR SVG VISUAL
+   RESISTOR SVG
    ================================================================ */
 .r-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 8px 0 16px;
+  display: flex; justify-content: center;
+  padding: 10px 0 18px;
 }
-.r-svg { width: 100%; max-width: 320px; height: auto; }
+.r-svg { width: 100%; max-width: 340px; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
 
 /* ================================================================
    BAND COUNT SELECTOR
    ================================================================ */
 .row-bands {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; flex-wrap: wrap;
 }
-.row-bands label {
-  font-size: 0.78rem;
-  color: var(--muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.row-bands > label {
+  font-size: .72rem; color: var(--muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px;
 }
-.seg {
-  display: flex;
-  gap: 4px;
-}
+.seg { display: flex; gap: 4px; }
 .seg-btn {
-  width: 38px;
-  height: 30px;
-  border-radius: 6px;
+  width: 40px; height: 32px;
+  border-radius: 7px;
   border: 1px solid var(--border);
-  background: var(--surf2);
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.12s;
+  background: var(--surf2); color: var(--muted);
+  font-size: .88rem; font-weight: 700; cursor: pointer;
+  transition: all .12s;
 }
 .seg-btn.on { background: var(--gold); color: #000; border-color: var(--gold); }
 
 /* ================================================================
-   BAND DROPDOWNS GRID
+   BAND GRID
    ================================================================ */
 .bands-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
-  margin-bottom: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(134px, 1fr));
+  gap: 8px; margin-bottom: 14px;
 }
-
-/* Bawat band ay nasa sariling card */
 .band-card {
   background: var(--surf);
   border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 9px 10px;
+  border-radius: var(--r); padding: 9px 10px;
 }
-.band-card label {
-  display: block;
-  font-size: 0.68rem;
-  color: var(--muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
+.band-card > label {
+  display: block; font-size: .66rem; color: var(--muted);
+  font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
   margin-bottom: 5px;
 }
-
-/* Color dropdown — may arrow indicator */
 .clr-sel {
   width: 100%;
   padding: 7px 26px 7px 8px;
   background: var(--surf2)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8499' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
     no-repeat right 7px center;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 600;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: .85rem; font-weight: 600;
+  appearance: none; -webkit-appearance: none; cursor: pointer;
 }
-
-/* Maliit na color swatch sa ilalim ng dropdown */
-.swatch {
-  height: 7px;
-  border-radius: 4px;
-  margin-top: 5px;
-  transition: background 0.2s;
-}
+.swatch { height: 7px; border-radius: 4px; margin-top: 5px; transition: background .2s; }
 
 /* ================================================================
-   RESULT CARD — Ipinapakita ang resistance value
+   RESULT CARD
    ================================================================ */
 .result-card {
-  background: var(--surf);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 14px 16px;
-  margin-bottom: 12px;
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
 }
 .result-lbl {
-  font-size: 0.68rem;
-  color: var(--muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 3px;
+  font-size: .66rem; color: var(--muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 3px;
 }
 .result-val {
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: -0.5px;
-  word-break: break-all;
+  font-size: 1.8rem; font-weight: 800; color: var(--gold);
+  letter-spacing: -.5px; word-break: break-all; cursor: pointer;
+  transition: opacity .15s;
 }
+.result-val:hover { opacity: .75; }
+.result-val:hover::after { content: ' 📋'; font-size: 1rem; }
 .result-row {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  padding-top: 10px;
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 10px; padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 .result-sub { flex: 1; min-width: 90px; }
-.result-sub .result-lbl { margin-bottom: 2px; }
-.result-sub .v {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-}
+.result-sub .v { font-size: .95rem; font-weight: 700; color: var(--text); }
 
 /* ================================================================
-   TIP BOX — Board exam tips at mnemonics
+   COPY TOAST
+   ================================================================ */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--green); color: #000;
+  padding: 9px 20px; border-radius: 24px;
+  font-size: .82rem; font-weight: 700;
+  transition: transform .25s; z-index: 999;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ================================================================
+   TIP / MNEMONIC BOXES
    ================================================================ */
 .tip {
-  background: #1a2d4a;
-  border-left: 3px solid var(--blue);
+  background: #1a2d4a; border-left: 3px solid var(--blue);
   border-radius: 0 var(--r) var(--r) 0;
-  padding: 10px 12px;
-  font-size: 0.81rem;
-  color: #93c5fd;
-  line-height: 1.6;
+  padding: 10px 12px; font-size: .8rem; color: #93c5fd; line-height: 1.6;
 }
 .tip strong { color: #bfdbfe; }
 
-/* ================================================================
-   ENCODE TAB — Value → Colors
-   ================================================================ */
-.encode-form {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.encode-form input,
-.encode-form select {
-  flex: 1;
-  min-width: 90px;
-  padding: 10px 10px;
-  background: var(--surf);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  color: var(--text);
-  font-size: 0.9rem;
-}
-.encode-form input:focus,
-.encode-form select:focus {
-  outline: none;
-  border-color: var(--blue);
-}
-.btn-go {
-  width: 100%;
-  padding: 11px;
-  background: var(--gold);
-  color: #000;
-  border: none;
-  border-radius: var(--r);
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.12s;
-}
-.btn-go:active { opacity: 0.8; }
-
-/* Mga kulay na lalabas bilang sagot */
-.answer-wrap {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-.ans-band {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
-  color: var(--muted);
-  font-weight: 600;
-}
-.ans-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 7px;
-  border: 2px solid rgba(255,255,255,0.15);
-}
-.ans-name { color: var(--text); font-size: 0.75rem; font-weight: 700; }
-
-/* ================================================================
-   SMD TAB
-   ================================================================ */
-.smd-input {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--surf);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  color: var(--text);
-  font-size: 1.3rem;
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-align: center;
-  margin-bottom: 10px;
-}
-.smd-input:focus { outline: none; border-color: var(--blue); }
-
-/* ================================================================
-   REFERENCE TABLE
-   ================================================================ */
-.ref-tbl {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.78rem;
-}
-.ref-tbl th {
-  background: var(--surf2);
-  color: var(--muted);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 7px 6px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-.ref-tbl td {
-  padding: 6px 6px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
-.ref-tbl tr:last-child td { border-bottom: none; }
-.clr-dot {
-  display: inline-block;
-  width: 22px;
-  height: 16px;
-  border-radius: 3px;
-  vertical-align: middle;
-  border: 1px solid rgba(255,255,255,0.15);
-}
-
-/* ================================================================
-   SECTION TITLE
-   ================================================================ */
-.sec-title {
-  font-size: 0.68rem;
-  color: var(--muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.7px;
-  padding-bottom: 7px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-/* ================================================================
-   ERROR MESSAGE
-   ================================================================ */
-.err { color: var(--red); font-size: 0.8rem; margin-top: 6px; }
-.warn { color: var(--gold); font-size: 0.8rem; margin-top: 6px; }
-
-/* ================================================================
-   E24 SERIES CHIPS
-   ================================================================ */
-.e24-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 8px;
-}
-.e24-chip {
-  background: var(--surf);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 3px 7px;
-  font-size: 0.72rem;
-  color: var(--muted);
-  font-family: monospace;
-}
-
-/* ================================================================
-   MNEMONIC BOX — Para sa board exam
-   ================================================================ */
 .mnemonic {
-  background: #1a2a1a;
-  border-left: 3px solid var(--green);
+  background: #1a2a1a; border-left: 3px solid var(--green);
   border-radius: 0 var(--r) var(--r) 0;
-  padding: 10px 12px;
-  font-size: 0.82rem;
-  color: #86efac;
-  line-height: 1.7;
+  padding: 10px 12px; font-size: .82rem; color: #86efac; line-height: 1.7;
   margin-bottom: 12px;
 }
 .mnemonic strong { color: #bbf7d0; }
 
 /* ================================================================
-   FORMULA BOX
+   ENCODE TAB
+   ================================================================ */
+.encode-form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.encode-form input, .encode-form select {
+  flex: 1; min-width: 90px;
+  padding: 10px; background: var(--surf);
+  border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); font-size: .9rem;
+}
+.encode-form input:focus, .encode-form select:focus { outline: none; border-color: var(--blue); }
+.btn-go {
+  width: 100%; padding: 12px;
+  background: var(--gold); color: #000;
+  border: none; border-radius: var(--r);
+  font-size: .95rem; font-weight: 700; cursor: pointer;
+  transition: opacity .12s;
+}
+.btn-go:active { opacity: .8; }
+
+.answer-wrap { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.ans-band {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  font-size: .7rem; color: var(--muted); font-weight: 600;
+}
+.ans-swatch {
+  width: 42px; height: 42px;
+  border-radius: 8px; border: 2px solid rgba(255,255,255,.15);
+}
+.ans-name { color: var(--text); font-size: .75rem; font-weight: 700; }
+
+/* ================================================================
+   SMD TAB
+   ================================================================ */
+.smd-input {
+  width: 100%; padding: 13px 16px;
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r); color: var(--text);
+  font-size: 1.4rem; font-family: monospace; font-weight: 700;
+  letter-spacing: 4px; text-align: center; margin-bottom: 10px;
+}
+.smd-input:focus { outline: none; border-color: var(--blue); }
+
+/* ================================================================
+   OHMMETER GUIDE (new!)
+   ================================================================ */
+.ohm-guide {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px;
+}
+.ohm-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 140px;
+}
+.ohm-lead {
+  width: 10px; height: 44px; border-radius: 4px; flex-shrink: 0;
+}
+.ohm-info { font-size: .78rem; line-height: 1.5; }
+.ohm-info strong { color: var(--text); font-size: .82rem; }
+.ohm-info span { color: var(--muted); }
+
+/* ================================================================
+   REFERENCE TABLE
+   ================================================================ */
+.ref-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
+.ref-tbl { width: 100%; border-collapse: collapse; font-size: .78rem; min-width: 380px; }
+.ref-tbl th {
+  background: var(--surf2); color: var(--muted);
+  font-size: .65rem; text-transform: uppercase; letter-spacing: .5px;
+  padding: 8px 8px; text-align: left;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+  position: sticky; top: 0;
+}
+.ref-tbl td { padding: 7px 8px; border-bottom: .5px solid var(--border); vertical-align: middle; }
+.ref-tbl tr:hover td { background: var(--surf2); }
+.ref-tbl tr:last-child td { border-bottom: none; }
+.clr-dot {
+  display: inline-block; width: 26px; height: 18px;
+  border-radius: 4px; vertical-align: middle;
+  border: 1px solid rgba(255,255,255,.15);
+}
+
+/* ================================================================
+   SECTION HEADING
+   ================================================================ */
+.sec-h {
+  font-size: .68rem; color: var(--muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .7px;
+  padding-bottom: 7px; border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+/* ================================================================
+   FORMULA / CODE BLOCK
    ================================================================ */
 .formula {
-  background: var(--surf2);
-  border-radius: var(--r);
-  padding: 10px 12px;
-  font-family: monospace;
-  font-size: 0.82rem;
-  color: #93c5fd;
-  line-height: 1.8;
-  margin: 8px 0;
+  background: var(--surf2); border-radius: var(--r);
+  padding: 10px 12px; font-family: monospace;
+  font-size: .82rem; color: #93c5fd; line-height: 1.9; margin: 8px 0;
+}
+
+/* ================================================================
+   E24 CHIPS
+   ================================================================ */
+.e24-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.e24-chip {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 8px;
+  font-size: .72rem; color: var(--muted); font-family: monospace;
+  cursor: default; transition: border-color .12s;
+}
+.e24-chip:hover { border-color: var(--blue); color: var(--text); }
+
+/* ================================================================
+   MISC
+   ================================================================ */
+.err  { color: var(--red);  font-size: .8rem; margin-top: 6px; }
+.warn { color: var(--gold); font-size: .8rem; margin-top: 6px; }
+.gap  { height: 12px; }
+
+/* ================================================================
+   QUIZ TAB
+   ================================================================ */
+.quiz-ans-btn {
+  width: 100%; padding: 11px 14px;
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: var(--r); color: var(--text);
+  font-size: .88rem; font-weight: 600; text-align: left;
+  cursor: pointer; transition: border-color .12s, background .12s;
+}
+.quiz-ans-btn:hover:not(:disabled) { border-color: var(--blue); background: #1e2540; }
+.quiz-ans-btn.correct { border-color: var(--green); background: #14532d; color: #86efac; }
+.quiz-ans-btn.wrong   { border-color: var(--red);   background: #450a0a; color: #fca5a5; }
+.quiz-ans-btn:disabled { cursor: default; opacity: .85; }
+.quiz-nav-btn {
+  flex: 1; padding: 10px;
+  background: var(--gold); color: #000;
+  border: none; border-radius: var(--r);
+  font-size: .88rem; font-weight: 700; cursor: pointer;
+  transition: opacity .12s;
+}
+.quiz-nav-btn:active { opacity: .8; }
+.quiz-nav-btn.skip-btn {
+  background: var(--surf2); color: var(--muted);
+  border: 1px solid var(--border);
 }
 </style>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
 <!-- ============================================================
      HEADER
      ============================================================ -->
-<header>
+<header class="site-header">
+  <a href="/" style="display:inline-flex;align-items:center;gap:5px;color:#f59e0b;text-decoration:none;font-size:.78rem;font-weight:600;opacity:.85;margin-bottom:6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85">← PinasTools Home</a>
   <div class="logo">⚡ PinasTools <span>· Resistor Color Code</span></div>
-  <span class="badge-offline">✓ Offline</span>
+  <span class="offline-badge">✓ Offline</span>
 </header>
 
 <!-- ============================================================
-     TAB BAR
+     TAB BAR  (keyboard: press 1–5)
      ============================================================ -->
 <nav class="tabs" role="tablist">
-  <button class="tab on" onclick="goTab('decode')" role="tab" aria-selected="true">🎨 Decode</button>
-  <button class="tab"    onclick="goTab('encode')" role="tab">🔢 Encode</button>
-  <button class="tab"    onclick="goTab('smd')"    role="tab">📦 SMD</button>
-  <button class="tab"    onclick="goTab('ref')"    role="tab">📋 Ref</button>
-  <button class="tab"    onclick="goTab('tips')"   role="tab">📝 Tips</button>
+  <button class="tab on"  onclick="goTab('decode')" data-key="1" role="tab" aria-selected="true" aria-controls="pg-decode">🎨 Decode</button>
+  <button class="tab"     onclick="goTab('encode')" data-key="2" role="tab" aria-selected="false" aria-controls="pg-encode">🔢 Encode</button>
+  <button class="tab"     onclick="goTab('smd')"    data-key="3" role="tab" aria-selected="false" aria-controls="pg-smd">📦 SMD</button>
+  <button class="tab"     onclick="goTab('ref')"    data-key="4" role="tab" aria-selected="false" aria-controls="pg-ref">📋 Ref</button>
+  <button class="tab"     onclick="goTab('tips')"   data-key="5" role="tab" aria-selected="false" aria-controls="pg-tips">📝 Tips</button>
+  <button class="tab"     onclick="goTab('quiz')"   data-key="6" role="tab" aria-selected="false" aria-controls="pg-quiz">🎯 Quiz</button>
 </nav>
 
 <!-- ============================================================
-     PAGE 1: DECODE — Kulay → Value
+     PAGE 1 — DECODE (Colors → Value)
      ============================================================ -->
 <section id="pg-decode" class="page on" role="tabpanel">
 
-  <!-- SVG ng resistor — ino-update sa real-time -->
+  <!-- Animated SVG resistor -->
   <div class="r-wrap">
-    <svg class="r-svg" viewBox="0 0 300 72" xmlns="http://www.w3.org/2000/svg"
+    <svg class="r-svg" viewBox="0 0 340 80" xmlns="http://www.w3.org/2000/svg"
          role="img" aria-label="Resistor na may color bands">
-      <!-- Mga lead wire sa magkabilang dulo -->
-      <line x1="0"   y1="36" x2="48"  y2="36" stroke="#777" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="252" y1="36" x2="300" y2="36" stroke="#777" stroke-width="2.5" stroke-linecap="round"/>
-      <!-- Body ng resistor -->
-      <rect x="48" y="14" width="204" height="44" rx="7" fill="#c9922e"/>
-      <!-- Mga color band — itatago o ipapakita ayon sa band count -->
-      <rect id="b1" x="66"  y="14" width="16" height="44" rx="2" fill="#1a1a1a" opacity="1"/>
-      <rect id="b2" x="91"  y="14" width="16" height="44" rx="2" fill="#8B4513" opacity="1"/>
-      <rect id="b3" x="116" y="14" width="16" height="44" rx="2" fill="#cc0000" opacity="1"/>
-      <rect id="b4" x="152" y="14" width="16" height="44" rx="2" fill="#d4af37" opacity="0"/>
-      <rect id="b5" x="182" y="14" width="16" height="44" rx="2" fill="#aaa"    opacity="0"/>
-      <rect id="b6" x="210" y="14" width="16" height="44" rx="2" fill="#8B4513" opacity="0"/>
-      <!-- Divider bago tolerance band -->
-      <line id="gap-line" x1="144" y1="10" x2="144" y2="62"
-            stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3 3"/>
+      <!-- Leads -->
+      <line x1="0"   y1="40" x2="55"  y2="40" stroke="#666" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="285" y1="40" x2="340" y2="40" stroke="#666" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Body -->
+      <rect x="55" y="16" width="230" height="48" rx="9" fill="#c9922e"/>
+      <!-- Highlight stripe on body -->
+      <rect x="55" y="16" width="230" height="8" rx="9" fill="rgba(255,255,255,.08)"/>
+      <!-- Color bands (JS will set x, fill, opacity) -->
+      <rect id="b1" x="75"  y="16" width="18" height="48" rx="2" fill="#1a1a1a" opacity="0"/>
+      <rect id="b2" x="101" y="16" width="18" height="48" rx="2" fill="#8B4513" opacity="0"/>
+      <rect id="b3" x="127" y="16" width="18" height="48" rx="2" fill="#cc0000" opacity="0"/>
+      <rect id="b4" x="167" y="16" width="18" height="48" rx="2" fill="#ccaa00" opacity="0"/>
+      <rect id="b5" x="198" y="16" width="18" height="48" rx="2" fill="#007a00" opacity="0"/>
+      <rect id="b6" x="228" y="16" width="18" height="48" rx="2" fill="#8B4513" opacity="0"/>
+      <!-- Gap line before tolerance band -->
+      <line id="gap-line" x1="158" y1="11" x2="158" y2="69"
+            stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="3 3"/>
     </svg>
   </div>
 
-  <!-- Selector ng bilang ng bands -->
+  <!-- Band count -->
   <div class="row-bands">
     <label>Bands:</label>
     <div class="seg">
@@ -530,20 +441,20 @@ header {
     </div>
   </div>
 
-  <!-- Mga dropdown para sa bawat band — dynamically generated ng JS -->
+  <!-- Band dropdowns (built by JS) -->
   <div class="bands-grid" id="bandsGrid"></div>
 
-  <!-- Result: resistance value at tolerance -->
+  <!-- Result — tap to copy -->
   <div class="result-card">
-    <div class="result-lbl">Resistance</div>
-    <div class="result-val" id="rVal">—</div>
+    <div class="result-lbl">Resistance (i-tap para kopyahin)</div>
+    <div class="result-val" id="rVal" onclick="copyResult()" title="Tap to copy">—</div>
     <div class="result-row">
       <div class="result-sub">
         <div class="result-lbl">Tolerance</div>
         <div class="v" id="rTol">—</div>
       </div>
       <div class="result-sub">
-        <div class="result-lbl">Range</div>
+        <div class="result-lbl">Min – Max Range</div>
         <div class="v" id="rRange">—</div>
       </div>
       <div class="result-sub" id="rTCBox" style="display:none">
@@ -553,24 +464,43 @@ header {
     </div>
   </div>
 
-  <!-- Tip para sa board exam -->
+  <!-- Ohmmeter lead guide (new feature!) -->
+  <div class="sec-h" style="margin-top:4px">Ohmmeter Lead Colors</div>
+  <div class="ohm-guide">
+    <div class="ohm-card">
+      <div class="ohm-lead" style="background:#cc0000"></div>
+      <div class="ohm-info">
+        <strong>Red Lead (+)</strong><br>
+        <span>Positive terminal<br>Insert sa V/Ω port</span>
+      </div>
+    </div>
+    <div class="ohm-card">
+      <div class="ohm-lead" style="background:#1a1a1a"></div>
+      <div class="ohm-info">
+        <strong>Black Lead (−)</strong><br>
+        <span>Negative terminal<br>Insert sa COM port</span>
+      </div>
+    </div>
+  </div>
+
   <div class="tip">
-    💡 <strong>Mnemonic:</strong> <em>"Bibili Ba Roy ng Gabi, Violet Grey White"</em>
-    — Black·Brown·Red·Orange·Yellow·Green·Blue·Violet·Gray·White (0–9).
-    Gold = ×0.1 (Tol ±5%), Silver = ×0.01 (Tol ±10%).
+    💡 <strong>Mnemonic (0–9):</strong> <em>"Bibili Ba Roy ng Gabi, Violet Grey White"</em>
+    — Black · Brown · Red · Orange · Yellow · Green · Blue · Violet · Gray · White
+    <br>Gold = ×0.1 (±5%) · Silver = ×0.01 (±10%)
+    <br><small style="opacity:.7">Keyboard shortcut: pindutin ang 1–5 para palipat ng tab</small>
   </div>
 </section>
 
 <!-- ============================================================
-     PAGE 2: ENCODE — Value → Kulay
+     PAGE 2 — ENCODE (Value → Colors)
      ============================================================ -->
 <section id="pg-encode" class="page" role="tabpanel">
-  <div class="sec-title">I-type ang resistance value</div>
+  <div class="sec-h">I-type ang resistance value</div>
 
   <div class="encode-form">
     <input type="number" id="encVal" placeholder="e.g. 4700" min="0" step="any"/>
     <select id="encUnit">
-      <option value="1">Ω</option>
+      <option value="1">Ω (ohm)</option>
       <option value="1000">kΩ</option>
       <option value="1000000">MΩ</option>
     </select>
@@ -582,286 +512,383 @@ header {
   <button class="btn-go" onclick="doEncode()">Hanapin ang mga Kulay →</button>
 
   <div id="encResult" style="margin-top:14px"></div>
+
+  <div class="gap"></div>
+  <div class="tip" style="margin-top:4px">
+    💡 <strong>Tip:</strong> Para sa 4-band, ang karaniwang tolerance ay Gold (±5%).
+    Para sa precision resistors (5-band), madalas Brown (±1%) o Red (±2%).
+  </div>
 </section>
 
 <!-- ============================================================
-     PAGE 3: SMD — Surface-Mount Device codes
+     PAGE 3 — SMD
      ============================================================ -->
 <section id="pg-smd" class="page" role="tabpanel">
-  <div class="sec-title">SMD Resistor Code Decoder</div>
+  <div class="sec-h">SMD Resistor Code Decoder</div>
 
   <div class="tip" style="margin-bottom:12px">
-    💡 I-type ang code na nakasulat sa katawan ng SMD resistor.
-    <br>• <strong>3-digit:</strong> 472 = 4.7 kΩ
-    <br>• <strong>4-digit:</strong> 4702 = 47 kΩ
-    <br>• <strong>R-notation:</strong> 4R7 = 4.7 Ω, R47 = 0.47 Ω
-    <br>• <strong>EIA-96:</strong> 01A = 100 Ω
+    💡 <strong>Mga SMD Format:</strong>
+    <br>• <strong>3-digit:</strong> 472 → 47 × 10² = 4.7 kΩ
+    <br>• <strong>4-digit:</strong> 4702 → 470 × 10² = 47 kΩ
+    <br>• <strong>R-notation:</strong> 4R7 = 4.7 Ω · R47 = 0.47 Ω
+    <br>• <strong>EIA-96:</strong> 01A = 100 Ω · 96F = 97.6 MΩ
   </div>
 
   <input class="smd-input" type="text" id="smdIn"
          placeholder="e.g.  4 7 2"
-         maxlength="6"
-         oninput="doSMD(this.value)"
-         autocomplete="off" autocorrect="off" spellcheck="false"/>
+         maxlength="6" autocomplete="off" autocorrect="off" spellcheck="false"
+         oninput="doSMD(this.value)"/>
 
   <div id="smdResult"></div>
 </section>
 
 <!-- ============================================================
-     PAGE 4: REFERENCE TABLE
+     PAGE 4 — REFERENCE
      ============================================================ -->
 <section id="pg-ref" class="page" role="tabpanel">
-  <div class="sec-title">Color Code Reference</div>
+  <div class="sec-h">Color Code Reference</div>
 
-  <!-- Ang full reference table — built by JS para makatipid ng HTML -->
-  <table class="ref-tbl" id="refTbl">
-    <thead>
-      <tr>
-        <th></th>
-        <th>Kulay</th>
-        <th>Digit</th>
-        <th>Mult.</th>
-        <th>Tol.</th>
-        <th>TC</th>
-      </tr>
-    </thead>
-    <tbody id="refBody"></tbody>
-  </table>
+  <div class="ref-wrap">
+    <table class="ref-tbl">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Kulay</th>
+          <th>Digit</th>
+          <th>Multiplier</th>
+          <th>Tolerance</th>
+          <th>TC (ppm/°C)</th>
+        </tr>
+      </thead>
+      <tbody id="refBody"></tbody>
+    </table>
+  </div>
 
-  <div style="margin-top:18px" class="sec-title">E24 Series (100Ω decade)</div>
+  <div class="sec-h">E24 Series — 100 Ω decade</div>
   <div class="e24-wrap" id="e24"></div>
+
+  <div class="gap"></div>
+  <div class="sec-h" style="margin-top:8px">E12 Series — 1 kΩ decade</div>
+  <div class="e24-wrap" id="e12"></div>
+
+  <div class="gap"></div>
+  <div class="sec-h" style="margin-top:8px">E6 Series — 10 kΩ decade</div>
+  <div class="e24-wrap" id="e6"></div>
 </section>
 
 <!-- ============================================================
-     PAGE 5: TIPS — Board exam reviewer
+     PAGE 5 — BOARD EXAM TIPS
      ============================================================ -->
 <section id="pg-tips" class="page" role="tabpanel">
-  <div class="sec-title">Board Exam Reviewer — Resistors</div>
+  <div class="sec-h">Board Exam Reviewer — Resistors</div>
 
-  <!-- Mnemonic -->
   <div class="mnemonic">
     <strong>Mnemonic para sa color sequence (0–9):</strong><br>
     <em>"Bibili Ba Roy ng Gabi, Violet Grey White"</em><br><br>
-    <strong>B</strong>lack · <strong>B</strong>rown · <strong>R</strong>ed ·
-    <strong>O</strong>range · <strong>Y</strong>ellow · <strong>G</strong>reen ·
-    <strong>B</strong>lue · <strong>V</strong>iolet · <strong>G</strong>ray · <strong>W</strong>hite<br>
-    0 · 1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9
+    <strong>B</strong>lack(0) · <strong>B</strong>rown(1) · <strong>R</strong>ed(2) ·
+    <strong>O</strong>range(3) · <strong>Y</strong>ellow(4) · <strong>G</strong>reen(5) ·
+    <strong>B</strong>lue(6) · <strong>V</strong>iolet(7) · <strong>G</strong>ray(8) · <strong>W</strong>hite(9)
   </div>
 
-  <!-- Mga formula na kailangan sa board exam -->
-  <div class="sec-title">Mga Formula</div>
+  <div class="sec-h">Mga Formula na Kailangan sa Board</div>
 
   <div class="result-card">
-    <div class="result-lbl">4-Band Resistor</div>
-    <div class="formula">
-      R = (10×D1 + D2) × Multiplier<br>
-      Tolerance = ±Gold(5%) or Silver(10%)
-    </div>
+    <div class="result-lbl">4-Band Formula</div>
+    <div class="formula">R = (10×D₁ + D₂) × Multiplier<br>Tol = Gold(±5%) o Silver(±10%)</div>
     <div class="tip" style="margin-top:8px">
-      Halimbawa: Brown-Black-Red-Gold<br>
+      Halimbawa: <strong>Brown–Black–Red–Gold</strong><br>
       R = (10×1 + 0) × 100 = <strong>1,000 Ω = 1 kΩ ±5%</strong>
     </div>
   </div>
 
-  <div class="result-card" style="margin-top:10px">
-    <div class="result-lbl">5-Band Resistor</div>
-    <div class="formula">
-      R = (100×D1 + 10×D2 + D3) × Multiplier<br>
-      Tolerance = band 5
-    </div>
+  <div class="gap"></div>
+  <div class="result-card">
+    <div class="result-lbl">5-Band Formula</div>
+    <div class="formula">R = (100×D₁ + 10×D₂ + D₃) × Multiplier</div>
     <div class="tip" style="margin-top:8px">
-      Halimbawa: Brown-Black-Black-Red-Brown<br>
+      Halimbawa: <strong>Brown–Black–Black–Red–Brown</strong><br>
       R = (100×1 + 0 + 0) × 100 = <strong>10,000 Ω = 10 kΩ ±1%</strong>
     </div>
   </div>
 
-  <div class="result-card" style="margin-top:10px">
+  <div class="gap"></div>
+  <div class="result-card">
     <div class="result-lbl">Resistors sa Series</div>
-    <div class="formula">R_total = R1 + R2 + R3 + ...</div>
+    <div class="formula">R_total = R₁ + R₂ + R₃ + ···</div>
   </div>
 
-  <div class="result-card" style="margin-top:10px">
+  <div class="gap"></div>
+  <div class="result-card">
     <div class="result-lbl">Resistors sa Parallel</div>
     <div class="formula">
-      Para sa 2 resistors:<br>
-      R_total = (R1 × R2) / (R1 + R2)<br><br>
-      Para sa marami:<br>
-      1/R_total = 1/R1 + 1/R2 + 1/R3 + ...
+      Para sa 2:  R = (R₁ × R₂) ÷ (R₁ + R₂)<br>
+      Para sa ≥3: 1/R = 1/R₁ + 1/R₂ + 1/R₃ + ···
     </div>
   </div>
 
-  <!-- Power rating -->
-  <div style="margin-top:14px" class="sec-title">Power Rating — Ohm's Law</div>
+  <div class="gap"></div>
   <div class="result-card">
+    <div class="result-lbl">Ohm's Law at Power</div>
     <div class="formula">
-      V = IR &nbsp;&nbsp; I = V/R &nbsp;&nbsp; R = V/I<br><br>
+      V = IR     I = V/R     R = V/I<br>
       P = IV = I²R = V²/R
     </div>
     <div class="tip" style="margin-top:8px">
-      Tandaan: Karaniwan na power rating ng resistors —
-      1/8W, 1/4W, 1/2W, 1W, 2W, 5W, 10W
+      <strong>Power ratings:</strong> 1/8W · 1/4W · 1/2W · 1W · 2W · 5W · 10W
     </div>
   </div>
 
-  <!-- Typical board exam traps -->
-  <div style="margin-top:14px" class="sec-title">Mga Karaniwang Board Exam Questions</div>
+  <div class="gap"></div>
+  <div class="sec-h" style="margin-top:8px">Karaniwang Board Exam Questions</div>
 
-  <div class="result-card" style="margin-top:0">
-    <div class="result-lbl">Q: Paano mabasa ang Gold at Silver bilang multiplier?</div>
-    <div style="margin-top:6px;font-size:0.85rem;line-height:1.7">
-      <strong style="color:var(--gold)">Gold</strong> = ×0.1 (para sa values na mas mababa sa 10Ω)<br>
-      <strong style="color:var(--muted)">Silver</strong> = ×0.01 (para sa values na mas mababa sa 1Ω)<br>
-      Halimbawa: Red-Gold = 2 × 0.1 = <strong>0.2 Ω</strong>
+  <div class="result-card">
+    <div class="result-lbl">Q: Gold at Silver bilang Multiplier (hindi Tolerance)?</div>
+    <div style="margin-top:7px;font-size:.85rem;line-height:1.7">
+      <strong style="color:var(--gold)">Gold</strong> bilang multiplier = ×0.1 (para sa values &lt; 10 Ω)<br>
+      <strong style="color:var(--muted)">Silver</strong> bilang multiplier = ×0.01 (para sa values &lt; 1 Ω)<br>
+      Halimbawa: Red–Gold = 2 × 0.1 = <strong>0.2 Ω</strong>
     </div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="result-card">
+    <div class="result-lbl">Q: Ano ang sinasabi ng 6th band?</div>
+    <div style="margin-top:7px;font-size:.85rem;line-height:1.7">
+      Band 6 = <strong>Temperature Coefficient (TC)</strong> sa ppm/°C<br>
+      Brown = 100 ppm/°C · Red = 50 · Orange = 15 · Yellow = 25<br>
+      Ibig sabihin: gaano nagbabago ang resistance per degree Celsius
+    </div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="result-card">
+    <div class="result-lbl">Q: Ano ang E-series at bakit mahalaga?</div>
+    <div style="margin-top:7px;font-size:.85rem;line-height:1.7">
+      <strong>E6</strong> = 6 values/decade — ±20% tolerance<br>
+      <strong>E12</strong> = 12 values/decade — ±10% tolerance<br>
+      <strong>E24</strong> = 24 values/decade — ±5% tolerance ← pinakakaraniwan<br>
+      <strong>E96</strong> = 96 values/decade — ±1% tolerance ← precision<br>
+      <strong>E192</strong> = 192 values/decade — ±0.5% tolerance
+    </div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="result-card">
+    <div class="result-lbl">Q: Paano decode ang SMD resistor code?</div>
+    <div style="margin-top:7px;font-size:.85rem;line-height:1.7">
+      <strong>3-digit XYZ:</strong> R = XY × 10<sup>Z</sup><br>
+      <strong>4-digit XYZW:</strong> R = XYZ × 10<sup>W</sup><br>
+      <strong>R-notation:</strong> R ay decimal point (4R7 = 4.7 Ω)<br>
+      <strong>EIA-96:</strong> 2-digit index + letter multiplier (01A = 100 Ω)
+    </div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="tip" style="margin-top:4px">
+    💡 <strong>Paalala:</strong> Sa PRC ECE Board, kadalasang tinatanong ang 4-band decode,
+    parallel resistance, at power dissipation. Araling mabuti ang mga formula sa itaas!
+  </div>
+
+  <div class="gap"></div>
+  <h4 style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);padding-bottom:7px;border-bottom:1px solid var(--border);margin-bottom:12px">📚 Real ECE Board Mnemonics</h4>
+
+  <div class="mnemonic">
+    <strong>B.B. ROY ng Great Britain ay Very Good Wife</strong><br>
+    <small style="color:#aaa;font-weight:400">Black(0) Brown(1) Red(2) Orange(3) Yellow(4) Green(5) Blue(6) Violet(7) Gray(8) White(9)</small><br>
+    <span style="font-size:.78rem;color:#888;font-style:italic">Ang "Great Britain ay Very Good Wife" = Gray(8) · White(9) — pang-extend ng classic na mnemonic!</span>
+  </div>
+
+  <div class="mnemonic" style="margin-top:10px">
+    <strong>Gold Silver = Good Score</strong><br>
+    <small style="color:#aaa;font-weight:400">Gold = ±5% tolerance · Silver = ±10% tolerance</small><br>
+    <span style="font-size:.78rem;color:#888;font-style:italic">Pag nandoon ang Gold o Silver sa dulo = tolerance band. Pag nasa multiplier position = 0.1 o 0.01.</span>
+  </div>
+
+  <div class="mnemonic" style="margin-top:10px">
+    <strong>Taglish Version: "Bad Boys Rape Our Young Girls But Violet Gives Willingly"</strong><br>
+    <small style="color:#aaa;font-weight:400">"Grabe Siya Noh!" para sa Gray(8) · Silver(9)</small><br>
+    <span style="font-size:.78rem;color:#888;font-style:italic">Ginagamit ng maraming ECE reviewees — controversial ngunit effective para sa memorization sa exam!</span>
   </div>
 
   <div class="result-card" style="margin-top:10px">
-    <div class="result-lbl">Q: Paano mabasa ang 6-band resistor?</div>
-    <div style="margin-top:6px;font-size:0.85rem;line-height:1.7">
-      Band 1,2,3 = Digits · Band 4 = Multiplier<br>
-      Band 5 = Tolerance · Band 6 = <strong>Temperature Coefficient</strong><br>
-      (TC unit: ppm/°C — ilang ohm ang nagbabago per degree Celsius)
-    </div>
-  </div>
-
-  <div class="result-card" style="margin-top:10px">
-    <div class="result-lbl">Q: Ano ang preferred values (E-series)?</div>
-    <div style="margin-top:6px;font-size:0.85rem;line-height:1.7">
-      <strong>E6</strong> = 6 values/decade (±20% tol)<br>
-      <strong>E12</strong> = 12 values/decade (±10% tol)<br>
-      <strong>E24</strong> = 24 values/decade (±5% tol) ← pinakakaraniwan<br>
-      <strong>E96</strong> = 96 values/decade (±1% tol) ← precision resistors
+    <div class="result-lbl">CalTech Tip — Resistor Identification sa Casio</div>
+    <div style="font-size:.82rem;line-height:1.7;color:var(--muted);margin-top:6px">
+      <strong style="color:var(--text)">Para sa parallel resistance ng 2 resistors:</strong><br>
+      R_par = R1 × R2 ÷ (R1 + R2)<br>
+      Sa Casio: type <span style="font-family:monospace;color:var(--gold)">(R1 × R2) ÷ (R1 + R2) =</span><br><br>
+      <strong style="color:var(--text)">Para sa 3+ parallel:</strong><br>
+      Gamitin ang <span style="font-family:monospace;color:var(--gold)">1 ÷ (1/R1 + 1/R2 + 1/R3)</span><br>
+      O sa EX model: gamitin ang fraction key para i-add ang reciprocals.
     </div>
   </div>
 </section>
 
 <!-- ============================================================
-     JAVASCRIPT — Lahat ng logic, walang external library
+     PAGE 6 — QUIZ
+     ============================================================ -->
+<section id="pg-quiz" class="page" role="tabpanel">
+  <div id="quiz-score-bar" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <span style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Score</span>
+    <span id="quiz-score-txt" style="font-size:1.1rem;font-weight:800;color:var(--gold)">0/50</span>
+    <div style="flex:1;height:7px;background:var(--surf2);border-radius:4px;overflow:hidden">
+      <div id="quiz-prog-fill" style="height:100%;width:0%;background:var(--gold);border-radius:4px;transition:width .3s"></div>
+    </div>
+    <span id="quiz-q-counter" style="font-size:.72rem;color:var(--muted)">Q1/50</span>
+  </div>
+
+  <div id="quiz-card" class="result-card" style="min-height:200px">
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <span id="quiz-diff-badge" style="font-size:.65rem;font-weight:700;padding:2px 9px;border-radius:12px;text-transform:uppercase;letter-spacing:.5px"></span>
+      <span id="quiz-cat-badge" style="font-size:.65rem;font-weight:700;padding:2px 9px;border-radius:12px;background:var(--surf2);color:var(--muted);text-transform:uppercase;letter-spacing:.5px"></span>
+    </div>
+    <div id="quiz-visual" style="margin-bottom:10px;text-align:center"></div>
+    <div id="quiz-qtext" style="font-size:.95rem;font-weight:600;margin-bottom:14px;line-height:1.5"></div>
+    <div id="quiz-choices" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="quiz-explanation" style="display:none;margin-top:12px;background:#1a2d4a;border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:10px 12px;font-size:.8rem;color:#93c5fd;line-height:1.6"></div>
+    <div id="quiz-nav" style="display:none;margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+
+  <div id="quiz-final" style="display:none">
+    <div class="result-card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:8px">🎯</div>
+      <div class="result-lbl">Final Score</div>
+      <div id="quiz-final-score" class="result-val" style="cursor:default"></div>
+      <div id="quiz-final-msg" style="margin-top:8px;font-size:.85rem;color:var(--muted)"></div>
+      <button class="btn-go" onclick="quizRestart()" style="margin-top:14px">🔄 Restart Quiz</button>
+    </div>
+  </div>
+</section>
+
+<!-- Copy toast notification -->
+<div class="toast" id="toast">📋 Kinopya!</div>
+
+<!-- ============================================================
+     JAVASCRIPT — Zero external dependencies
      ============================================================ -->
 <script>
 // ================================================================
-// DATA — Impormasyon ng bawat kulay
-// digit: ang numero na kinakatawan nito (null kung hindi digit)
-// mult: ang multiplier value
-// tol: tolerance string (null kung wala)
-// tc: temperature coefficient sa ppm/°C (null kung wala)
+// DATA — Bawat kulay ay may digit, multiplier, tolerance, at TC
 // ================================================================
 const COLORS = [
-  { name:'Black',  h:'#1a1a1a', digit:0, mult:1,         tol:null,     tc:250 },
-  { name:'Brown',  h:'#8B4513', digit:1, mult:10,        tol:'±1%',    tc:100 },
-  { name:'Red',    h:'#cc0000', digit:2, mult:100,       tol:'±2%',    tc:50  },
-  { name:'Orange', h:'#e65c00', digit:3, mult:1000,      tol:null,     tc:15  },
-  { name:'Yellow', h:'#ccaa00', digit:4, mult:10000,     tol:null,     tc:25  },
-  { name:'Green',  h:'#007a00', digit:5, mult:100000,    tol:'±0.5%',  tc:20  },
-  { name:'Blue',   h:'#0055cc', digit:6, mult:1000000,   tol:'±0.25%', tc:10  },
-  { name:'Violet', h:'#7700cc', digit:7, mult:10000000,  tol:'±0.1%',  tc:5   },
-  { name:'Gray',   h:'#555555', digit:8, mult:1e8,       tol:'±0.05%', tc:1   },
-  { name:'White',  h:'#dddddd', digit:9, mult:1e9,       tol:null,     tc:null},
-  { name:'Gold',   h:'#d4af37', digit:null, mult:0.1,   tol:'±5%',    tc:null},
-  { name:'Silver', h:'#999999', digit:null, mult:0.01,  tol:'±10%',   tc:null},
+  { name:'Black',  h:'#1a1a1a', digit:0, mult:1,        tol:null,     tc:250 },
+  { name:'Brown',  h:'#8B4513', digit:1, mult:10,       tol:'±1%',    tc:100 },
+  { name:'Red',    h:'#cc0000', digit:2, mult:100,      tol:'±2%',    tc:50  },
+  { name:'Orange', h:'#e65c00', digit:3, mult:1000,     tol:null,     tc:15  },
+  { name:'Yellow', h:'#ccaa00', digit:4, mult:10000,    tol:null,     tc:25  },
+  { name:'Green',  h:'#007a00', digit:5, mult:1e5,      tol:'±0.5%',  tc:20  },
+  { name:'Blue',   h:'#0055cc', digit:6, mult:1e6,      tol:'±0.25%', tc:10  },
+  { name:'Violet', h:'#7700cc', digit:7, mult:1e7,      tol:'±0.1%',  tc:5   },
+  { name:'Gray',   h:'#555555', digit:8, mult:1e8,      tol:'±0.05%', tc:1   },
+  { name:'White',  h:'#dddddd', digit:9, mult:1e9,      tol:null,     tc:null},
+  { name:'Gold',   h:'#d4af37', digit:null, mult:0.1,  tol:'±5%',    tc:null},
+  { name:'Silver', h:'#aaaaaa', digit:null, mult:0.01, tol:'±10%',   tc:null},
 ];
 
-// Mga subset ng COLORS para sa bawat uri ng band
-const DIGITS = COLORS.filter(c => c.digit !== null);           // Para sa digit bands
-const MULTS  = COLORS;                                          // Lahat ay pwedeng multiplier
-const TOLS   = COLORS.filter(c => c.tol !== null);             // Para sa tolerance band
-const TCS    = COLORS.filter(c => c.tc !== null);              // Para sa TC band
+// Mga subset para sa bawat band type
+const DIGITS = COLORS.filter(c => c.digit !== null);
+const MULTS  = COLORS;
+const TOLS   = COLORS.filter(c => c.tol !== null);
+const TCS    = COLORS.filter(c => c.tc  !== null);
 
-// ================================================================
-// BAND CONFIGURATION — Depende sa bilang ng bands
-// type: 'digit' | 'mult' | 'tol' | 'tc'
-// ================================================================
+// Kung ano ang ipapakita para sa bawat bilang ng bands
 const BAND_CFG = {
   3: [
-    { lbl:'Band 1 — 1st Digit',  type:'digit' },
-    { lbl:'Band 2 — 2nd Digit',  type:'digit' },
-    { lbl:'Band 3 — Multiplier', type:'mult'  },
+    { lbl:'Band 1 — 1st Digit',   type:'digit' },
+    { lbl:'Band 2 — 2nd Digit',   type:'digit' },
+    { lbl:'Band 3 — Multiplier',  type:'mult'  },
   ],
   4: [
-    { lbl:'Band 1 — 1st Digit',  type:'digit' },
-    { lbl:'Band 2 — 2nd Digit',  type:'digit' },
-    { lbl:'Band 3 — Multiplier', type:'mult'  },
-    { lbl:'Band 4 — Tolerance',  type:'tol'   },
+    { lbl:'Band 1 — 1st Digit',   type:'digit' },
+    { lbl:'Band 2 — 2nd Digit',   type:'digit' },
+    { lbl:'Band 3 — Multiplier',  type:'mult'  },
+    { lbl:'Band 4 — Tolerance',   type:'tol'   },
   ],
   5: [
-    { lbl:'Band 1 — 1st Digit',  type:'digit' },
-    { lbl:'Band 2 — 2nd Digit',  type:'digit' },
-    { lbl:'Band 3 — 3rd Digit',  type:'digit' },
-    { lbl:'Band 4 — Multiplier', type:'mult'  },
-    { lbl:'Band 5 — Tolerance',  type:'tol'   },
+    { lbl:'Band 1 — 1st Digit',   type:'digit' },
+    { lbl:'Band 2 — 2nd Digit',   type:'digit' },
+    { lbl:'Band 3 — 3rd Digit',   type:'digit' },
+    { lbl:'Band 4 — Multiplier',  type:'mult'  },
+    { lbl:'Band 5 — Tolerance',   type:'tol'   },
   ],
   6: [
-    { lbl:'Band 1 — 1st Digit',  type:'digit' },
-    { lbl:'Band 2 — 2nd Digit',  type:'digit' },
-    { lbl:'Band 3 — 3rd Digit',  type:'digit' },
-    { lbl:'Band 4 — Multiplier', type:'mult'  },
-    { lbl:'Band 5 — Tolerance',  type:'tol'   },
-    { lbl:'Band 6 — Temp. Coeff',type:'tc'    },
+    { lbl:'Band 1 — 1st Digit',   type:'digit' },
+    { lbl:'Band 2 — 2nd Digit',   type:'digit' },
+    { lbl:'Band 3 — 3rd Digit',   type:'digit' },
+    { lbl:'Band 4 — Multiplier',  type:'mult'  },
+    { lbl:'Band 5 — Tolerance',   type:'tol'   },
+    { lbl:'Band 6 — Temp. Coeff', type:'tc'    },
   ],
 };
 
-// Default na kulay para sa bawat uri ng band
-const DEFAULTS = { digit:'Brown', mult:'Black', tol:'Gold', tc:'Brown' };
+// Default na kulay para sa bawat band type
+const DEF = { digit:'Brown', mult:'Black', tol:'Gold', tc:'Brown' };
 
-// ================================================================
-// STATE — Kasalukuyang estado ng app
-// ================================================================
-let nBands = 4;                 // Bilang ng bands na pinili
-let sel    = {};                // Piniling kulay: { b0:'Brown', b1:'Black', ... }
-
-// SVG positions para sa bawat band configuration
+// SVG x-positions ng bawat band para sa bawat band count
 const SVG_POS = {
-  3: [ {id:'b1',x:72 }, {id:'b2',x:116}, {id:'b3',x:205} ],
-  4: [ {id:'b1',x:66 }, {id:'b2',x:91 }, {id:'b3',x:152}, {id:'b4',x:182} ],
-  5: [ {id:'b1',x:62 }, {id:'b2',x:84 }, {id:'b3',x:106}, {id:'b4',x:148}, {id:'b5',x:176} ],
-  6: [ {id:'b1',x:58 }, {id:'b2',x:78 }, {id:'b3',x:98 }, {id:'b4',x:133}, {id:'b5',x:158}, {id:'b6',x:183} ],
+  3: [{id:'b1',x:78},{id:'b2',x:127},{id:'b3',x:220}],
+  4: [{id:'b1',x:73},{id:'b2',x:101},{id:'b3',x:165},{id:'b4',x:198}],
+  5: [{id:'b1',x:68},{id:'b2',x:93},{id:'b3',x:118},{id:'b4',x:168},{id:'b5',x:198}],
+  6: [{id:'b1',x:63},{id:'b2',x:86},{id:'b3',x:109},{id:'b4',x:150},{id:'b5',x:178},{id:'b6',x:206}],
 };
 
 // ================================================================
-// HELPER: i-format ang ohm value sa tamang unit
+// STATE
 // ================================================================
+let nBands = 4;
+let sel    = {};          // { b0:'Brown', b1:'Black', ... }
+let lastResultText = '';  // Para sa copy-to-clipboard
+
+// ================================================================
+// HELPERS
+// ================================================================
+function getSet(type) {
+  return type==='digit'?DIGITS : type==='mult'?MULTS : type==='tol'?TOLS : TCS;
+}
+
+// I-format ang ohm value sa tamang unit
 function fmtOhm(v) {
   if (!isFinite(v) || v < 0) return '—';
-  if (v >= 1e9) return trimZ((v / 1e9).toPrecision(4)) + ' GΩ';
-  if (v >= 1e6) return trimZ((v / 1e6).toPrecision(4)) + ' MΩ';
-  if (v >= 1e3) return trimZ((v / 1e3).toPrecision(4)) + ' kΩ';
-  if (v < 1 && v > 0) return trimZ(v.toPrecision(3)) + ' Ω';
-  return trimZ(v.toPrecision(4)) + ' Ω';
+  const fmt = n => n.toPrecision(4).replace(/\.?0+$/, '');
+  if (v >= 1e9) return fmt(v/1e9) + ' GΩ';
+  if (v >= 1e6) return fmt(v/1e6) + ' MΩ';
+  if (v >= 1e3) return fmt(v/1e3) + ' kΩ';
+  if (v <  1 && v > 0) return v.toPrecision(3).replace(/\.?0+$/,'') + ' Ω';
+  return fmt(v) + ' Ω';
 }
 
-// Alisin ang trailing zeros pagkatapos ng decimal point
-function trimZ(s) { return s.replace(/\.?0+$/, ''); }
-
-// Kuhanin ang set ng colors para sa isang band type
-function getSet(type) {
-  if (type === 'digit') return DIGITS;
-  if (type === 'mult')  return MULTS;
-  if (type === 'tol')   return TOLS;
-  if (type === 'tc')    return TCS;
-  return COLORS;
+// Multiplier para sa encode result display
+function fmtMult(m) {
+  if (m >= 1e6) return '×' + fmtOhm(m).replace(' Ω','').replace(' k','k').replace(' M','M').replace(' G','G');
+  if (m >= 1e3) return '×' + (m/1e3).toFixed(0) + 'k';
+  if (m >= 1)   return '×' + m;
+  return '÷' + Math.round(1/m);
 }
 
 // ================================================================
-// TAB SWITCHING — Palitan ang aktibong page
+// TAB SWITCHING
 // ================================================================
 function goTab(id) {
-  // Itago ang lahat ng pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  // I-deactivate ang lahat ng tabs
   document.querySelectorAll('.tab').forEach(b => {
-    b.classList.toggle('on', b.getAttribute('onclick') === "goTab('" + id + "')");
-    b.setAttribute('aria-selected', b.classList.contains('on'));
+    const on = b.getAttribute('onclick') === "goTab('" + id + "')";
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', on);
   });
-  // Ipakita ang tamang page
   document.getElementById('pg-' + id).classList.add('on');
 }
 
+// Keyboard shortcut: 1–5 para sa tabs
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+  const map = {'1':'decode','2':'encode','3':'smd','4':'ref','5':'tips','6':'quiz'};
+  if (map[e.key]) goTab(map[e.key]);
+});
+
 // ================================================================
-// BAND COUNT — Palitan ang bilang ng bands
+// BAND COUNT CHANGE
 // ================================================================
 function setBands(n) {
   nBands = n;
-  // I-update ang segment button states
   document.querySelectorAll('.seg-btn').forEach((b, i) => {
     b.classList.toggle('on', [3,4,5,6][i] === n);
   });
@@ -871,30 +898,23 @@ function setBands(n) {
 }
 
 // ================================================================
-// BUILD BANDS — Gumawa ng mga dropdown cards
+// BUILD BAND DROPDOWNS
 // ================================================================
 function buildBands() {
   const grid = document.getElementById('bandsGrid');
-  const cfg  = BAND_CFG[nBands];
-  grid.innerHTML = '';  // I-clear ang luma
-
-  cfg.forEach((band, i) => {
+  grid.innerHTML = '';
+  BAND_CFG[nBands].forEach((band, i) => {
     const key    = 'b' + i;
     const colors = getSet(band.type);
+    if (!sel[key]) sel[key] = DEF[band.type] || colors[0].name;
 
-    // Gamitin ang nakaraang pinili, o default
-    if (!sel[key]) sel[key] = DEFAULTS[band.type] || colors[0].name;
-
-    // Gumawa ng card
-    const card  = document.createElement('div');
+    const card = document.createElement('div');
     card.className = 'band-card';
 
-    // Label
     const lbl = document.createElement('label');
     lbl.textContent = band.lbl;
     lbl.htmlFor = 'sel-' + i;
 
-    // Dropdown
     const s = document.createElement('select');
     s.className = 'clr-sel';
     s.id = 'sel-' + i;
@@ -906,13 +926,10 @@ function buildBands() {
       s.appendChild(o);
     });
 
-    // Color swatch
     const sw = document.createElement('div');
     sw.className = 'swatch';
-    const cur = colors.find(c => c.name === sel[key]) || colors[0];
-    sw.style.background = cur.h;
+    sw.style.background = (colors.find(c => c.name === sel[key]) || colors[0]).h;
 
-    // Event listener para sa pagbabago ng kulay
     s.addEventListener('change', e => {
       sel[key] = e.target.value;
       const col = getSet(BAND_CFG[nBands][i].type).find(c => c.name === e.target.value);
@@ -921,54 +938,43 @@ function buildBands() {
       decode();
     });
 
-    card.appendChild(lbl);
-    card.appendChild(s);
-    card.appendChild(sw);
+    card.append(lbl, s, sw);
     grid.appendChild(card);
   });
 }
 
 // ================================================================
-// UPDATE SVG — I-update ang visual na resistor
+// UPDATE SVG RESISTOR
 // ================================================================
-// Siguraduhing may ika-6 na rect ang SVG
-(function() {
-  const svg = document.querySelector('.r-svg');
-  if (!document.getElementById('b6')) {
-    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    r.id = 'b6';
-    r.setAttribute('y', '14');
-    r.setAttribute('width', '16');
-    r.setAttribute('height', '44');
-    r.setAttribute('rx', '2');
-    r.setAttribute('fill', '#888');
-    r.setAttribute('opacity', '0');
-    svg.appendChild(r);
-  }
-})();
-
 function updateSVG() {
-  const cfg  = BAND_CFG[nBands];
-  const pos  = SVG_POS[nBands] || SVG_POS[4];
+  const pos = SVG_POS[nBands] || SVG_POS[4];
 
-  // Itago muna ang lahat ng bands
+  // Itago lahat
   ['b1','b2','b3','b4','b5','b6'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.setAttribute('opacity', '0');
   });
 
-  // Ipakita ang mga aktibong band
-  cfg.forEach((band, i) => {
+  // Ipakita ang aktibo
+  BAND_CFG[nBands].forEach((band, i) => {
     const p = pos[i];
     if (!p) return;
     const el = document.getElementById(p.id);
     if (!el) return;
-    const colorName = sel['b' + i] || DEFAULTS[band.type];
-    const col = getSet(band.type).find(c => c.name === colorName) || getSet(band.type)[0];
+    const name = sel['b' + i] || DEF[band.type];
+    const col  = getSet(band.type).find(c => c.name === name) || getSet(band.type)[0];
     el.setAttribute('x', p.x);
     el.setAttribute('fill', col.h);
     el.setAttribute('opacity', '1');
   });
+
+  // Gap line position: bago ang tolerance band
+  const gapPos = nBands === 3 ? 185
+               : nBands === 4 ? 148
+               : nBands === 5 ? 145
+               : 135;
+  const gap = document.getElementById('gap-line');
+  if (gap) { gap.setAttribute('x1', gapPos); gap.setAttribute('x2', gapPos); }
 }
 
 // ================================================================
@@ -976,38 +982,32 @@ function updateSVG() {
 // ================================================================
 function decode() {
   const cfg = BAND_CFG[nBands];
-  let digits = [];
-  let mult = 1, tol = null, tc = null;
+  let digits = [], mult = 1, tol = null, tc = null;
 
   cfg.forEach((band, i) => {
-    const name = sel['b' + i] || DEFAULTS[band.type];
+    const name = sel['b' + i] || DEF[band.type];
     const col  = getSet(band.type).find(c => c.name === name) || getSet(band.type)[0];
-
-    if (band.type === 'digit') digits.push(col.digit);
-    else if (band.type === 'mult') mult = col.mult;
-    else if (band.type === 'tol')  tol  = col.tol;
-    else if (band.type === 'tc')   tc   = col.tc;
+    if      (band.type === 'digit') digits.push(col.digit);
+    else if (band.type === 'mult')  mult = col.mult;
+    else if (band.type === 'tol')   tol  = col.tol;
+    else if (band.type === 'tc')    tc   = col.tc;
   });
 
-  // Kalkulahin ang resistance
-  // Formula: R = (D1*10^(n-1) + D2*10^(n-2) + ...) × Multiplier
   const base = digits.reduce((acc, d) => acc * 10 + d, 0);
   const R    = base * mult;
+  lastResultText = fmtOhm(R);
 
-  // Ipakita ang resistance value
-  document.getElementById('rVal').textContent = fmtOhm(R);
+  document.getElementById('rVal').textContent   = fmtOhm(R);
+  document.getElementById('rTol').textContent   = tol || '—';
 
-  // Tolerance at range
-  document.getElementById('rTol').textContent = tol || '—';
   if (tol && isFinite(R)) {
     const pct = parseFloat(tol.replace('±','').replace('%','')) / 100;
     document.getElementById('rRange').textContent =
-      fmtOhm(R * (1 - pct)) + ' – ' + fmtOhm(R * (1 + pct));
+      fmtOhm(R*(1-pct)) + ' – ' + fmtOhm(R*(1+pct));
   } else {
     document.getElementById('rRange').textContent = '—';
   }
 
-  // Temperature coefficient (para sa 6-band)
   const tcBox = document.getElementById('rTCBox');
   if (tc !== null) {
     tcBox.style.display = '';
@@ -1018,7 +1018,34 @@ function decode() {
 }
 
 // ================================================================
-// ENCODE — Value → Kulay
+// COPY RESULT TO CLIPBOARD
+// ================================================================
+function copyResult() {
+  if (!lastResultText || lastResultText === '—') return;
+  const text = lastResultText;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showToast);
+  } else {
+    // Fallback para sa older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ================================================================
+// ENCODE — Value → Colors
 // ================================================================
 function doEncode() {
   const raw   = parseFloat(document.getElementById('encVal').value);
@@ -1026,20 +1053,18 @@ function doEncode() {
   const bands = parseInt(document.getElementById('encBands').value);
   const div   = document.getElementById('encResult');
 
-  // Validate input
   if (isNaN(raw) || raw <= 0) {
-    div.innerHTML = '<div class="err">⚠️ Mag-type ng valid na resistance value (halimbawa: 4700).</div>';
+    div.innerHTML = '<div class="err">⚠️ Mag-type ng valid na value (halimbawa: 4700).</div>';
     return;
   }
 
   const val     = raw * unit;
-  const nDigits = bands === 4 ? 2 : 3;
-  const sigMin  = Math.pow(10, nDigits - 1);
-  const sigMax  = Math.pow(10, nDigits) - 1;
+  const nDig    = bands === 4 ? 2 : 3;
+  const sigMin  = Math.pow(10, nDig - 1);
+  const sigMax  = Math.pow(10, nDig) - 1;
 
   // Hanapin ang pinaka-angkop na multiplier
-  // Sorter: mula pinakamalaki hanggang pinakamaliit
-  const sorted  = [...MULTS].filter(c => c.mult > 0).sort((a,b) => b.mult - a.mult);
+  const sorted = [...MULTS].filter(c => c.mult > 0).sort((a,b) => b.mult - a.mult);
   let bestMult = null, bestBase = null, bestErr = Infinity;
 
   for (const mc of sorted) {
@@ -1055,41 +1080,34 @@ function doEncode() {
     return;
   }
 
-  // Bumuo ng mga band colors
-  const dStr      = String(bestBase).padStart(nDigits, '0');
+  const dStr       = String(bestBase).padStart(nDig, '0');
   const bandColors = [];
 
-  // Digit bands
   for (const ch of dStr) {
-    const d   = parseInt(ch);
-    const col = DIGITS.find(c => c.digit === d);
-    bandColors.push({ color: col, role: 'Digit ' + d });
+    const d = parseInt(ch);
+    bandColors.push({ color: DIGITS.find(c => c.digit === d), role: 'Digit ' + d });
   }
-  // Multiplier band
-  bandColors.push({ color: bestMult, role: '×' + fmtMult(bestMult.mult) });
-  // Tolerance band (default: Gold ±5%)
+  bandColors.push({ color: bestMult, role: fmtMult(bestMult.mult) });
+
   const gold = TOLS.find(c => c.name === 'Gold');
   bandColors.push({ color: gold, role: '±5%' });
 
-  // Actual na value pagkatapos ng rounding
-  const actual  = bestBase * bestMult.mult;
-  const errPct  = Math.abs(actual - val) / val * 100;
-  const errNote = errPct > 0.1
+  const actual = bestBase * bestMult.mult;
+  const errPct = Math.abs(actual - val) / val * 100;
+  const note   = errPct > 0.1
     ? `<div class="warn">⚠️ Pinakamalapit na standard value: ${fmtOhm(actual)} (${errPct.toFixed(2)}% error)</div>`
     : '';
 
-  // Ipakita ang resulta
   div.innerHTML = `
     <div class="result-card">
       <div class="result-lbl">Mga Color Band</div>
       <div class="answer-wrap" id="ansWrap"></div>
-      <div style="margin-top:10px;font-size:0.88rem">
+      <div style="margin-top:10px;font-size:.9rem">
         Lumalabas na: <strong style="color:var(--gold)">${fmtOhm(actual)}</strong>
       </div>
-      ${errNote}
+      ${note}
     </div>`;
 
-  // Gumawa ng mga swatch
   const wrap = document.getElementById('ansWrap');
   bandColors.forEach(b => {
     if (!b.color) return;
@@ -1103,44 +1121,21 @@ function doEncode() {
   });
 }
 
-// Format multiplier para sa display
-function fmtMult(m) {
-  if (m >= 1e9) return '1G';
-  if (m >= 1e6) return '1M';
-  if (m >= 1e3) return trimZ((m/1e3).toPrecision(3)) + 'k';
-  if (m < 1)    return '÷' + Math.round(1/m);
-  return m.toString();
-}
-
 // ================================================================
-// SMD DECODE — Decode ang SMD resistor codes
+// SMD DECODE
 // ================================================================
-
-// EIA-96 table — 96 standard values
 const EIA96 = [
-  100,102,105,107,110,113,115,118,121,124,
-  127,130,133,137,140,143,147,150,154,158,
-  162,165,169,174,178,182,187,191,196,200,
-  205,210,215,221,226,232,237,243,249,255,
-  261,267,274,280,287,294,301,309,316,324,
-  332,340,348,357,365,374,383,392,402,412,
-  422,432,442,453,464,475,487,499,511,523,
-  536,549,562,576,590,604,619,634,649,665,
-  681,698,715,732,750,768,787,806,825,845,
-  866,887,909,931,953,976
+  100,102,105,107,110,113,115,118,121,124,127,130,133,137,140,143,147,150,154,158,
+  162,165,169,174,178,182,187,191,196,200,205,210,215,221,226,232,237,243,249,255,
+  261,267,274,280,287,294,301,309,316,324,332,340,348,357,365,374,383,392,402,412,
+  422,432,442,453,464,475,487,499,511,523,536,549,562,576,590,604,619,634,649,665,
+  681,698,715,732,750,768,787,806,825,845,866,887,909,931,953,976
 ];
-
-// EIA-96 letter multipliers
-const EIA96M = {
-  'Z':0.001, 'Y':0.01, 'X':0.1,
-  'A':1,     'B':10,   'C':100,
-  'D':1000,  'E':10000,'F':100000
-};
+const EIA96M = {Z:.001,Y:.01,X:.1,A:1,B:10,C:100,D:1e3,E:1e4,F:1e5};
 
 function doSMD(raw) {
   const code = raw.trim().toUpperCase();
   const div  = document.getElementById('smdResult');
-
   if (code.length < 2) { div.innerHTML = ''; return; }
 
   let val = null, formula = '';
@@ -1150,48 +1145,44 @@ function doSMD(raw) {
     const n = parseFloat(code.replace('R', '.'));
     if (!isNaN(n)) { val = n; formula = `"R" notation: ${code} → ${n} Ω`; }
   }
-
-  // EIA-96: 2 digits + letter (e.g. 01A, 96F)
+  // EIA-96: 2 digits + letter
   else if (/^\d{2}[A-Z]$/.test(code)) {
-    const idx = parseInt(code.slice(0, 2)) - 1;
+    const idx = parseInt(code.slice(0,2)) - 1;
     const ltr = code[2];
     if (idx >= 0 && idx < 96 && EIA96M[ltr] !== undefined) {
       val     = EIA96[idx] * EIA96M[ltr];
-      formula = `EIA-96: index ${code.slice(0,2)} = ${EIA96[idx]}Ω × ${EIA96M[ltr]} = ${val}Ω`;
+      formula = `EIA-96: index ${code.slice(0,2)} = ${EIA96[idx]} Ω × ${EIA96M[ltr]}`;
     }
   }
-
   // 3-digit: XYZ → XY × 10^Z
   else if (/^\d{3}$/.test(code)) {
-    const sig = parseInt(code.slice(0, 2));
+    const sig = parseInt(code.slice(0,2));
     const exp = parseInt(code[2]);
     val     = sig * Math.pow(10, exp);
-    formula = `${code[0]}${code[1]} × 10^${exp} = ${sig} × ${Math.pow(10,exp)} = ${val} Ω`;
+    formula = `${code[0]}${code[1]} × 10^${exp} = ${sig} × ${Math.pow(10,exp).toLocaleString()} = ${val.toLocaleString()} Ω`;
   }
-
   // 4-digit: XYZW → XYZ × 10^W
   else if (/^\d{4}$/.test(code)) {
-    const sig = parseInt(code.slice(0, 3));
+    const sig = parseInt(code.slice(0,3));
     const exp = parseInt(code[3]);
     val     = sig * Math.pow(10, exp);
-    formula = `${code.slice(0,3)} × 10^${exp} = ${sig} × ${Math.pow(10,exp)} = ${val} Ω`;
+    formula = `${code.slice(0,3)} × 10^${exp} = ${sig} × ${Math.pow(10,exp).toLocaleString()} = ${val.toLocaleString()} Ω`;
   }
 
-  // Ipakita ang resulta
   if (val !== null && isFinite(val)) {
     div.innerHTML = `
       <div class="result-card">
         <div class="result-lbl">SMD Value</div>
-        <div class="result-val">${fmtOhm(val)}</div>
-        <div class="formula" style="margin-top:8px">${formula}</div>
+        <div class="result-val" onclick="navigator.clipboard&&navigator.clipboard.writeText('${fmtOhm(val)}')"
+             title="Tap to copy">${fmtOhm(val)}</div>
+        <div class="formula" style="margin-top:10px">${formula}</div>
       </div>`;
   } else {
     div.innerHTML = `
       <div class="result-card">
-        <div class="result-lbl">Hindi Nakilala</div>
         <div class="err">
-          Hindi valid ang format na "${code}".<br>
-          Subukan: 472 (3-digit), 4702 (4-digit), 4R7 (R-notation), 01A (EIA-96)
+          Hindi valid ang format na "<strong>${code}</strong>".<br>
+          Subukan: <code>472</code> (3-digit) · <code>4702</code> (4-digit) · <code>4R7</code> · <code>01A</code> (EIA-96)
         </div>
       </div>`;
   }
@@ -1202,66 +1193,276 @@ function doSMD(raw) {
 // ================================================================
 function buildRef() {
   const tbody = document.getElementById('refBody');
-
   COLORS.forEach(c => {
+    const mult = c.mult;
+    let ms = '×1';
+    if (mult===0.01) ms='÷100'; else if (mult===0.1) ms='÷10';
+    else if (mult>=1e9) ms='×10⁹'; else if (mult>=1e8) ms='×10⁸';
+    else if (mult>=1e7) ms='×10⁷'; else if (mult>=1e6) ms='×10⁶';
+    else if (mult>=1e5) ms='×10⁵'; else if (mult>=1e4) ms='×10⁴';
+    else if (mult>=1e3) ms='×10³'; else if (mult>=100) ms='×100';
+    else if (mult>=10)  ms='×10';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><span class="clr-dot" style="background:${c.h}"></span></td>
       <td style="font-weight:700">${c.name}</td>
-      <td>${c.digit !== null ? c.digit : '—'}</td>
-      <td style="font-family:monospace">${fmtMultRef(c.mult)}</td>
-      <td>${c.tol || '—'}</td>
-      <td>${c.tc !== null ? c.tc : '—'}</td>`;
+      <td>${c.digit!==null ? c.digit : '—'}</td>
+      <td style="font-family:monospace">${ms}</td>
+      <td>${c.tol||'—'}</td>
+      <td>${c.tc!==null ? c.tc : '—'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// Format multiplier para sa reference table
-function fmtMultRef(m) {
-  if (m === 1)   return '×1';
-  if (m >= 1e9)  return '×10⁹';
-  if (m >= 1e8)  return '×10⁸';
-  if (m >= 1e7)  return '×10⁷';
-  if (m >= 1e6)  return '×10⁶';
-  if (m >= 1e5)  return '×10⁵';
-  if (m >= 1e4)  return '×10⁴';
-  if (m >= 1e3)  return '×10³';
-  if (m >= 100)  return '×100';
-  if (m >= 10)   return '×10';
-  if (m === 0.1) return '÷10';
-  if (m === 0.01)return '÷100';
-  return '×' + m;
-}
-
 // ================================================================
-// BUILD E24 SERIES
+// BUILD E-SERIES CHIPS
 // ================================================================
-function buildE24() {
-  // E24 base values (×100Ω decade para sa halimbawa)
+function buildESeries() {
   const E24 = [10,11,12,13,15,16,18,20,22,24,27,30,33,36,39,43,47,51,56,62,68,75,82,91];
-  const wrap = document.getElementById('e24');
-  E24.forEach(v => {
-    const chip = document.createElement('span');
-    chip.className = 'e24-chip';
-    chip.textContent = fmtOhm(v * 100);  // ×100Ω decade
-    wrap.appendChild(chip);
-  });
+  const E12 = [10,12,15,18,22,27,33,39,47,56,68,82];
+  const E6  = [10,15,22,33,47,68];
+
+  const make = (vals, decade, id) => {
+    const wrap = document.getElementById(id);
+    vals.forEach(v => {
+      const chip = document.createElement('span');
+      chip.className = 'e24-chip';
+      chip.textContent = fmtOhm(v * decade);
+      chip.title = `${v * decade} Ω`;
+      wrap.appendChild(chip);
+    });
+  };
+
+  make(E24, 100,    'e24');   // 100Ω decade
+  make(E12, 1000,   'e12');   // 1kΩ decade
+  make(E6,  10000,  'e6');    // 10kΩ decade
 }
 
 // ================================================================
-// INITIALIZATION — Patakbuhin pagkatapos mag-load ang page
+// INIT — Patakbuhin pagkatapos mag-load
 // ================================================================
 function init() {
-  buildBands();    // Gumawa ng band dropdowns
-  updateSVG();     // I-update ang SVG resistor
-  decode();        // Kalkulahin ang initial value
-  buildRef();      // Gumawa ng reference table
-  buildE24();      // Gumawa ng E24 series chips
+  buildBands();
+  updateSVG();
+  decode();
+  buildRef();
+  buildESeries();
 }
 
-// Patakbuhin ang init pagkatapos mag-load ang DOM
 document.addEventListener('DOMContentLoaded', init);
-</script>
 
+// ================================================================
+// QUIZ — 50 Questions, Resistor Color Code & Circuits
+// ================================================================
+const C={black:{h:'#111',n:0,m:1},brown:{h:'#8B4513',n:1,m:10,t:'±1%'},red:{h:'#dc2626',n:2,m:100,t:'±2%'},orange:{h:'#f97316',n:3,m:1000},yellow:{h:'#facc15',n:4,m:10000},green:{h:'#16a34a',n:5,m:1e5,t:'±0.5%'},blue:{h:'#2563eb',n:6,m:1e6,t:'±0.25%'},violet:{h:'#7c3aed',n:7,m:1e7,t:'±0.1%'},gray:{h:'#6b7280',n:8,m:1e8,t:'±0.05%'},white:{h:'#eee',n:9,m:1e9},gold:{h:'#d4af37',m:0.1,t:'±5%'},silver:{h:'#c0c0c0',m:0.01,t:'±10%'}};
+const cNames=Object.keys(C);
+
+function quizSvg(bands){
+  let x=40,rects='';
+  const w=bands.length>4?12:18,gap=bands.length>4?22:28;
+  bands.forEach(b=>{
+    rects+=`<rect x="${x}" y="18" width="${w}" height="44" fill="${C[b].h}" stroke="#000" stroke-width=".5" rx="2"/>`;
+    x+=gap;
+  });
+  const labels=bands.map(b=>`<span style="background:${C[b].h};color:${['yellow','white','gold','silver'].includes(b)?'#000':'#fff'};padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700">${b}</span>`).join('');
+  return `<svg width="280" height="80" viewBox="0 0 280 80" style="max-width:100%"><rect x="5" y="30" width="30" height="4" fill="#999"/><rect x="245" y="30" width="30" height="4" fill="#999"/><path d="M35 22 L50 12 L230 12 L245 22 L245 58 L230 68 L50 68 L35 58 Z" fill="#e8dcc6" stroke="#b8a082" stroke-width="1.5"/>${rects}</svg><div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:6px">${labels}</div>`;
+}
+function quizFmt(v){if(v>=1e6)return(v/1e6%1===0?(v/1e6).toFixed(0):(v/1e6).toFixed(2))+'MΩ';if(v>=1e3)return(v/1e3%1===0?(v/1e3).toFixed(0):(v/1e3).toFixed(2))+'kΩ';return v+'Ω';}
+function quizRi(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function quizSh(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+// Generate the 50 questions
+function quizGenQs(){
+  const qs=[];
+
+  // ── 4-band questions (15) ──
+  const fourBandCombos=[
+    {bands:['brown','black','red','gold'],ans:'1kΩ ±5%'},
+    {bands:['red','red','red','gold'],ans:'2.2kΩ ±5%'},
+    {bands:['orange','orange','brown','gold'],ans:'330Ω ±5%'},
+    {bands:['yellow','violet','orange','gold'],ans:'47kΩ ±5%'},
+    {bands:['green','blue','yellow','gold'],ans:'560kΩ ±5%'},
+    {bands:['brown','black','black','gold'],ans:'10Ω ±5%'},
+    {bands:['red','black','brown','gold'],ans:'200Ω ±5%'},
+    {bands:['blue','gray','orange','silver'],ans:'68kΩ ±10%'},
+    {bands:['white','brown','red','gold'],ans:'910Ω ±5%'},
+    {bands:['violet','green','brown','gold'],ans:'750Ω ±5%'},
+    {bands:['brown','green','brown','gold'],ans:'150Ω ±5%'},
+    {bands:['red','violet','yellow','gold'],ans:'270kΩ ±5%'},
+    {bands:['orange','white','red','gold'],ans:'3.9kΩ ±5%'},
+    {bands:['brown','black','orange','gold'],ans:'10kΩ ±5%'},
+    {bands:['gray','red','brown','silver'],ans:'820Ω ±10%'},
+  ];
+  fourBandCombos.forEach(({bands,ans})=>{
+    const d1=C[bands[0]].n,d2=C[bands[1]].n,mult=C[bands[2]].m,tol=C[bands[3]].t;
+    const val=(d1*10+d2)*mult;
+    const correct=quizFmt(val)+' '+tol;
+    const wrongs=quizSh(['220Ω ±5%','470Ω ±5%','4.7kΩ ±5%','100kΩ ±5%','1MΩ ±5%','33kΩ ±10%','5.6kΩ ±5%','680Ω ±5%'].filter(x=>x!==correct)).slice(0,3);
+    qs.push({q:`What is the resistance of this 4-band resistor?`,visual:quizSvg(bands),choices:quizSh([correct,...wrongs]),correct,cat:'4-Band Decode',diff:'Easy',exp:`Formula: (${d1}×10+${d2}) × ${mult} = ${val}Ω → ${correct}`});
+  });
+
+  // ── 5-band questions (10) ──
+  const fiveBandCombos=[
+    {bands:['brown','black','black','red','brown'],ans:'10kΩ ±1%'},
+    {bands:['red','red','black','brown','brown'],ans:'220Ω ±1%'},
+    {bands:['green','blue','black','black','brown'],ans:'560Ω ±1%'},
+    {bands:['orange','orange','black','red','brown'],ans:'33kΩ ±1%'},
+    {bands:['brown','black','black','black','brown'],ans:'100Ω ±1%'},
+    {bands:['violet','green','black','orange','brown'],ans:'750kΩ ±1%'},
+    {bands:['yellow','violet','black','brown','brown'],ans:'4.7kΩ ±1%'},
+    {bands:['blue','gray','black','black','brown'],ans:'680Ω ±1%'},
+    {bands:['red','black','black','orange','red'],ans:'200kΩ ±2%'},
+    {bands:['brown','green','black','brown','brown'],ans:'1.5kΩ ±1%'},
+  ];
+  fiveBandCombos.forEach(({bands,ans})=>{
+    const d1=C[bands[0]].n,d2=C[bands[1]].n,d3=C[bands[2]].n,mult=C[bands[3]].m,tol=C[bands[4]].t;
+    const val=(d1*100+d2*10+d3)*mult;
+    const correct=quizFmt(val)+' '+tol;
+    const wrongs=quizSh(['1kΩ ±1%','2.2kΩ ±1%','47kΩ ±1%','100kΩ ±2%','330Ω ±2%','560kΩ ±1%','82kΩ ±1%'].filter(x=>x!==correct)).slice(0,3);
+    qs.push({q:`Decode this 5-band precision resistor:`,visual:quizSvg(bands),choices:quizSh([correct,...wrongs]),correct,cat:'5-Band Decode',diff:'Medium',exp:`Formula: (${d1}×100+${d2}×10+${d3}) × ${mult} = ${val}Ω → ${correct}`});
+  });
+
+  // ── 6-band question (1) ──
+  qs.push({q:'A 6-band resistor reads: Brown-Black-Black-Red-Brown-Red. What is its resistance, tolerance, and TC?',visual:quizSvg(['brown','black','black','red','brown','red']),choices:quizSh(['10kΩ ±1% 50ppm/°C','1kΩ ±1% 50ppm/°C','10kΩ ±2% 100ppm/°C','100kΩ ±1% 50ppm/°C']),correct:'10kΩ ±1% 50ppm/°C',cat:'6-Band',diff:'Hard',exp:'(1×100+0×10+0)×100=10,000Ω=10kΩ. Band 5=Brown(±1%), Band 6=Red(50ppm/°C).'});
+
+  // ── SMD questions (4) ──
+  qs.push({q:'What is the resistance of SMD code "472"?',visual:'',choices:quizSh(['4.7kΩ','47kΩ','472Ω','4.72kΩ']),correct:'4.7kΩ',cat:'SMD',diff:'Medium',exp:'3-digit: 47 × 10² = 4,700Ω = 4.7kΩ'});
+  qs.push({q:'Decode the SMD code "4R7":',visual:'',choices:quizSh(['4.7Ω','47Ω','0.47Ω','470Ω']),correct:'4.7Ω',cat:'SMD',diff:'Medium',exp:'R-notation: 4R7 → decimal point at R → 4.7Ω'});
+  qs.push({q:'What does SMD code "103" mean?',visual:'',choices:quizSh(['10kΩ','1kΩ','100kΩ','103Ω']),correct:'10kΩ',cat:'SMD',diff:'Medium',exp:'3-digit: 10 × 10³ = 10,000Ω = 10kΩ'});
+  qs.push({q:'What is the value of SMD code "R100"?',visual:'',choices:quizSh(['0.1Ω','100Ω','1Ω','10Ω']),correct:'0.1Ω',cat:'SMD',diff:'Hard',exp:'R-notation: R100 → 0.100Ω = 0.1Ω'});
+
+  // ── Series / Parallel (8) ──
+  qs.push({q:'Three resistors of 10Ω, 20Ω, and 30Ω are connected in series. What is the total resistance?',visual:'',choices:quizSh(['60Ω','5.45Ω','20Ω','15Ω']),correct:'60Ω',cat:'Series',diff:'Easy',exp:'Series: R = 10+20+30 = 60Ω'});
+  qs.push({q:'Two 100Ω resistors are connected in parallel. What is the total resistance?',visual:'',choices:quizSh(['50Ω','200Ω','100Ω','25Ω']),correct:'50Ω',cat:'Parallel',diff:'Easy',exp:'Parallel 2 equal: R = 100÷2 = 50Ω'});
+  qs.push({q:'A 6Ω and 3Ω resistor are in parallel. What is the equivalent resistance?',visual:'',choices:quizSh(['2Ω','9Ω','4.5Ω','1Ω']),correct:'2Ω',cat:'Parallel',diff:'Easy',exp:'R = (6×3)÷(6+3) = 18÷9 = 2Ω'});
+  qs.push({q:'Four 40Ω resistors are in parallel. What is the equivalent resistance?',visual:'',choices:quizSh(['10Ω','160Ω','40Ω','4Ω']),correct:'10Ω',cat:'Parallel',diff:'Medium',exp:'4 equal in parallel: R = 40÷4 = 10Ω'});
+  qs.push({q:'Two resistors R1=47Ω and R2=100Ω are in series. A 12V source is applied. What is the current?',visual:'',choices:quizSh(['82mA','128mA','255mA','47mA']),correct:'82mA',cat:'Series',diff:'Medium',exp:'I = V/(R1+R2) = 12÷147 ≈ 0.0816A ≈ 82mA'});
+  qs.push({q:'Three 30Ω resistors are in parallel. What is the total resistance?',visual:'',choices:quizSh(['10Ω','90Ω','30Ω','15Ω']),correct:'10Ω',cat:'Parallel',diff:'Easy',exp:'3 equal in parallel: R = 30÷3 = 10Ω'});
+  qs.push({q:'A 1kΩ and 4kΩ resistor are in parallel. What is the equivalent?',visual:'',choices:quizSh(['800Ω','5kΩ','2.5kΩ','400Ω']),correct:'800Ω',cat:'Parallel',diff:'Medium',exp:'R = (1000×4000)÷(1000+4000) = 4,000,000÷5,000 = 800Ω'});
+  qs.push({q:'In a series circuit, if one resistor burns open, what happens?',visual:'',choices:quizSh(['No current flows','Current increases','Other resistors blow','Current stays same']),correct:'No current flows',cat:'Series',diff:'Easy',exp:'Series: a break anywhere stops current in the whole loop.'});
+
+  // ── Max/Min (4) ──
+  qs.push({q:'A 10kΩ ±5% resistor. What is its maximum resistance?',visual:'',choices:quizSh(['10,500Ω','10,050Ω','9,500Ω','10,100Ω']),correct:'10,500Ω',cat:'Tolerance',diff:'Easy',exp:'Max = 10,000 × (1 + 0.05) = 10,500Ω'});
+  qs.push({q:'A 470Ω ±10% resistor. What is its minimum resistance?',visual:'',choices:quizSh(['423Ω','517Ω','460Ω','400Ω']),correct:'423Ω',cat:'Tolerance',diff:'Easy',exp:'Min = 470 × (1 − 0.10) = 423Ω'});
+  qs.push({q:'A 1kΩ ±1% resistor. What is its tolerance band in ohms?',visual:'',choices:quizSh(['±10Ω','±1Ω','±100Ω','±50Ω']),correct:'±10Ω',cat:'Tolerance',diff:'Medium',exp:'Tolerance = 1000 × 0.01 = ±10Ω'});
+  qs.push({q:'Which tolerance color gives the tightest (best) precision?',visual:'',choices:quizSh(['Violet (±0.1%)','Brown (±1%)','Gold (±5%)','Silver (±10%)']),correct:'Violet (±0.1%)',cat:'Tolerance',diff:'Medium',exp:'Violet = ±0.1% — the tightest tolerance in standard color code.'});
+
+  // ── Power (4) ──
+  qs.push({q:'A 100Ω resistor has 5V across it. What power does it dissipate?',visual:'',choices:quizSh(['250mW','500mW','50mW','1W']),correct:'250mW',cat:'Power',diff:'Easy',exp:'P = V²/R = 25/100 = 0.25W = 250mW'});
+  qs.push({q:'A 50Ω resistor carries 200mA. What is its power dissipation?',visual:'',choices:quizSh(['2W','1W','0.5W','4W']),correct:'2W',cat:'Power',diff:'Easy',exp:'P = I²R = (0.2)²×50 = 0.04×50 = 2W'});
+  qs.push({q:'A resistor dissipates 1W at 50mA. What is its resistance?',visual:'',choices:quizSh(['400Ω','200Ω','100Ω','800Ω']),correct:'400Ω',cat:'Power',diff:'Medium',exp:'R = P/I² = 1/(0.05)² = 1/0.0025 = 400Ω'});
+  qs.push({q:'A 1/4W resistor has 10V across it. What is the minimum safe resistance?',visual:'',choices:quizSh(['400Ω','100Ω','250Ω','1kΩ']),correct:'400Ω',cat:'Power',diff:'Hard',exp:'P=V²/R → R=V²/P = 100/0.25 = 400Ω minimum'});
+
+  // ── Identify color questions (4) ──
+  qs.push({q:'Which color represents the digit 7 in the resistor color code?',visual:'',choices:quizSh(['Violet','Blue','Gray','Green']),correct:'Violet',cat:'Color ID',diff:'Easy',exp:'Mnemonic: B B R O Y G B V G W → position 7 = Violet'});
+  qs.push({q:'Which band color gives a multiplier of ×10,000?',visual:'',choices:quizSh(['Yellow','Green','Orange','Red']),correct:'Yellow',cat:'Color ID',diff:'Easy',exp:'Yellow digit = 4, so multiplier = 10⁴ = 10,000'});
+  qs.push({q:'What tolerance does the Gold band represent?',visual:'',choices:quizSh(['±5%','±1%','±10%','±2%']),correct:'±5%',cat:'Color ID',diff:'Easy',exp:'Gold = ±5% tolerance. Silver = ±10%.'});
+  qs.push({q:'Which color has a multiplier of ×0.01?',visual:'',choices:quizSh(['Silver','Gold','White','Gray']),correct:'Silver',cat:'Color ID',diff:'Easy',exp:'Silver as multiplier = ÷100 = ×0.01 (for sub-1Ω resistors)'});
+
+  return quizSh(qs).slice(0,50);
+}
+
+let quizQs=[], quizIdx=0, quizScore=0, quizAnswered=false;
+
+function quizRestart(){
+  quizQs=quizGenQs();
+  quizIdx=0; quizScore=0; quizAnswered=false;
+  document.getElementById('quiz-final').style.display='none';
+  document.getElementById('quiz-card').style.display='';
+  document.getElementById('quiz-score-bar').style.display='flex';
+  quizRender();
+}
+
+function quizRender(){
+  if(quizIdx>=quizQs.length){quizFinish();return;}
+  const q=quizQs[quizIdx];
+  const total=quizQs.length;
+  document.getElementById('quiz-score-txt').textContent=`${quizScore}/${total}`;
+  document.getElementById('quiz-prog-fill').style.width=`${(quizIdx/total)*100}%`;
+  document.getElementById('quiz-q-counter').textContent=`Q${quizIdx+1}/${total}`;
+
+  // Difficulty badge
+  const db=document.getElementById('quiz-diff-badge');
+  db.textContent=q.diff;
+  db.style.background=q.diff==='Easy'?'#14532d':q.diff==='Medium'?'#1e3a5f':'#450a0a';
+  db.style.color=q.diff==='Easy'?'#86efac':q.diff==='Medium'?'#93c5fd':'#fca5a5';
+
+  document.getElementById('quiz-cat-badge').textContent=q.cat;
+  document.getElementById('quiz-visual').innerHTML=q.visual||'';
+  document.getElementById('quiz-qtext').textContent=q.q;
+
+  const choicesEl=document.getElementById('quiz-choices');
+  choicesEl.innerHTML='';
+  q.choices.forEach(ch=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-ans-btn';
+    btn.textContent=ch;
+    btn.onclick=()=>quizCheck(ch,q,btn);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('quiz-explanation').style.display='none';
+  document.getElementById('quiz-explanation').innerHTML='';
+  const nav=document.getElementById('quiz-nav');
+  nav.style.display='none';
+  nav.innerHTML='';
+  quizAnswered=false;
+}
+
+function quizCheck(chosen,q,btn){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  const correct=chosen===q.correct;
+  if(correct)quizScore++;
+
+  // Mark buttons
+  document.querySelectorAll('.quiz-ans-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q.correct)b.classList.add('correct');
+    else if(b===btn&&!correct)b.classList.add('wrong');
+  });
+
+  // Explanation
+  const expEl=document.getElementById('quiz-explanation');
+  expEl.innerHTML=(correct?'✅ ':'❌ ')+q.exp;
+  expEl.style.display='block';
+
+  // Nav buttons
+  const nav=document.getElementById('quiz-nav');
+  nav.style.display='flex';
+  nav.innerHTML='';
+  const nxt=document.createElement('button');
+  nxt.className='quiz-nav-btn';
+  nxt.textContent=quizIdx+1>=quizQs.length?'Finish 🏁':'Next →';
+  nxt.onclick=quizNextQ;
+  nav.appendChild(nxt);
+
+  document.getElementById('quiz-score-txt').textContent=`${quizScore}/${quizQs.length}`;
+}
+
+function quizNextQ(){
+  quizIdx++;
+  quizRender();
+}
+
+function quizFinish(){
+  document.getElementById('quiz-card').style.display='none';
+  document.getElementById('quiz-score-bar').style.display='none';
+  const fin=document.getElementById('quiz-final');
+  fin.style.display='block';
+  const pct=Math.round(quizScore/quizQs.length*100);
+  document.getElementById('quiz-final-score').textContent=`${quizScore}/${quizQs.length} (${pct}%)`;
+  const msg=pct>=90?'Outstanding! Ready ka na para sa board exam! 🏆':pct>=75?'Magaling! Konti na lang! 💪':pct>=60?'Pwede pa! Mag-aral pa ng konti. 📚':'Huwag sumuko! Basahin ang Tips tab at subukang muli. 🔄';
+  document.getElementById('quiz-final-msg').textContent=msg;
+}
+
+// Auto-init quiz when quiz tab is first shown
+const _origGoTab=goTab;
+function goTab(id){
+  _origGoTab(id);
+  if(id==='quiz'&&quizQs.length===0)quizRestart();
+}
+</script>
 </body>
 </html>
