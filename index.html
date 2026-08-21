@@ -1,83 +1,261 @@
-<!doctype html>
-<html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PinasTools.com - Libre na engineering tools para sa Filipino students</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;400&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="description" content="SSS Contribution Calculator 2025 — Monthly contribution, WISP, EC, salary loan amortization. Libre, walang ads.">
+<meta name="theme-color" content="#111318">
+<title>PinasTools · SSS Contribution Calculator</title>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
-:root{--bg:#111318;--surf:#1a1e28;--surf2:#1c1f26;--border:#2e3340;--gold:#f59e0b;--text:#e8eaf0;--muted:#7a8499;--green:#22c55e;--r:16px}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:Outfit,system-ui;max-width:1120px;margin:auto;padding:20px}
-.header{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:32px}
-.logo{display:flex;align-items:center;gap:12px}.logo-mark{width:40px;height:40px;background:var(--gold);border-radius:10px;display:grid;place-items:center;font-weight:800;color:#000}
-.badges{display:flex;gap:8px}.badge{border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--muted)}
-.hero h1{font-size:42px;line-height:1.1;max-width:600px}.hero h1 span{color:var(--gold)}
-.hero p{color:var(--muted);margin-top:12px;max-width:640px}
-.search{margin:24px 0;background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:4px 16px;display:flex;align-items:center;gap:12px}
-.search input{flex:1;background:transparent;border:0;color:#fff;padding:14px 0;font-size:16px;outline:0}
-.search small{color:var(--muted);background:var(--bg);padding:6px 10px;border-radius:8px;border:1px solid var(--border)}
-.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}.tag{background:var(--surf);border:1px solid var(--border);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted);cursor:pointer}
-.section{display:flex;align-items:center;gap:12px;margin:40px 0 16px}.bar{width:6px;height:28px;border-radius:999px;background:var(--gold)}.section.ce .bar{background:#22c55e}.section.daily .bar{background:var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:28px}}
-.card{background:linear-gradient(to bottom right,var(--surf2),#1a1d25);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;transition:.2s;cursor:pointer}.card:hover{border-color:var(--gold);transform:translateY(-2px)}
-.card.flagship{border-color:rgba(245,158,11,.3);grid-column:1/-1}
-.card .top{display:flex;gap:12px;align-items:flex-start}.icon{width:44px;height:44px;border-radius:12px;background:#111318;border:1px solid var(--border);display:grid;place-items:center;font-size:22px}
-.card h3{font-size:16px}.card p{color:var(--muted);font-size:13px;margin-top:4px;line-height:1.4}
-.pills{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}.pill{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border)}.pill.gold{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}.pill.green{background:#052e16;color:var(--green);border-color:rgba(22,101,52,.4)}.pill.hot{background:#431407;color:#fb923c;border-color:rgba(154,52,18,.5)}.pill.blue{background:#1e1b4b;color:#93c5fd;border-color:rgba(49,46,129,.5)}
-.arrow{position:absolute;top:20px;right:16px;width:28px;height:28px;border-radius:50%;background:var(--surf);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted)}
-.live{color:var(--gold);font-size:12px;margin-top:12px;display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;background:var(--gold);border-radius:50%}
-a{color:inherit;text-decoration:none}
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+:root{--bg:#111318;--surf:#1a1d28;--surf2:#22263a;--border:#2a3050;--gold:#f59e0b;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--teal:#14b8a6;--text:#e8eaf0;--muted:#7a8499;--r:16px;--font:'Outfit','Segoe UI',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.site-header{position:sticky;top:0;z-index:100;background:var(--surf);border-bottom:2px solid var(--gold);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:none;color:var(--gold);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:8px;font-family:var(--font)}
+.header-title{font-size:1rem;font-weight:800}
+.header-sub{font-size:.72rem;color:var(--muted);margin-left:auto;font-weight:600}
+.tab-bar{display:flex;gap:4px;padding:14px 14px 0;overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surf2);color:var(--muted);font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab-btn.on{background:var(--gold);color:#000;border-color:var(--gold)}
+main{padding:14px 14px 40px;max-width:540px;margin:0 auto}
+.section{display:none}.section.on{display:block}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card-title{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+.input-group{margin-bottom:14px}
+.input-label{font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.input-row{display:flex;align-items:center;gap:8px}
+.peso-prefix{font-size:1rem;font-weight:700;color:var(--gold)}
+input[type=number],select{width:100%;padding:11px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:1rem;outline:none;transition:border .15s;-webkit-appearance:none;appearance:none}
+input[type=number]:focus,select:focus{border-color:var(--gold)}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:.85rem;color:var(--muted)}
+.result-label small{display:block;font-size:.7rem;color:var(--border)}
+.result-val{font-size:1rem;font-weight:700}
+.gold{color:var(--gold)}.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}.teal{color:var(--teal)}
+.total-row{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.total-label{font-size:.88rem;font-weight:700;color:var(--gold)}
+.total-val{font-size:1.3rem;font-weight:800;color:var(--gold)}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:-4px;margin-bottom:4px}
+.pill{display:inline-block;background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;margin:3px 3px 0 0}
+.amort-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.amort-box{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.amort-box .val{font-size:1.2rem;font-weight:800}.amort-box .lbl{font-size:.7rem;color:var(--muted);margin-top:2px}
+.elig-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+.elig-row:last-child{border-bottom:none}
+.elig-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.elig-name{font-size:.9rem;font-weight:700;margin-bottom:2px}
+.elig-desc{font-size:.75rem;color:var(--muted)}
+.elig-amount{font-size:.85rem;font-weight:700;color:var(--green);margin-top:3px}
+.contrib-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.contrib-table th{background:var(--surf2);color:var(--muted);font-weight:700;padding:8px 10px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px}
+.contrib-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.contrib-table tr:last-child td{border-bottom:none}
+.contrib-table tr.hl td{background:rgba(245,158,11,.06);font-weight:700}
+.contrib-table tr.hl td:first-child{color:var(--gold)}
+.note-box{background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.2);border-radius:12px;padding:14px;font-size:.8rem;color:var(--teal);line-height:1.6;margin-top:6px}
+.note-box strong{color:#5eead4}
+footer{text-align:center;padding:20px 16px;color:var(--muted);font-size:.72rem;border-top:1px solid var(--border)}
+footer a{color:var(--gold);text-decoration:none}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="logo"><div class="logo-mark" style="background:linear-gradient(135deg,#0038a8,#ce1126);font-size:18px">🔧</div><div><b>PinasTools<span style="color:#7a8499;font-weight:400">.com</span></b><div style="font-size:11px;color:var(--muted)">Libre na engineering tools para sa Filipino students</div></div></div>
-  <div class="badges"><div class="badge">✓ Offline Ready</div><div class="badge">✓ Board Exam Focused</div><div class="badge">🇵🇭 Taglish</div></div>
+<header class="site-header">
+  <button class="back-btn" onclick="history.length>1?history.back():location.href='/'">‹</button>
+  <div><div class="header-title">SSS Contribution Calculator</div></div>
+  <span class="header-sub">2025–2026</span>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="switchTab('contribution',this)">💰 Contribution</button>
+  <button class="tab-btn" onclick="switchTab('loan',this)">💳 Salary Loan</button>
+  <button class="tab-btn" onclick="switchTab('table',this)">📋 Rate Table</button>
+  <button class="tab-btn" onclick="switchTab('benefits',this)">🏥 Benefits</button>
 </div>
 
-<div class="hero">
-  <h1>Lahat ng kailangan mo sa <span>board exam review</span> at engineering.</h1>
-  <p>Mabilis, offline-ready, Taglish explanations. Walang ads na istorbo. Ginawa ng Pinoy para sa Pinoy.</p>
-  <div class="search"><span style="color:var(--muted)">⌕</span><input id="q" placeholder="Maghanap ng tool... hal. resistor, kmap, sahod" oninput="filter()"><small><span id="count">15</span> / 15 tools</small></div>
-  <div class="tags"><div class="tag" onclick="go('ece-reviewer')">ECE Board Reviewer</div><div class="tag" onclick="go('resistor')">Resistor</div><div class="tag" onclick="go('db-converter')">dB Converter</div><div class="tag" onclick="location.href='/tools/sahod-calculator/'">Sahod 2026</div><div class="tag" onclick="location.href='/ce/beam-moment/'">Beam</div></div>
+<main>
+<!-- CONTRIBUTION -->
+<div class="section on" id="sec-contribution">
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">Monthly Salary</div>
+    <div class="input-group">
+      <label class="input-label">Gross Monthly Salary</label>
+      <div class="input-row"><span class="peso-prefix">₱</span>
+        <input type="number" id="salary-input" value="25000" min="1000" max="200000" step="500" oninput="computeContrib()">
+      </div>
+    </div>
+    <div class="pill-row">
+      <button class="pill" onclick="setSalary(15000)">₱15K</button>
+      <button class="pill" onclick="setSalary(25000)">₱25K</button>
+      <button class="pill" onclick="setSalary(35000)">₱35K</button>
+      <button class="pill" onclick="setSalary(50000)">₱50K</button>
+      <button class="pill" onclick="setSalary(75000)">₱75K</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Monthly Salary Credit (MSC)</div>
+    <div class="result-row"><span class="result-label">Your MSC<small>Basis for all contributions</small></span><span class="result-val gold" id="res-msc">—</span></div>
+    <div class="result-row"><span class="result-label">Regular SSS MSC<small>Up to ₱20,000</small></span><span class="result-val" id="res-reg-msc">—</span></div>
+    <div class="result-row"><span class="result-label">WISP MSC<small>Portion above ₱20,000</small></span><span class="result-val teal" id="res-wisp-msc">—</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Your Deduction (Employee Share)</div>
+    <div class="result-row"><span class="result-label">Regular SSS<small>4.5% of Regular MSC</small></span><span class="result-val red" id="res-ee-reg">—</span></div>
+    <div class="result-row"><span class="result-label">WISP Contribution<small>4.5% of WISP MSC</small></span><span class="result-val red" id="res-ee-wisp">—</span></div>
+    <div class="total-row"><span class="total-label">Total EE Deduction</span><span class="total-val" id="res-ee-total">—</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Employer Share</div>
+    <div class="result-row"><span class="result-label">Regular SSS<small>9.5% of Regular MSC</small></span><span class="result-val green" id="res-er-reg">—</span></div>
+    <div class="result-row"><span class="result-label">WISP Contribution<small>9.5% of WISP MSC</small></span><span class="result-val green" id="res-er-wisp">—</span></div>
+    <div class="result-row"><span class="result-label">Employees' Compensation (EC)<small>₱10 if MSC ≤ ₱15K · ₱30 if higher</small></span><span class="result-val green" id="res-er-ec">—</span></div>
+    <div class="total-row"><span class="total-label">Total ER Share</span><span class="total-val" id="res-er-total">—</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Combined Monthly &amp; Annual</div>
+    <div class="result-row"><span class="result-label">Total Monthly (EE + ER)</span><span class="result-val gold" id="res-combined">—</span></div>
+    <div class="result-row"><span class="result-label">Annual Total</span><span class="result-val" id="res-annual">—</span></div>
+  </div>
+  <div class="note-box"><strong>Tandaan:</strong> SSS contribution rate = <strong>14% total</strong> (4.5% EE + 9.5% ER) simula 2023. WISP ay para sa retirement savings para sa MSC na higit ₱20,000. Min MSC: <strong>₱5,000</strong> · Max MSC: <strong>₱35,000</strong></div>
 </div>
 
-<div class="section"><div class="bar"></div><h2>ECE / CpE</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Electronics & Communications</span><span style="margin-left:auto;color:var(--muted);font-size:12px">6 tools</span></div>
-<div class="grid" id="grid-ece">
-  <a class="card flagship" href="/ece/ece-reviewer/"><div class="arrow">›</div><div class="top"><div class="icon" style="background:var(--gold);color:#000">🏆</div><div><h3>ECE Board Reviewer</h3><p>3000+ questions · Quiz, Blitz & Flashcard · Leaderboard · GCash prize</p><div class="pills"><span class="pill gold">Flagship</span><span class="pill">Freemium</span><span class="pill blue">Board Exam</span></div><div class="live"><span class="dot"></span> 2,847 students online ngayon · Libre magsimula</div></div></div></a>
-  <a class="card" href="/ece/resistor/"><div class="arrow">›</div><div class="top"><div class="icon">🎨</div><div><h3>Resistor Color Code</h3><p>4-band, 5-band, 6-band decoder · Auto-value to color</p><div class="pills"><span class="pill hot">Hot</span><span class="pill blue">Board Exam</span></div></div></div></a>
-  <a class="card" href="/ece/db-converter/"><div class="arrow">›</div><div class="top"><div class="icon">📶</div><div><h3>dB / Decibel Converter</h3><p>dBm, dBW, voltage ratio, power gain · EST essentials</p><div class="pills"><span class="pill hot">Hot</span><span class="pill blue">EST Board</span></div></div></div></a>
-  <a class="card" href="/ece/kmap/"><div class="arrow">›</div><div class="top"><div class="icon">🧩</div><div><h3>K-Map Simplifier</h3><p>2 to 4 variables · SOP & POS · Step-by-step grouping</p></div></div></a>
-  <a class="card" href="/ece/number-system/"><div class="arrow">›</div><div class="top"><div class="icon">🔢</div><div><h3>Number System Converter</h3><p>Binary, Octal, Decimal, Hex · With solution steps</p></div></div></a>
-  <a class="card" href="/ece/op-amp/"><div class="arrow">›</div><div class="top"><div class="icon">🔌</div><div><h3>Op-Amp Calculator</h3><p>Inverting & Non-inverting · Gain & bandwidth</p></div></div></a>
+<!-- LOAN -->
+<div class="section" id="sec-loan">
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">Loan Details</div>
+    <div class="input-group">
+      <label class="input-label">Loan Amount</label>
+      <div class="input-row"><span class="peso-prefix">₱</span>
+        <input type="number" id="loan-amount" value="40000" min="1000" step="1000" oninput="computeLoan()">
+      </div>
+    </div>
+    <div class="pill-row">
+      <button class="pill" onclick="setLoan(10000)">₱10K</button>
+      <button class="pill" onclick="setLoan(20000)">₱20K</button>
+      <button class="pill" onclick="setLoan(40000)">₱40K</button>
+      <button class="pill" onclick="setLoan(60000)">₱60K</button>
+      <button class="pill" onclick="setLoan(100000)">₱100K</button>
+    </div>
+    <div class="input-group" style="margin-top:14px">
+      <label class="input-label">Loan Term</label>
+      <select id="loan-term" onchange="computeLoan()">
+        <option value="12">12 months (1 year)</option>
+        <option value="24" selected>24 months (2 years)</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Amortization Summary</div>
+    <div class="amort-grid">
+      <div class="amort-box"><div class="val gold" id="loan-monthly">—</div><div class="lbl">Monthly Amortization</div></div>
+      <div class="amort-box"><div class="val red" id="loan-interest">—</div><div class="lbl">Total Interest (10% p.a.)</div></div>
+      <div class="amort-box"><div class="val" id="loan-total-pay">—</div><div class="lbl">Total Repayment</div></div>
+      <div class="amort-box"><div class="val teal" id="loan-net">—</div><div class="lbl">Net Proceeds (after 1% fee)</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Eligibility Requirements</div>
+    <div class="elig-row"><span class="elig-icon">📅</span><div><div class="elig-name">1-Month Loan</div><div class="elig-desc">36 posted monthly contributions; at least 6 in the last 12 months</div><div class="elig-amount">Up to 1 month MSC</div></div></div>
+    <div class="elig-row"><span class="elig-icon">📅</span><div><div class="elig-name">2-Month Loan</div><div class="elig-desc">72 posted monthly contributions; at least 6 in the last 12 months</div><div class="elig-amount">Up to 2 months MSC</div></div></div>
+    <div class="elig-row"><span class="elig-icon">⏳</span><div><div class="elig-name">Age Requirement</div><div class="elig-desc">Not more than 65 years old; not a pensioner or disability beneficiary</div></div></div>
+    <div class="elig-row" style="border:none"><span class="elig-icon">✅</span><div><div class="elig-name">Good Standing</div><div class="elig-desc">No delinquent SSS loan; employer up-to-date with contributions</div></div></div>
+  </div>
+  <div class="note-box"><strong>Paalala:</strong> SSS Salary Loan = <strong>10% per annum</strong> interest. Net proceeds = loan amount minus 1% service charge. Aktwal na net depende sa SSS computation mo.</div>
 </div>
 
-<div class="section"><div class="bar"></div><h2>EE — Electrical Engineering</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Power & Systems</span></div>
-<div class="grid" id="grid-ee">
-  <a class="card" href="/ee/ohms-law/"><div class="arrow">›</div><div class="top"><div class="icon">🔌</div><div><h3>Ohm's Law & Power</h3><p>V=IR, P=VI · Solve any variable · Power triangle</p><div class="pills"><span class="pill">Calculator</span><span class="pill blue">Board Exam</span></div></div></div></a>
-  <a class="card" href="/ee/pec-wire-size/"><div class="arrow">›</div><div class="top"><div class="icon">🔧</div><div><h3>PEC Wire Size</h3><p>Ampacity table · Voltage drop · PEC 2023 compliant</p><div class="pills"><span class="pill">PEC</span><span class="pill blue">Board Exam</span></div></div></div></a>
-  <a class="card" href="/ee/three-phase/"><div class="arrow">›</div><div class="top"><div class="icon">⚙️</div><div><h3>Three-Phase Power</h3><p>Wye & Delta · Line vs Phase · Power factor calc</p><div class="pills"><span class="pill">Power Systems</span><span class="pill hot">Hot</span></div></div></div></a>
-  <a class="card" href="/ee/transformer/"><div class="arrow">›</div><div class="top"><div class="icon">🏗️</div><div><h3>Transformer Calculator</h3><p>Turns ratio · Efficiency · kVA to current</p><div class="pills"><span class="pill">Power Systems</span><span class="pill blue">Board Exam</span></div></div></div></a>
-  <a class="card" href="/ee/motor-hp-kw/"><div class="arrow">›</div><div class="top"><div class="icon">🏭</div><div><h3>Motor HP/kW Calculator</h3><p>HP ↔ kW · FLA · Service factor · Single & 3-phase</p><div class="pills"><span class="pill">Calculator</span><span class="pill">PEC</span></div></div></div></a>
-  <a class="card" href="/ee/unit-converter/"><div class="arrow">›</div><div class="top"><div class="icon">🔄</div><div><h3>Engineering Unit Converter</h3><p>Electrical units · Fast prefix · SI to Imperial</p><div class="pills"><span class="pill green">New</span><span class="pill">Calculator</span></div></div></div></a>
+<!-- TABLE -->
+<div class="section" id="sec-table">
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">SSS Contribution Table 2025–2026 (Regular)</div>
+    <div style="overflow-x:auto"><table class="contrib-table"><thead><tr><th>Compensation Range</th><th>MSC</th><th>EE (4.5%)</th><th>ER+EC</th><th>Total</th></tr></thead><tbody id="table-body"></tbody></table></div>
+  </div>
+  <div class="note-box">Regular SSS only. WISP contributions apply separately for MSC above ₱20,000. EC: ₱10 (MSC ≤ ₱15K) or ₱30 — employer paid. <strong>Self-employed/Voluntary/OFW</strong>: pay both EE + ER share yourself.</div>
 </div>
 
-<div class="section ce"><div class="bar"></div><h2>CE — Civil Engineering</h2><span style="margin-left:auto;color:var(--muted);font-size:12px">5 tools</span></div>
-<div class="grid" id="grid-ce">
-  <a class="card" href="/ce/beam-moment/"><div class="arrow">›</div><div class="top"><div class="icon">📐</div><div><h3>Beam & Moment Calculator</h3><p>Shear & moment diagram · Reactions · Point & UDL</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
-  <a class="card" href="/ce/fluid-mechanics/"><div class="arrow">›</div><div class="top"><div class="icon">💧</div><div><h3>Fluid Mechanics</h3><p>Bernoulli · Reynolds · Head loss · Flow rate tools</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
-  <a class="card" href="/ce/surveying/"><div class="arrow">›</div><div class="top"><div class="icon">🧭</div><div><h3>Surveying & Traverse</h3><p>Bearing & azimuth · Lat & Dep · Area computation</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill green">New</span></div></div></div></a>
-  <a class="card" href="/ce/concrete-mix/"><div class="arrow">›</div><div class="top"><div class="icon">🧱</div><div><h3>Concrete Mix Design</h3><p>ACI 211 method · Water-cement ratio · PH materials</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill">Calculator</span></div></div></div></a>
-  <a class="card" href="/ce/soil-mechanics/"><div class="arrow">›</div><div class="top"><div class="icon">🌍</div><div><h3>Soil Mechanics</h3><p>Atterberg limits · Permeability · Consolidation</p><div class="pills"><span class="pill blue">Board Exam</span><span class="pill green">New</span></div></div></div></a>
+<!-- BENEFITS -->
+<div class="section" id="sec-benefits">
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">SSS Benefits Overview</div>
+    <div class="elig-row"><span class="elig-icon">🏥</span><div><div class="elig-name">Sickness Benefit</div><div class="elig-desc">90% of daily salary credit × sick days. Min. 3 days, max. 120 days/year. Need 3 months contribution in 12 months before semester of sickness.</div><div class="elig-amount">Daily: 90% of (MSC ÷ 30)</div></div></div>
+    <div class="elig-row"><span class="elig-icon">🤱</span><div><div class="elig-name">Maternity Benefit</div><div class="elig-desc">105 days (singleton) or 120 days (multiple birth). Solo parent: +15 days. Need 3 months contribution in prior 12 months.</div><div class="elig-amount">100% of avg daily salary credit × days</div></div></div>
+    <div class="elig-row"><span class="elig-icon">🦽</span><div><div class="elig-name">Disability Benefit</div><div class="elig-desc">Monthly pension or lump sum based on degree of disability and credited contributions.</div><div class="elig-amount">Based on MSC and credited years of service</div></div></div>
+    <div class="elig-row"><span class="elig-icon">👴</span><div><div class="elig-name">Retirement Benefit</div><div class="elig-desc">Age 60 (optional) or 65 (mandatory). Need minimum 120 posted contributions. Monthly pension or lump sum.</div><div class="elig-amount">Min. ₱2,000/month pension</div></div></div>
+    <div class="elig-row"><span class="elig-icon">💀</span><div><div class="elig-name">Death / Funeral Benefit</div><div class="elig-desc">Monthly pension for primary beneficiaries. Funeral grant for burial expenses.</div><div class="elig-amount">Funeral grant: ₱20,000 – ₱40,000</div></div></div>
+    <div class="elig-row" style="border:none"><span class="elig-icon">🌀</span><div><div class="elig-name">Calamity Loan</div><div class="elig-desc">When NDRRMC declares calamity in your area. 10% interest, 24 months to pay.</div><div class="elig-amount">Up to 1 month MSC</div></div></div>
+  </div>
 </div>
+</main>
 
-<div class="section daily"><div class="bar"></div><h2>Pang-araw-araw</h2><span style="color:var(--muted);font-size:13px;margin-left:8px">— Everyday PH Tools</span><span style="margin-left:auto;color:var(--muted);font-size:12px">3 tools</span></div>
-<div class="grid" id="grid-tools">
-  <a class="card" href="/tools/sahod-calculator/"><div class="arrow">›</div><div class="top"><div class="icon">💰</div><div><h3>Sahod Calculator 2026</h3><p>BIR tax table 2026 · SSS, PhilHealth, Pag-IBIG · Net pay</p><div class="pills"><span class="pill green">2026 Update</span><span class="pill hot">Hot</span></div></div></div></a>
-  <a class="card" href="/tools/id-photo/"><div class="arrow">›</div><div class="top"><div class="icon">🪪</div><div><h3>2x2 ID Photo Maker</h3><p>PH standard 2x2 & 1x1 · White background · Print ready</p><div class="pills"><span class="pill">ID Ready</span><span class="pill">Everyday</span></div></div></div></a>
-  <a class="card" href="/tools/sss-contribution/"><div class="arrow">›</div><div class="top"><div class="icon">🏦</div><div><h3>SSS Contribution</h3><p>2026 table · Employee & employer share · Auto compute</p><div class="pills"><span class="pill">PH Gov</span><span class="pill green">2026 Update</span></div></div></div></a>
-</div>
+<footer><div style="margin-bottom:4px">📡 Based on SSS Circular 2023-010 (14% contribution rate)</div><a href="/">← PinasTools Home</a> · <a href="https://www.sss.gov.ph" target="_blank" rel="noopener">sss.gov.ph ↗</a></footer>
 
 <script>
-function go(q){const el=document.getElementById('grid-ece'); const cards=[...el.querySelectorAll('a')]; const found=cards.find(c=>c.href.includes(q)); if(found) found.scrollIntoView({behavior:'smooth'});}
-function filter(){const q=document.getElementById('q').value.toLowerCase(); const all=document.querySelectorAll('.card'); let cnt=0; all.forEach(c=>{const t=c.innerText.toLowerCase(); const show=t.includes(q); c.style.display=show?'':'none'; if(show)cnt++;}); document.getElementById('count').innerText=cnt;}
+function getMSC(s){if(s<5000)return 5000;if(s>=34750)return 35000;return Math.round(s/500)*500}
+function fmt(n){return'₱'+n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function fmtI(n){return'₱'+Math.round(n).toLocaleString()}
+
+function computeContrib(){
+  const s=parseFloat(document.getElementById('salary-input').value)||0;
+  const msc=getMSC(s),regMsc=Math.min(20000,msc),wispMsc=Math.max(0,msc-20000);
+  const regEe=regMsc*0.045,regEr=regMsc*0.095,ec=msc<=15000?10:30;
+  const wEe=wispMsc*0.045,wEr=wispMsc*0.095;
+  const totEe=regEe+wEe,totEr=regEr+wEr+ec;
+  document.getElementById('res-msc').textContent=fmtI(msc);
+  document.getElementById('res-reg-msc').textContent=fmtI(regMsc);
+  document.getElementById('res-wisp-msc').textContent=fmtI(wispMsc);
+  document.getElementById('res-ee-reg').textContent=fmt(regEe);
+  document.getElementById('res-ee-wisp').textContent=fmt(wEe);
+  document.getElementById('res-ee-total').textContent=fmt(totEe);
+  document.getElementById('res-er-reg').textContent=fmt(regEr);
+  document.getElementById('res-er-wisp').textContent=fmt(wEr);
+  document.getElementById('res-er-ec').textContent=fmt(ec);
+  document.getElementById('res-er-total').textContent=fmt(totEr);
+  document.getElementById('res-combined').textContent=fmt(totEe+totEr);
+  document.getElementById('res-annual').textContent=fmt((totEe+totEr)*12);
+}
+function setSalary(v){document.getElementById('salary-input').value=v;computeContrib()}
+
+function computeLoan(){
+  const p=parseFloat(document.getElementById('loan-amount').value)||0;
+  const n=parseInt(document.getElementById('loan-term').value);
+  const r=0.10/12;
+  const m=p>0&&n>0?p*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1):0;
+  const tot=m*n,interest=tot-p,net=p-p*0.01;
+  document.getElementById('loan-monthly').textContent=fmt(m);
+  document.getElementById('loan-interest').textContent=fmt(interest);
+  document.getElementById('loan-total-pay').textContent=fmt(tot);
+  document.getElementById('loan-net').textContent=fmt(net);
+}
+function setLoan(v){document.getElementById('loan-amount').value=v;computeLoan()}
+
+function buildTable(){
+  const s=parseFloat(document.getElementById('salary-input').value)||0;
+  const curMsc=getMSC(s);
+  const mscs=[5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000,10500,11000,11500,12000,12500,13000,13500,14000,14500,15000,15500,16000,16500,17000,17500,18000,18500,19000,19500,20000];
+  const tbody=document.getElementById('table-body');tbody.innerHTML='';
+  mscs.forEach(m=>{
+    const ee=m*0.045,er=m*0.095,ec=m<=15000?10:30,tot=ee+er+ec;
+    const lo=m===5000?0:m-249,hi=m===20000?20249:m+250;
+    const range=m===5000?'Below ₱5,250':`₱${lo.toLocaleString()} – ₱${(hi-1).toLocaleString()}`;
+    const tr=document.createElement('tr');
+    if(m===curMsc)tr.classList.add('hl');
+    tr.innerHTML=`<td>${range}</td><td>₱${m.toLocaleString()}</td><td>₱${ee.toFixed(2)}</td><td>₱${(er+ec).toFixed(2)}</td><td>₱${tot.toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='table')buildTable();
+  if(id==='loan')computeLoan();
+}
+computeContrib();computeLoan();
 </script>
-</body></html>
+</body>
+</html>
