@@ -1,2 +1,962 @@
-<!doctype html><html lang="fil"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Engineering Unit Converter - PinasTools</title>
-<style>:root{--bg:#111318;--surf:#1a1e28;--surf2:#22273a;--border:#2a3050;--gold:#f59e0b;--text:#e8eaf0;--muted:#7a8499;--r:16px}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:system-ui,Outfit,sans-serif;padding:20px;max-width:900px;margin:auto}a{color:var(--gold);text-decoration:none}.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin:16px 0}input,select{width:100%;padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);color:#fff;font-size:16px;margin:6px 0}button{background:var(--gold);color:#000;border:0;padding:14px 24px;border-radius:12px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}h1{font-size:28px;margin:16px 0}label{color:var(--muted);font-size:14px}</style></head><body><a href="/">← PinasTools Home</a><h1>Engineering Unit Converter</h1><div class="card"><p>kW ↔ HP, etc coming. Use Ohm's law for now.</p></div><p style="margin-top:24px"><a href="/ece/ece-reviewer/">→ ECE Reviewer (7710 Qs)</a> · <a href="/">Home</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Converter — PinasTools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   PinasTools Unit Converter
+   Dark theme, mobile-first, Outfit font
+   ============================================= */
+:root {
+  --bg: #111318;
+  --surf: #1a1e28;
+  --surf2: #20253200;
+  --border: #2e3340;
+  --gold: #f59e0b;
+  --gold-dim: rgba(245,158,11,0.12);
+  --text: #e8eaf0;
+  --muted: #7a8499;
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.1);
+  --red: #f87171;
+  --blue: #60a5fa;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Header ---- */
+header {
+  background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.back-link {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity .15s;
+}
+.back-link:hover { opacity: .75; }
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+}
+.header-spacer { width: 80px; } /* balance the back link */
+
+/* ---- Tab Bar ---- */
+.tab-bar-wrap {
+  background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar-wrap::-webkit-scrollbar { display: none; }
+.tab-bar {
+  display: flex;
+  min-width: max-content;
+  padding: 0 12px;
+  gap: 2px;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* ---- Main Layout ---- */
+main {
+  flex: 1;
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ---- Section panels ---- */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ---- Quick Calc Card ---- */
+.card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 12px;
+}
+
+/* Quick calc input row */
+.qc-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.qc-input {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color .15s;
+}
+.qc-input:focus { border-color: var(--gold); }
+.qc-input::placeholder { color: var(--muted); font-size: 16px; }
+.qc-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.qc-select:focus { border-color: var(--gold); }
+
+/* Conversion results grid */
+.conv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+.conv-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.conv-item.source-unit {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.conv-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.conv-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green);
+  word-break: break-all;
+}
+.conv-item.source-unit .conv-value { color: var(--gold); }
+
+/* ---- Reference Table ---- */
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ref-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.ref-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tbody tr { transition: background .12s; }
+.ref-table tbody tr:hover { background: rgba(245,158,11,0.04); }
+.ref-from { font-weight: 600; color: var(--text); }
+.ref-equals { color: var(--muted); padding: 0 4px; }
+.ref-to { color: var(--green); font-weight: 500; }
+.ref-note { font-size: 12px; color: var(--muted); font-style: italic; }
+
+/* ---- Tip box ---- */
+.tip-box {
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.tip-box strong { color: var(--gold); }
+.tip-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 4px;
+}
+
+/* ---- Pinoy note ---- */
+.pinoy-note {
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.pinoy-note strong { color: var(--green); }
+
+/* ---- Formula display ---- */
+.formula-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.formula-chip {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-family: 'Outfit', monospace;
+  color: var(--blue);
+  font-weight: 500;
+}
+
+/* ---- Temp special layout ---- */
+.temp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.temp-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.temp-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing:.04em; margin-bottom: 4px; }
+.temp-value { font-size: 24px; font-weight: 700; color: var(--green); }
+.temp-unit { font-size: 13px; color: var(--muted); margin-left: 2px; }
+.temp-card.active-temp .temp-value { color: var(--gold); }
+
+/* ---- More links ---- */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.tool-link {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color .15s, background .15s;
+}
+.tool-link:hover {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.tool-link-icon { font-size: 24px; }
+.tool-link-label { font-weight: 600; font-size: 15px; }
+.tool-link-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ---- Footer ---- */
+footer {
+  text-align: center;
+  padding: 18px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
+footer span { color: var(--gold); }
+
+/* ---- Responsive ---- */
+@media (min-width: 600px) {
+  main { padding: 20px 24px; }
+  .header-title { font-size: 18px; }
+  .tab-btn { font-size: 14px; padding: 11px 18px; }
+  .qc-input { font-size: 24px; }
+}
+@media (min-width: 900px) {
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <a href="/" class="back-link">← PinasTools</a>
+  <div class="header-title">🔄 Engineering Unit Converter</div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- ===== TAB BAR ===== -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" onclick="showTab('length')"   role="tab">📏 Length</button>
+    <button class="tab-btn"        onclick="showTab('weight')"   role="tab">⚖️ Weight</button>
+    <button class="tab-btn"        onclick="showTab('temp')"     role="tab">🌡️ Temp</button>
+    <button class="tab-btn"        onclick="showTab('volume')"   role="tab">💧 Volume</button>
+    <button class="tab-btn"        onclick="showTab('power')"    role="tab">⚡ Power</button>
+    <button class="tab-btn"        onclick="showTab('areapres')" role="tab">📐 Area &amp; Pressure</button>
+    <button class="tab-btn"        onclick="showTab('more')"     role="tab">🔧 More</button>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+  <!-- ==================== LENGTH ==================== -->
+  <div id="panel-length" class="panel active">
+    <div class="card">
+      <div class="card-title">Quick Calc — Length</div>
+      <div class="qc-row">
+        <input class="qc-input" id="len-input" type="number" placeholder="Enter value" oninput="convertLength()">
+        <select class="qc-select" id="len-unit" onchange="convertLength()">
+          <option value="mm">Millimeter (mm)</option>
+          <option value="cm">Centimeter (cm)</option>
+          <option value="m" selected>Meter (m)</option>
+          <option value="km">Kilometer (km)</option>
+          <option value="in">Inch (in)</option>
+          <option value="ft">Foot (ft)</option>
+          <option value="yd">Yard (yd)</option>
+          <option value="mi">Mile (mi)</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="len-results">
+        <div class="conv-item"><div class="conv-label">mm</div><div class="conv-value" id="len-mm">—</div></div>
+        <div class="conv-item"><div class="conv-label">cm</div><div class="conv-value" id="len-cm">—</div></div>
+        <div class="conv-item"><div class="conv-label">m</div><div class="conv-value" id="len-m">—</div></div>
+        <div class="conv-item"><div class="conv-label">km</div><div class="conv-value" id="len-km">—</div></div>
+        <div class="conv-item"><div class="conv-label">inch</div><div class="conv-value" id="len-in">—</div></div>
+        <div class="conv-item"><div class="conv-label">foot</div><div class="conv-value" id="len-ft">—</div></div>
+        <div class="conv-item"><div class="conv-label">yard</div><div class="conv-value" id="len-yd">—</div></div>
+        <div class="conv-item"><div class="conv-label">mile</div><div class="conv-value" id="len-mi">—</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      Memorize these: <strong>1 in = 2.54 cm</strong>, <strong>1 ft = 12 in = 0.3048 m</strong>, <strong>1 mile = 5280 ft = 1.609 km</strong>.
+      PRC loves unit conversions in word problems!
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Table — Length</div>
+      <table class="ref-table">
+        <thead><tr><th>From</th><th></th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td class="ref-from">1 inch</td><td class="ref-equals">=</td><td class="ref-to">2.54 cm = 25.4 mm = 0.0254 m</td></tr>
+          <tr><td class="ref-from">1 foot</td><td class="ref-equals">=</td><td class="ref-to">12 in = 30.48 cm = 0.3048 m</td></tr>
+          <tr><td class="ref-from">1 yard</td><td class="ref-equals">=</td><td class="ref-to">3 ft = 0.9144 m = 91.44 cm</td></tr>
+          <tr><td class="ref-from">1 mile</td><td class="ref-equals">=</td><td class="ref-to">5280 ft = 1.609344 km = 1609.34 m</td></tr>
+          <tr><td class="ref-from">1 meter</td><td class="ref-equals">=</td><td class="ref-to">3.28084 ft = 39.3701 in = 100 cm</td></tr>
+          <tr><td class="ref-from">1 kilometer</td><td class="ref-equals">=</td><td class="ref-to">0.62137 mi = 3280.84 ft = 1000 m</td></tr>
+          <tr><td class="ref-from">1 centimeter</td><td class="ref-equals">=</td><td class="ref-to">0.3937 in = 10 mm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== WEIGHT ==================== -->
+  <div id="panel-weight" class="panel">
+    <div class="pinoy-note">
+      🇵🇭 <strong>Pinoy unit:</strong> 1 cavan = 50 kg (used for rice/grain in the Philippines). Commonly tested in Agri-Eng exams!
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quick Calc — Weight / Mass</div>
+      <div class="qc-row">
+        <input class="qc-input" id="wt-input" type="number" placeholder="Enter value" oninput="convertWeight()">
+        <select class="qc-select" id="wt-unit" onchange="convertWeight()">
+          <option value="g">Gram (g)</option>
+          <option value="kg" selected>Kilogram (kg)</option>
+          <option value="ton">Metric Ton (t)</option>
+          <option value="oz">Ounce (oz)</option>
+          <option value="lb">Pound (lb)</option>
+          <option value="cavan">Cavan (PH)</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="wt-results">
+        <div class="conv-item"><div class="conv-label">gram</div><div class="conv-value" id="wt-g">—</div></div>
+        <div class="conv-item"><div class="conv-label">kilogram</div><div class="conv-value" id="wt-kg">—</div></div>
+        <div class="conv-item"><div class="conv-label">metric ton</div><div class="conv-value" id="wt-ton">—</div></div>
+        <div class="conv-item"><div class="conv-label">ounce</div><div class="conv-value" id="wt-oz">—</div></div>
+        <div class="conv-item"><div class="conv-label">pound (lb)</div><div class="conv-value" id="wt-lb">—</div></div>
+        <div class="conv-item"><div class="conv-label">cavan 🇵🇭</div><div class="conv-value" id="wt-cavan">—</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      Key values: <strong>1 kg = 2.20462 lbs</strong>, <strong>1 lb = 16 oz = 453.592 g</strong>, <strong>1 metric ton = 1000 kg</strong>.
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Table — Weight</div>
+      <table class="ref-table">
+        <thead><tr><th>From</th><th></th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td class="ref-from">1 kg</td><td class="ref-equals">=</td><td class="ref-to">2.20462 lbs = 35.274 oz = 1000 g</td></tr>
+          <tr><td class="ref-from">1 pound (lb)</td><td class="ref-equals">=</td><td class="ref-to">0.453592 kg = 16 oz = 453.592 g</td></tr>
+          <tr><td class="ref-from">1 ounce (oz)</td><td class="ref-equals">=</td><td class="ref-to">28.3495 g = 0.0625 lb</td></tr>
+          <tr><td class="ref-from">1 metric ton</td><td class="ref-equals">=</td><td class="ref-to">1000 kg = 2204.62 lbs</td></tr>
+          <tr><td class="ref-from">1 cavan 🇵🇭</td><td class="ref-equals">=</td><td class="ref-to">50 kg = 110.23 lbs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== TEMPERATURE ==================== -->
+  <div id="panel-temp" class="panel">
+    <div class="card">
+      <div class="card-title">Quick Calc — Temperature</div>
+      <div class="qc-row">
+        <input class="qc-input" id="tmp-input" type="number" placeholder="Enter value" oninput="convertTemp()">
+        <select class="qc-select" id="tmp-unit" onchange="convertTemp()">
+          <option value="C" selected>Celsius (°C)</option>
+          <option value="F">Fahrenheit (°F)</option>
+          <option value="K">Kelvin (K)</option>
+        </select>
+      </div>
+      <div class="temp-grid">
+        <div class="temp-card" id="tc-C">
+          <div class="temp-label">Celsius</div>
+          <div><span class="temp-value" id="res-C">—</span><span class="temp-unit">°C</span></div>
+        </div>
+        <div class="temp-card" id="tc-F">
+          <div class="temp-label">Fahrenheit</div>
+          <div><span class="temp-value" id="res-F">—</span><span class="temp-unit">°F</span></div>
+        </div>
+        <div class="temp-card" id="tc-K">
+          <div class="temp-label">Kelvin</div>
+          <div><span class="temp-value" id="res-K">—</span><span class="temp-unit">K</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Formulas</div>
+      <div class="formula-row">
+        <span class="formula-chip">°F = (°C × 9/5) + 32</span>
+        <span class="formula-chip">°C = (°F − 32) × 5/9</span>
+        <span class="formula-chip">K = °C + 273.15</span>
+        <span class="formula-chip">°C = K − 273.15</span>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      Absolute zero = <strong>0 K = −273.15 °C</strong>. Water freezes at <strong>0 °C = 32 °F = 273.15 K</strong>.
+      Human body temp = <strong>37 °C = 98.6 °F = 310.15 K</strong>. °R (Rankine) = °F + 459.67 (rare but appears in thermo!).
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Points</div>
+      <table class="ref-table">
+        <thead><tr><th>Description</th><th>°C</th><th>°F</th><th>K</th></tr></thead>
+        <tbody>
+          <tr><td>Absolute zero</td><td>−273.15</td><td>−459.67</td><td>0</td></tr>
+          <tr><td>Water freezes</td><td>0</td><td>32</td><td>273.15</td></tr>
+          <tr><td>Room temp</td><td>25</td><td>77</td><td>298.15</td></tr>
+          <tr><td>Body temp</td><td>37</td><td>98.6</td><td>310.15</td></tr>
+          <tr><td>Water boils (1 atm)</td><td>100</td><td>212</td><td>373.15</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== VOLUME ==================== -->
+  <div id="panel-volume" class="panel">
+    <div class="pinoy-note">
+      🇵🇭 <strong>Pinoy reference:</strong> 1 drum (55-gal drum) = 55 US gal ≈ 208 L. Commonly used in industrial PH settings!
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quick Calc — Volume</div>
+      <div class="qc-row">
+        <input class="qc-input" id="vol-input" type="number" placeholder="Enter value" oninput="convertVolume()">
+        <select class="qc-select" id="vol-unit" onchange="convertVolume()">
+          <option value="mL">Milliliter (mL)</option>
+          <option value="L" selected>Liter (L)</option>
+          <option value="m3">Cubic Meter (m³)</option>
+          <option value="ft3">Cubic Foot (ft³)</option>
+          <option value="galUS">US Gallon</option>
+          <option value="galUK">UK Gallon</option>
+          <option value="cup">US Cup</option>
+          <option value="drum">Drum (55 gal) 🇵🇭</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="vol-results">
+        <div class="conv-item"><div class="conv-label">mL</div><div class="conv-value" id="vol-mL">—</div></div>
+        <div class="conv-item"><div class="conv-label">Liter (L)</div><div class="conv-value" id="vol-L">—</div></div>
+        <div class="conv-item"><div class="conv-label">m³</div><div class="conv-value" id="vol-m3">—</div></div>
+        <div class="conv-item"><div class="conv-label">ft³</div><div class="conv-value" id="vol-ft3">—</div></div>
+        <div class="conv-item"><div class="conv-label">US Gallon</div><div class="conv-value" id="vol-galUS">—</div></div>
+        <div class="conv-item"><div class="conv-label">UK Gallon</div><div class="conv-value" id="vol-galUK">—</div></div>
+        <div class="conv-item"><div class="conv-label">US Cup</div><div class="conv-value" id="vol-cup">—</div></div>
+        <div class="conv-item"><div class="conv-label">Drum 🇵🇭</div><div class="conv-value" id="vol-drum">—</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      Key: <strong>1 L = 1000 mL = 0.001 m³</strong>, <strong>1 US gal = 3.78541 L</strong>, <strong>1 UK gal = 4.54609 L</strong>,
+      <strong>1 ft³ = 28.3168 L</strong>. Watch for US vs UK gallon in problems!
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Table — Volume</div>
+      <table class="ref-table">
+        <thead><tr><th>From</th><th></th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td class="ref-from">1 liter</td><td class="ref-equals">=</td><td class="ref-to">1000 mL = 0.001 m³ = 0.264172 US gal</td></tr>
+          <tr><td class="ref-from">1 US gallon</td><td class="ref-equals">=</td><td class="ref-to">3.78541 L = 3785.41 mL = 0.133681 ft³</td></tr>
+          <tr><td class="ref-from">1 UK gallon</td><td class="ref-equals">=</td><td class="ref-to">4.54609 L = 1.20095 US gal</td></tr>
+          <tr><td class="ref-from">1 ft³</td><td class="ref-equals">=</td><td class="ref-to">28.3168 L = 7.48052 US gal</td></tr>
+          <tr><td class="ref-from">1 m³</td><td class="ref-equals">=</td><td class="ref-to">1000 L = 264.172 US gal = 35.3147 ft³</td></tr>
+          <tr><td class="ref-from">1 drum 🇵🇭</td><td class="ref-equals">=</td><td class="ref-to">55 US gal = 208.197 L</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== POWER ==================== -->
+  <div id="panel-power" class="panel">
+    <div class="card">
+      <div class="card-title">Quick Calc — Power</div>
+      <div class="qc-row">
+        <input class="qc-input" id="pow-input" type="number" placeholder="Enter value" oninput="convertPower()">
+        <select class="qc-select" id="pow-unit" onchange="convertPower()">
+          <option value="W" selected>Watt (W)</option>
+          <option value="kW">Kilowatt (kW)</option>
+          <option value="hpM">HP Mechanical</option>
+          <option value="hpMet">HP Metric</option>
+          <option value="BTU">BTU/hr</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="pow-results">
+        <div class="conv-item"><div class="conv-label">Watt (W)</div><div class="conv-value" id="pow-W">—</div></div>
+        <div class="conv-item"><div class="conv-label">Kilowatt (kW)</div><div class="conv-value" id="pow-kW">—</div></div>
+        <div class="conv-item"><div class="conv-label">HP Mechanical</div><div class="conv-value" id="pow-hpM">—</div></div>
+        <div class="conv-item"><div class="conv-label">HP Metric</div><div class="conv-value" id="pow-hpMet">—</div></div>
+        <div class="conv-item"><div class="conv-label">BTU/hr</div><div class="conv-value" id="pow-BTU">—</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      <strong>1 HP (mechanical) = 746 W = 0.746 kW</strong>. HP metric = 735.499 W. Most EE board exams use mechanical HP.
+      <strong>1 kW = 3412.14 BTU/hr</strong>. Refrigeration: 1 ton = 12,000 BTU/hr = 3.517 kW.
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Table — Power</div>
+      <table class="ref-table">
+        <thead><tr><th>From</th><th></th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td class="ref-from">1 HP (mech)</td><td class="ref-equals">=</td><td class="ref-to">746 W = 0.746 kW = 2544.43 BTU/hr</td></tr>
+          <tr><td class="ref-from">1 HP (metric)</td><td class="ref-equals">=</td><td class="ref-to">735.499 W = 0.7355 kW</td></tr>
+          <tr><td class="ref-from">1 kW</td><td class="ref-equals">=</td><td class="ref-to">1000 W = 1.34102 HP (mech) = 3412.14 BTU/hr</td></tr>
+          <tr><td class="ref-from">1 BTU/hr</td><td class="ref-equals">=</td><td class="ref-to">0.29307 W = 0.000393 HP</td></tr>
+          <tr><td class="ref-from">1 ton refrig.</td><td class="ref-equals">=</td><td class="ref-to">12,000 BTU/hr = 3.517 kW</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== AREA & PRESSURE ==================== -->
+  <div id="panel-areapres" class="panel">
+    <!-- AREA -->
+    <div class="card">
+      <div class="card-title">Quick Calc — Area</div>
+      <div class="qc-row">
+        <input class="qc-input" id="area-input" type="number" placeholder="Enter value" oninput="convertArea()">
+        <select class="qc-select" id="area-unit" onchange="convertArea()">
+          <option value="m2" selected>Sq Meter (m²)</option>
+          <option value="ft2">Sq Foot (ft²)</option>
+          <option value="in2">Sq Inch (in²)</option>
+          <option value="km2">Sq Kilometer (km²)</option>
+          <option value="ha">Hectare (ha)</option>
+          <option value="acre">Acre</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="area-results">
+        <div class="conv-item"><div class="conv-label">m²</div><div class="conv-value" id="area-m2">—</div></div>
+        <div class="conv-item"><div class="conv-label">ft²</div><div class="conv-value" id="area-ft2">—</div></div>
+        <div class="conv-item"><div class="conv-label">in²</div><div class="conv-value" id="area-in2">—</div></div>
+        <div class="conv-item"><div class="conv-label">km²</div><div class="conv-value" id="area-km2">—</div></div>
+        <div class="conv-item"><div class="conv-label">hectare</div><div class="conv-value" id="area-ha">—</div></div>
+        <div class="conv-item"><div class="conv-label">acre</div><div class="conv-value" id="area-acre">—</div></div>
+      </div>
+    </div>
+
+    <!-- PRESSURE -->
+    <div class="card">
+      <div class="card-title">Quick Calc — Pressure</div>
+      <div class="qc-row">
+        <input class="qc-input" id="pres-input" type="number" placeholder="Enter value" oninput="convertPressure()">
+        <select class="qc-select" id="pres-unit" onchange="convertPressure()">
+          <option value="Pa">Pascal (Pa)</option>
+          <option value="kPa" selected>Kilopascal (kPa)</option>
+          <option value="MPa">Megapascal (MPa)</option>
+          <option value="bar">Bar</option>
+          <option value="atm">Atmosphere (atm)</option>
+          <option value="psi">PSI</option>
+          <option value="mmHg">mmHg (Torr)</option>
+        </select>
+      </div>
+      <div class="conv-grid" id="pres-results">
+        <div class="conv-item"><div class="conv-label">Pa</div><div class="conv-value" id="pres-Pa">—</div></div>
+        <div class="conv-item"><div class="conv-label">kPa</div><div class="conv-value" id="pres-kPa">—</div></div>
+        <div class="conv-item"><div class="conv-label">MPa</div><div class="conv-value" id="pres-MPa">—</div></div>
+        <div class="conv-item"><div class="conv-label">bar</div><div class="conv-value" id="pres-bar">—</div></div>
+        <div class="conv-item"><div class="conv-label">atm</div><div class="conv-value" id="pres-atm">—</div></div>
+        <div class="conv-item"><div class="conv-label">PSI</div><div class="conv-value" id="pres-psi">—</div></div>
+        <div class="conv-item"><div class="conv-label">mmHg</div><div class="conv-value" id="pres-mmHg">—</div></div>
+      </div>
+    </div>
+
+    <div class="pinoy-note">
+      🇵🇭 <strong>Pinoy reminders:</strong> 1 cavan rice ≈ 50 kg | 1 drum = 55 US gal = 208 L | Standard atmosphere = 101.325 kPa = 14.696 PSI
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">📋 Board Exam Tip</div>
+      <strong>1 atm = 101.325 kPa = 14.696 PSI = 1.01325 bar = 760 mmHg</strong>. Gage vs Absolute: P_abs = P_gage + P_atm.
+      Area: <strong>1 hectare = 10,000 m² = 2.47105 acres</strong>.
+    </div>
+
+    <div class="card">
+      <div class="card-title">Reference Table — Area &amp; Pressure</div>
+      <table class="ref-table">
+        <thead><tr><th>From</th><th></th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="color:var(--gold);font-weight:600;font-size:12px;padding-top:10px;padding-bottom:4px;">AREA</td></tr>
+          <tr><td class="ref-from">1 m²</td><td class="ref-equals">=</td><td class="ref-to">10.7639 ft² = 1550 in²</td></tr>
+          <tr><td class="ref-from">1 ft²</td><td class="ref-equals">=</td><td class="ref-to">0.092903 m² = 144 in²</td></tr>
+          <tr><td class="ref-from">1 hectare</td><td class="ref-equals">=</td><td class="ref-to">10,000 m² = 2.47105 acres</td></tr>
+          <tr><td class="ref-from">1 acre</td><td class="ref-equals">=</td><td class="ref-to">4046.86 m² = 43,560 ft²</td></tr>
+          <tr><td class="ref-from">1 km²</td><td class="ref-equals">=</td><td class="ref-to">100 ha = 247.105 acres</td></tr>
+          <tr><td colspan="3" style="color:var(--gold);font-weight:600;font-size:12px;padding-top:10px;padding-bottom:4px;">PRESSURE</td></tr>
+          <tr><td class="ref-from">1 atm</td><td class="ref-equals">=</td><td class="ref-to">101.325 kPa = 14.696 PSI = 760 mmHg = 1.01325 bar</td></tr>
+          <tr><td class="ref-from">1 bar</td><td class="ref-equals">=</td><td class="ref-to">100 kPa = 14.5038 PSI = 0.9869 atm</td></tr>
+          <tr><td class="ref-from">1 PSI</td><td class="ref-equals">=</td><td class="ref-to">6.89476 kPa = 0.068046 atm</td></tr>
+          <tr><td class="ref-from">1 kPa</td><td class="ref-equals">=</td><td class="ref-to">0.145038 PSI = 0.009869 atm = 0.01 bar</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== MORE ==================== -->
+  <div id="panel-more" class="panel">
+    <div class="card">
+      <div class="card-title">More PinasTools</div>
+      <div class="links-grid">
+        <a href="/ece/db-converter/" class="tool-link">
+          <div class="tool-link-icon">📶</div>
+          <div>
+            <div class="tool-link-label">dB Converter</div>
+            <div class="tool-link-sub">dBm, dBW, dBV, dBmV, dBμV</div>
+          </div>
+        </a>
+        <a href="/ee/ohms-law/" class="tool-link">
+          <div class="tool-link-icon">⚡</div>
+          <div>
+            <div class="tool-link-label">Ohm's Law Calculator</div>
+            <div class="tool-link-sub">V, I, R, P — solve any variable</div>
+          </div>
+        </a>
+        <a href="/ee/motor-hp-kw/" class="tool-link">
+          <div class="tool-link-icon">🔌</div>
+          <div>
+            <div class="tool-link-label">Motor HP / kW Converter</div>
+            <div class="tool-link-sub">HP ↔ kW with efficiency</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">All Unit Categories Here</div>
+      <table class="ref-table">
+        <thead><tr><th>Tab</th><th>Units Covered</th></tr></thead>
+        <tbody>
+          <tr><td>📏 Length</td><td>mm, cm, m, km, in, ft, yd, mi</td></tr>
+          <tr><td>⚖️ Weight</td><td>g, kg, ton, oz, lb, cavan (PH)</td></tr>
+          <tr><td>🌡️ Temperature</td><td>°C, °F, K</td></tr>
+          <tr><td>💧 Volume</td><td>mL, L, m³, ft³, US gal, UK gal, cup, drum</td></tr>
+          <tr><td>⚡ Power</td><td>W, kW, HP (mech), HP (metric), BTU/hr</td></tr>
+          <tr><td>📐 Area</td><td>m², ft², in², km², hectare, acre</td></tr>
+          <tr><td>📐 Pressure</td><td>Pa, kPa, MPa, bar, atm, PSI, mmHg</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <span>PinasTools.com</span> — Libre na engineering tools para sa Filipino students 🇵🇭
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+/* ============================================================
+   Tab switching
+   ============================================================ */
+function showTab(id) {
+  // Panels
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  // Buttons
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.remove('active'));
+  // Find clicked button by tab id order
+  const btns = document.querySelectorAll('.tab-btn');
+  const ids = ['length','weight','temp','volume','power','areapres','more'];
+  const idx = ids.indexOf(id);
+  if (idx >= 0) btns[idx].classList.add('active');
+}
+
+/* ============================================================
+   Formatting helper
+   ============================================================ */
+function fmt(n) {
+  if (n === null || isNaN(n)) return '—';
+  if (Math.abs(n) === 0) return '0';
+  if (Math.abs(n) >= 1e9) return n.toExponential(4);
+  if (Math.abs(n) >= 100000) return n.toLocaleString('en-PH', {maximumFractionDigits: 2});
+  if (Math.abs(n) >= 1) return parseFloat(n.toPrecision(7)).toString();
+  if (Math.abs(n) >= 0.001) return parseFloat(n.toPrecision(5)).toString();
+  return n.toExponential(4);
+}
+
+function highlightSource(gridId, unitKey) {
+  document.querySelectorAll('#' + gridId + ' .conv-item').forEach(el => {
+    el.classList.remove('source-unit');
+  });
+  const el = document.getElementById(gridId.replace('-results','') + '-' + unitKey);
+  if (el) el.closest('.conv-item').classList.add('source-unit');
+}
+
+/* ============================================================
+   LENGTH  (base: meter)
+   ============================================================ */
+const lenToM = { mm:0.001, cm:0.01, m:1, km:1000, in:0.0254, ft:0.3048, yd:0.9144, mi:1609.344 };
+
+function convertLength() {
+  const v = parseFloat(document.getElementById('len-input').value);
+  const u = document.getElementById('len-unit').value;
+  if (isNaN(v)) {
+    ['mm','cm','m','km','in','ft','yd','mi'].forEach(k => document.getElementById('len-'+k).textContent = '—');
+    return;
+  }
+  const meters = v * lenToM[u];
+  for (const k in lenToM) {
+    document.getElementById('len-'+k).textContent = fmt(meters / lenToM[k]);
+  }
+  highlightSource('len-results', u);
+}
+
+/* ============================================================
+   WEIGHT  (base: grams)
+   ============================================================ */
+const wtToG = { g:1, kg:1000, ton:1e6, oz:28.34952, lb:453.59237, cavan:50000 };
+
+function convertWeight() {
+  const v = parseFloat(document.getElementById('wt-input').value);
+  const u = document.getElementById('wt-unit').value;
+  if (isNaN(v)) {
+    ['g','kg','ton','oz','lb','cavan'].forEach(k => document.getElementById('wt-'+k).textContent = '—');
+    return;
+  }
+  const grams = v * wtToG[u];
+  for (const k in wtToG) {
+    document.getElementById('wt-'+k).textContent = fmt(grams / wtToG[k]);
+  }
+  highlightSource('wt-results', u);
+}
+
+/* ============================================================
+   TEMPERATURE
+   ============================================================ */
+function convertTemp() {
+  const v = parseFloat(document.getElementById('tmp-input').value);
+  const u = document.getElementById('tmp-unit').value;
+  let C, F, K;
+  if (isNaN(v)) {
+    ['C','F','K'].forEach(k => { document.getElementById('res-'+k).textContent = '—'; });
+    ['C','F','K'].forEach(k => document.getElementById('tc-'+k).classList.remove('active-temp'));
+    return;
+  }
+  if (u === 'C') { C = v; F = C*9/5+32; K = C+273.15; }
+  else if (u === 'F') { C = (v-32)*5/9; F = v; K = C+273.15; }
+  else { K = v; C = K-273.15; F = C*9/5+32; }
+
+  document.getElementById('res-C').textContent = fmt(C);
+  document.getElementById('res-F').textContent = fmt(F);
+  document.getElementById('res-K').textContent = fmt(K);
+
+  ['C','F','K'].forEach(k => document.getElementById('tc-'+k).classList.remove('active-temp'));
+  document.getElementById('tc-'+u).classList.add('active-temp');
+}
+
+/* ============================================================
+   VOLUME  (base: milliliter)
+   ============================================================ */
+const volToML = { mL:1, L:1000, m3:1e6, ft3:28316.8466, galUS:3785.41178, galUK:4546.09, cup:236.5882, drum:208197.649 };
+
+function convertVolume() {
+  const v = parseFloat(document.getElementById('vol-input').value);
+  const u = document.getElementById('vol-unit').value;
+  if (isNaN(v)) {
+    Object.keys(volToML).forEach(k => document.getElementById('vol-'+k).textContent = '—');
+    return;
+  }
+  const ml = v * volToML[u];
+  for (const k in volToML) {
+    document.getElementById('vol-'+k).textContent = fmt(ml / volToML[k]);
+  }
+  highlightSource('vol-results', u);
+}
+
+/* ============================================================
+   POWER  (base: watt)
+   ============================================================ */
+const powToW = { W:1, kW:1000, hpM:745.69987, hpMet:735.49875, BTU:0.29307107 };
+
+function convertPower() {
+  const v = parseFloat(document.getElementById('pow-input').value);
+  const u = document.getElementById('pow-unit').value;
+  if (isNaN(v)) {
+    Object.keys(powToW).forEach(k => document.getElementById('pow-'+k).textContent = '—');
+    return;
+  }
+  const watts = v * powToW[u];
+  for (const k in powToW) {
+    document.getElementById('pow-'+k).textContent = fmt(watts / powToW[k]);
+  }
+  highlightSource('pow-results', u);
+}
+
+/* ============================================================
+   AREA  (base: sq meter)
+   ============================================================ */
+const areaToM2 = { m2:1, ft2:0.09290304, in2:0.00064516, km2:1e6, ha:10000, acre:4046.8564224 };
+
+function convertArea() {
+  const v = parseFloat(document.getElementById('area-input').value);
+  const u = document.getElementById('area-unit').value;
+  if (isNaN(v)) {
+    Object.keys(areaToM2).forEach(k => document.getElementById('area-'+k).textContent = '—');
+    return;
+  }
+  const m2 = v * areaToM2[u];
+  for (const k in areaToM2) {
+    document.getElementById('area-'+k).textContent = fmt(m2 / areaToM2[k]);
+  }
+  highlightSource('area-results', u);
+}
+
+/* ============================================================
+   PRESSURE  (base: Pascal)
+   ============================================================ */
+const presToPa = { Pa:1, kPa:1000, MPa:1e6, bar:1e5, atm:101325, psi:6894.757293, mmHg:133.322387 };
+
+function convertPressure() {
+  const v = parseFloat(document.getElementById('pres-input').value);
+  const u = document.getElementById('pres-unit').value;
+  if (isNaN(v)) {
+    Object.keys(presToPa).forEach(k => document.getElementById('pres-'+k).textContent = '—');
+    return;
+  }
+  const pa = v * presToPa[u];
+  for (const k in presToPa) {
+    document.getElementById('pres-'+k).textContent = fmt(pa / presToPa[k]);
+  }
+  highlightSource('pres-results', u);
+}
+</script>
+</body>
+</html>
