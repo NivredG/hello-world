@@ -366,6 +366,15 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
               <option value="all">Lahat ng Topics</option>
             </select>
           </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">Bilang ng Tanong</div>
+            <select class="ctrl-select" id="blitz-count-select">
+              <option value="10">10 questions</option>
+              <option value="20" selected>20 questions</option>
+              <option value="30">30 questions</option>
+              <option value="50">50 questions</option>
+            </select>
+          </div>
         </div>
         <button class="btn btn-primary btn-full" onclick="startBlitz()">⚡ Simulan ang Blitz</button>
       </div>
@@ -921,6 +930,15 @@ function updateCountDropdown() {
 
 // ── MODE SWITCH ──
 function switchMode(mode, btn) {
+  // Stop any running blitz timer
+  if (state.blitzTimer) { clearInterval(state.blitzTimer); state.blitzTimer = null; }
+  // Return all full screens to home
+  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.remove('active');
+  });
+  document.getElementById('home-screen').classList.add('active');
+
   state.currentMode = mode;
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -1211,8 +1229,9 @@ function lifelinePhone() {
 // ════════════ BLITZ MODE ════════════
 function startBlitz() {
   const tierLimit = TIERS[state.tier].blitz;
+  const selected = parseInt(document.getElementById('blitz-count-select')?.value || 20);
   const filtered = getFilteredQuestions('blitz-topic-select');
-  const count = Math.min(tierLimit, filtered.length);
+  const count = Math.min(tierLimit, selected, filtered.length);
 
   if (count < 5) {
     alert(`Hindi sapat ang tanong. Available: ${filtered.length}`);
