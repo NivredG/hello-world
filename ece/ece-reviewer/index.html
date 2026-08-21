@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script id="qs-free-tag" src="questions-free.js"></script>
+<script src="questions-board-exams.js"></script>
 <style>
 :root {
   --bg:#111318;
@@ -115,8 +116,8 @@ select.ctrl-select:focus{border-color:var(--gold);outline:none}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap}
 
 /* ── QUIZ SCREEN ── */
-#quiz-screen,#blitz-screen,#study-screen,#mnemonics-screen,#caltech-screen,#end-screen{display:none}
-#quiz-screen.active,#blitz-screen.active,#study-screen.active,#mnemonics-screen.active,#caltech-screen.active,#end-screen.active,#home-screen.active{display:block}
+#quiz-screen,#blitz-screen,#study-screen,#mnemonics-screen,#caltech-screen,#end-screen,#board-screen,#board-result-screen{display:none}
+#quiz-screen.active,#blitz-screen.active,#study-screen.active,#mnemonics-screen.active,#caltech-screen.active,#end-screen.active,#home-screen.active,#board-screen.active,#board-result-screen.active{display:block}
 
 /* Progress bar */
 .progress-wrap{margin-bottom:14px}
@@ -319,6 +320,7 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
   <button class="mode-tab" data-mode="caltech" onclick="switchMode('caltech',this)">🔢 CalTech</button>
   <button class="mode-tab" data-mode="leaderboard" onclick="switchMode('leaderboard',this)">🏆 Leaderboard</button>
   <button class="mode-tab" data-mode="resistor" onclick="switchMode('resistor',this)">🎨 Resistor</button>
+  <button class="mode-tab" data-mode="pastboards" onclick="switchMode('pastboards',this)">📅 Past Boards</button>
 </div>
 
 <!-- ══════════ HOME SCREEN ══════════ -->
@@ -373,6 +375,14 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
               <option value="20" selected>20 questions</option>
               <option value="30">30 questions</option>
               <option value="50">50 questions</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">Timer bawat Tanong</div>
+            <select class="ctrl-select" id="blitz-timer-select">
+              <option value="10" selected>10 seconds</option>
+              <option value="15">15 seconds</option>
+              <option value="20">20 seconds</option>
             </select>
           </div>
         </div>
@@ -446,6 +456,30 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
           <div class="res-lead"></div>
         </div>
         <div class="res-result" id="res-result">—</div>
+      </div>
+    </div>
+
+    <!-- Past Boards Home -->
+    <div id="home-pastboards" style="display:none">
+      <div class="section-title">📅 Past Board Exams</div>
+      <div class="start-card">
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
+          Subukan ang actual questions na lumabas sa ECE Licensure Exam. Makikita mo kung pumasa ka ba noon!
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Piliin ang Exam</label>
+          <select id="board-exam-select" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:.95rem;outline:none">
+            <option value="November 1996">📋 November 1996 ECE Board Exam (61 items)</option>
+            <option value="October 2008">📋 October 2008 ECE Board Exam (73 items)</option>
+          </select>
+        </div>
+        <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.8rem;color:var(--gold);line-height:1.6">
+          <strong>📌 Passing Criteria:</strong> ≥70% overall at walang subject na mas mababa sa 50%.
+          <br><span style="color:var(--muted)">Note: Ang mga tanong dito ay mula sa actual board exam — open-ended ang sagot, kaya MCQ format ang gagamitin gamit ang aming question bank para sa choices.</span>
+        </div>
+        <button class="btn btn-gold" onclick="startBoardExam()" style="width:100%;padding:14px;font-size:1rem">
+          🚀 Simulan ang Past Board Exam
+        </button>
       </div>
     </div>
 
@@ -681,6 +715,67 @@ select.res-select{background:var(--surface2);border:1px solid var(--border);colo
   </div>
 </div>
 
+<!-- ══════════ BOARD EXAM SCREEN ══════════ -->
+<div id="board-screen">
+  <div class="container">
+    <!-- Header bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <button class="btn btn-sm" onclick="exitBoardExam()" style="font-size:.8rem;padding:6px 14px">‹ Umalis</button>
+      <div style="text-align:center">
+        <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px" id="board-exam-label">November 1996</div>
+        <div style="font-size:.85rem;font-weight:700" id="board-progress-text">Tanong 1 ng 61</div>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted)" id="board-score-live">✓ 0 · ✗ 0</div>
+    </div>
+
+    <!-- Progress bar -->
+    <div style="background:var(--border);border-radius:99px;height:5px;margin-bottom:20px;overflow:hidden">
+      <div id="board-prog-fill" style="height:100%;background:var(--gold);border-radius:99px;transition:width .3s;width:0%"></div>
+    </div>
+
+    <!-- Question card -->
+    <div class="quiz-card" id="board-q-card">
+      <div class="question-text" id="board-q-text">Loading...</div>
+      <div class="topic-badge" id="board-q-topic" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Choices -->
+    <div id="board-choices" style="margin-top:14px;display:flex;flex-direction:column;gap:10px"></div>
+
+    <!-- Next button (hidden until answered) -->
+    <div style="margin-top:16px;text-align:center">
+      <button id="board-next-btn" class="btn btn-gold" onclick="boardNextQuestion()" style="display:none;padding:12px 32px">Susunod →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BOARD RESULT SCREEN ══════════ -->
+<div id="board-result-screen">
+  <div class="container" style="text-align:center;padding-top:24px">
+    <div style="font-size:3rem;margin-bottom:8px" id="board-result-emoji">🏆</div>
+    <div style="font-size:1.5rem;font-weight:800;margin-bottom:4px" id="board-result-verdict">PUMASA KA!</div>
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:20px" id="board-result-exam-label">November 1996 ECE Board Exam</div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;font-weight:700">Your Score</div>
+      <div style="font-size:3rem;font-weight:800;color:var(--gold)" id="board-result-pct">—%</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:4px" id="board-result-fraction">— / — correct</div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px;text-align:left">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;font-weight:700">By Topic</div>
+      <div id="board-result-topics"></div>
+    </div>
+
+    <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-bottom:20px;font-size:.8rem;color:var(--muted);line-height:1.6" id="board-result-note"></div>
+
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="startBoardExam()">🔁 Ulitin</button>
+      <button class="btn btn-sm" onclick="exitBoardExam()">🏠 Home</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ SCRIPT ══════════ -->
 <script>
 // ── CONSTANTS ──
@@ -761,7 +856,7 @@ let state = {
   ll5050Used: false, llPhoneUsed: false,
   // blitz
   blitzQs: [], blitzIndex: 0, blitzCorrect: 0, blitzStreak: 0,
-  blitzTimer: null, blitzTimeLeft: 20,
+  blitzTimer: null, blitzTimeLeft: 10, blitzMaxTime: 10,
   // study
   studyQs: [], studyIndex: 0, studyKnown: 0, studyReview: [],
   // attempts (free)
@@ -933,7 +1028,7 @@ function switchMode(mode, btn) {
   // Stop any running blitz timer
   if (state.blitzTimer) { clearInterval(state.blitzTimer); state.blitzTimer = null; }
   // Return all full screens to home
-  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen'].forEach(s => {
+  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen','board-screen','board-result-screen'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.remove('active');
   });
@@ -943,7 +1038,7 @@ function switchMode(mode, btn) {
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
 
-  const modes = ['quiz','blitz','study','mnemonics','caltech','leaderboard','resistor'];
+  const modes = ['quiz','blitz','study','mnemonics','caltech','leaderboard','resistor','pastboards'];
   modes.forEach(m => {
     const el = document.getElementById('home-' + m);
     if (el) el.style.display = m === mode ? 'block' : 'none';
@@ -1081,7 +1176,7 @@ function playSound(type) {
 
 function showScreen(id) {
   document.getElementById('home-screen').classList.remove('active');
-  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen'].forEach(s => {
+  ['quiz-screen','blitz-screen','study-screen','mnemonics-screen','caltech-screen','end-screen','board-screen','board-result-screen'].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.remove('active');
   });
@@ -1244,7 +1339,8 @@ function startBlitz() {
   state.blitzIndex = 0;
   state.blitzCorrect = 0;
   state.blitzStreak = 0;
-  state.blitzTimeLeft = 20;
+  state.blitzMaxTime = parseInt(document.getElementById('blitz-timer-select')?.value || 10);
+  state.blitzTimeLeft = state.blitzMaxTime;
 
   showScreen('blitz-screen');
   renderBlitzQuestion();
@@ -1276,7 +1372,7 @@ function renderBlitzQuestion() {
 
   // Timer
   clearInterval(state.blitzTimer);
-  state.blitzTimeLeft = 20;
+  state.blitzTimeLeft = state.blitzMaxTime || 10;
   updateBlitzTimer();
   state.blitzTimer = setInterval(() => {
     state.blitzTimeLeft--;
@@ -1293,11 +1389,12 @@ function updateBlitzTimer() {
   const ring = document.getElementById('blitz-ring');
   const t = state.blitzTimeLeft;
   el.textContent = t;
-  const urgent = t <= 5;
-  const warning = t <= 10;
+  const urgent = t <= Math.ceil(maxT * 0.3);
+  const warning = t <= Math.ceil(maxT * 0.5);
   el.classList.toggle('urgent', urgent);
   const circumference = 175.93;
-  const offset = circumference * (1 - t / 20);
+  const maxT = state.blitzMaxTime || 10;
+  const offset = circumference * (1 - t / maxT);
   ring.style.strokeDashoffset = offset;
   ring.style.stroke = urgent ? 'var(--red)' : warning ? '#f59e0b' : 'var(--gold)';
   // Tik-tak tick every second, faster when urgent
@@ -1897,6 +1994,161 @@ document.addEventListener('keydown', e => {
     closeGcashModal();
   }
 });
+
+// ════════════ PAST BOARD EXAM MODE ════════════
+const boardState = {
+  questions: [],
+  current: 0,
+  correct: 0,
+  wrong: 0,
+  answered: false,
+  examLabel: '',
+  topicScores: {}  // {topic: {correct, total}}
+};
+
+function startBoardExam() {
+  const examYear = document.getElementById('board-exam-select').value;
+  const qs = (typeof QA_BOARD_EXAMS !== 'undefined' ? QA_BOARD_EXAMS : []).filter(q => q.year === examYear);
+  if (qs.length === 0) {
+    alert('Walang tanong para sa exam na ito. Please reload the page.');
+    return;
+  }
+  // Shuffle questions
+  const shuffled = [...qs].sort(() => Math.random() - 0.5);
+  boardState.questions = shuffled;
+  boardState.current = 0;
+  boardState.correct = 0;
+  boardState.wrong = 0;
+  boardState.examLabel = examYear;
+  boardState.topicScores = {};
+  showScreen('board-screen');
+  renderBoardQuestion();
+}
+
+function renderBoardQuestion() {
+  const q = boardState.questions[boardState.current];
+  const total = boardState.questions.length;
+  boardState.answered = false;
+
+  document.getElementById('board-exam-label').textContent = boardState.examLabel + ' ECE Board Exam';
+  document.getElementById('board-progress-text').textContent = `Tanong ${boardState.current + 1} ng ${total}`;
+  document.getElementById('board-score-live').textContent = `✓ ${boardState.correct} · ✗ ${boardState.wrong}`;
+  document.getElementById('board-prog-fill').style.width = ((boardState.current / total) * 100) + '%';
+  document.getElementById('board-q-text').textContent = q.q;
+  document.getElementById('board-q-topic').textContent = q.topic || '';
+  document.getElementById('board-next-btn').style.display = 'none';
+
+  // Build MCQ choices using existing generateMCQ
+  const mcq = generateMCQ(q);
+  const choicesDiv = document.getElementById('board-choices');
+  choicesDiv.innerHTML = '';
+  mcq.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choice;
+    btn.onclick = () => selectBoardAnswer(btn, i, mcq.answer, q, mcq.choices);
+    choicesDiv.appendChild(btn);
+  });
+}
+
+function selectBoardAnswer(btn, idx, correctIdx, q, choices) {
+  if (boardState.answered) return;
+  boardState.answered = true;
+
+  const choicesDiv = document.getElementById('board-choices');
+  const allBtns = choicesDiv.querySelectorAll('.choice-btn');
+
+  const isCorrect = idx === correctIdx;
+  if (isCorrect) {
+    btn.classList.add('correct');
+    boardState.correct++;
+    playSound('correct');
+  } else {
+    btn.classList.add('wrong');
+    allBtns[correctIdx].classList.add('correct');
+    boardState.wrong++;
+    playSound('wrong');
+  }
+
+  // Track by topic
+  const topic = q.topic || 'General';
+  if (!boardState.topicScores[topic]) boardState.topicScores[topic] = { correct: 0, total: 0 };
+  boardState.topicScores[topic].total++;
+  if (isCorrect) boardState.topicScores[topic].correct++;
+
+  // Show answer explanation if available
+  if (q.exp) {
+    const expDiv = document.createElement('div');
+    expDiv.style.cssText = 'margin-top:10px;padding:12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;font-size:.78rem;color:var(--muted);line-height:1.5';
+    expDiv.textContent = '💡 ' + q.exp;
+    choicesDiv.appendChild(expDiv);
+  }
+
+  document.getElementById('board-next-btn').style.display = 'inline-block';
+
+  // Show actual answer if wrong
+  if (!isCorrect) {
+    const note = document.createElement('div');
+    note.style.cssText = 'margin-top:8px;padding:10px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;font-size:.78rem;color:var(--green)';
+    note.textContent = '✅ Tamang sagot: ' + choices[correctIdx];
+    choicesDiv.appendChild(note);
+  }
+}
+
+function boardNextQuestion() {
+  boardState.current++;
+  if (boardState.current >= boardState.questions.length) {
+    showBoardResult();
+  } else {
+    renderBoardQuestion();
+  }
+}
+
+function showBoardResult() {
+  const total = boardState.questions.length;
+  const correct = boardState.correct;
+  const pct = Math.round((correct / total) * 100);
+  const passed = pct >= 70;
+
+  document.getElementById('board-result-emoji').textContent = passed ? '🎉' : '😔';
+  document.getElementById('board-result-verdict').textContent = passed ? 'PUMASA KA! 🏆' : 'HINDI PUMASA';
+  document.getElementById('board-result-verdict').style.color = passed ? 'var(--green)' : 'var(--red)';
+  document.getElementById('board-result-exam-label').textContent = boardState.examLabel + ' ECE Board Exam';
+  document.getElementById('board-result-pct').textContent = pct + '%';
+  document.getElementById('board-result-pct').style.color = passed ? 'var(--green)' : 'var(--red)';
+  document.getElementById('board-result-fraction').textContent = `${correct} / ${total} correct`;
+
+  // Topic breakdown
+  const topicsDiv = document.getElementById('board-result-topics');
+  topicsDiv.innerHTML = '';
+  Object.entries(boardState.topicScores).forEach(([topic, s]) => {
+    const tpct = Math.round((s.correct / s.total) * 100);
+    const color = tpct >= 70 ? 'var(--green)' : tpct >= 50 ? 'var(--gold)' : 'var(--red)';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.82rem';
+    row.innerHTML = `<span style="color:var(--muted)">${topic}</span><span style="font-weight:700;color:${color}">${s.correct}/${s.total} (${tpct}%)</span>`;
+    topicsDiv.appendChild(row);
+  });
+
+  // Verdict note
+  const noteEl = document.getElementById('board-result-note');
+  if (passed) {
+    noteEl.textContent = `🎉 Congrats! Pumasa ka sa ${boardState.examLabel} board exam na may ${pct}%! Patuloy mag-aral para sa tunay na board exam! 💪`;
+    noteEl.style.color = 'var(--green)';
+    noteEl.style.borderColor = 'rgba(34,197,94,.2)';
+    noteEl.style.background = 'rgba(34,197,94,.07)';
+    playSound('fanfare');
+  } else {
+    noteEl.textContent = `Kailangan ng ${70 - pct}% pa para pumasa. Huwag mag-alala — araw-araw na pag-aaral ang susi! I-try ulit. 💪`;
+    noteEl.style.color = 'var(--muted)';
+  }
+
+  showScreen('board-result-screen');
+}
+
+function exitBoardExam() {
+  switchMode('pastboards', document.querySelector('[data-mode="pastboards"]'));
+}
 
 // ── BOOT ──
 init();
